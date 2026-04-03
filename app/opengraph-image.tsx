@@ -68,6 +68,8 @@ export default async function Image() {
           {/* Headline */}
           <div
             style={{
+              display: "flex",
+              flexWrap: "wrap",
               fontSize: "56px",
               fontWeight: 800,
               color: "#ffffff",
@@ -76,7 +78,7 @@ export default async function Image() {
               maxWidth: "900px",
             }}
           >
-            Find your almost-ranking keywords.{" "}
+            <span>Find your almost-ranking keywords. </span>
             <span style={{ color: "#4ade80" }}>Know exactly what to do next.</span>
           </div>
 
