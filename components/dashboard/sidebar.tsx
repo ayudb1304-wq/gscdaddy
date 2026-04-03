@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, Target, Lightbulb, Settings, Crosshair, ChevronDown } from "lucide-react"
+import { LayoutDashboard, Target, Lightbulb, Settings, Crosshair, ChevronDown, CreditCard } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useState } from "react"
 
@@ -22,8 +22,10 @@ const navItems = [
   },
   {
     label: "Settings",
-    href: "/settings",
     icon: Settings,
+    children: [
+      { label: "Billing", href: "/settings/billing", icon: CreditCard },
+    ],
   },
 ]
 

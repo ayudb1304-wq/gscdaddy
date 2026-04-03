@@ -22,15 +22,15 @@ export function FinalCTA() {
 
             <div className="mt-8">
               <Button size="lg" className="h-12 px-8 text-sm font-semibold" asChild>
-                <a href="#pricing">
-                  Start my free trial
+                <a href="/login">
+                  Get started — it's free
                   <ArrowRight className="ml-1 size-4" />
                 </a>
               </Button>
             </div>
 
             <p className="mt-4 text-sm text-muted-foreground">
-              Free 14-day trial · No credit card · Cancel anytime
+              No credit card required · 14 days free · Cancel anytime
             </p>
           </div>
         </FadeInSection>

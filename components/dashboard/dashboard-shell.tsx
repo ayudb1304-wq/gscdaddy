@@ -19,11 +19,12 @@ interface DashboardShellProps {
     avatar_url: string | null
   }
   sites: Site[]
+  plan: string
   daysRemaining?: number
   children: React.ReactNode
 }
 
-export function DashboardShell({ user, sites, daysRemaining, children }: DashboardShellProps) {
+export function DashboardShell({ user, sites, plan, daysRemaining, children }: DashboardShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
@@ -43,6 +44,7 @@ export function DashboardShell({ user, sites, daysRemaining, children }: Dashboa
         <Header
           user={user}
           sites={sites}
+          plan={plan}
           daysRemaining={daysRemaining}
           onToggleSidebar={() => setSidebarOpen(true)}
         />

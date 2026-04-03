@@ -98,7 +98,9 @@ export const PRICING_TIERS = [
     description: "For solo bloggers",
     features: [
       "1 site",
+      "5 AI recs/day",
       "Striking distance keywords",
+      "Content decay alerts",
       "Weekly email summary",
     ],
     highlighted: false,
@@ -111,9 +113,8 @@ export const PRICING_TIERS = [
     description: "For serious creators & consultants",
     features: [
       "5 sites",
+      "25 AI recs/day",
       "Everything in Blogger",
-      "AI recommendations",
-      "Content decay alerts",
       "Priority support",
     ],
     highlighted: true,
@@ -125,7 +126,8 @@ export const PRICING_TIERS = [
     annualPrice: 79,
     description: "For teams & client work",
     features: [
-      "15 sites",
+      "25 sites",
+      "Unlimited AI recs",
       "Everything in Pro",
       "PDF exports",
       "Team access",

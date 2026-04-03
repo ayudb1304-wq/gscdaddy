@@ -1,7 +1,7 @@
 import { requireAuth } from "@/lib/auth"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { successResponse, errors } from "@/lib/api/response"
-import { getEffectivePlan } from "@/lib/billing/access"
+import { checkAccess } from "@/lib/billing/access"
 import { getPlanLimits } from "@/lib/billing/plans"
 import { generateRecommendations } from "@/lib/ai/generate-recommendations"
 
@@ -34,12 +34,13 @@ export async function POST(
       .eq("site_id", siteId)
       .gte("created_at", `${today}T00:00:00Z`)
 
-    const plan = getEffectivePlan(user)
-    const limits = getPlanLimits(plan)
+    const access = checkAccess(user)
+    const isPaid = ["blogger", "pro", "agency"].includes(access.plan)
+    const limits = isPaid ? getPlanLimits(access.plan) : getPlanLimits("free")
 
     if ((count || 0) >= limits.aiRecsPerDay) {
       return errors.planLimit(
-        `Daily recommendation limit reached (${limits.aiRecsPerDay}/day on ${plan} plan)`
+        `Daily recommendation limit reached (${limits.aiRecsPerDay}/day). Upgrade for more.`
       )
     }
 

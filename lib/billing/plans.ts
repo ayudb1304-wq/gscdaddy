@@ -1,18 +1,18 @@
 export const PLANS = {
   free: {
     sites: 1,
-    aiRecsPerDay: 2,
+    aiRecsPerDay: 3,
     features: ["striking_distance", "weekly_email"],
   },
-  starter: {
+  blogger: {
     sites: 1,
-    aiRecsPerDay: 3,
+    aiRecsPerDay: 5,
     price: { monthly: 19, annual: 15 },
-    features: ["striking_distance", "weekly_email"],
+    features: ["striking_distance", "weekly_email", "decay_alerts"],
   },
   pro: {
     sites: 5,
-    aiRecsPerDay: 5,
+    aiRecsPerDay: 25,
     price: { monthly: 49, annual: 39 },
     features: [
       "striking_distance",
@@ -23,8 +23,8 @@ export const PLANS = {
     ],
   },
   agency: {
-    sites: 15,
-    aiRecsPerDay: 10,
+    sites: 25,
+    aiRecsPerDay: 999,
     price: { monthly: 99, annual: 79 },
     features: [
       "striking_distance",

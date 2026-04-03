@@ -82,7 +82,12 @@ export function Pricing() {
                 </div>
 
                 <div className="mt-4">
-                  <div className="flex items-baseline gap-1">
+                  <div className="flex items-baseline gap-1.5">
+                    {isAnnual && (
+                      <span className="font-mono text-lg text-muted-foreground line-through">
+                        ${tier.monthlyPrice}
+                      </span>
+                    )}
                     <span className="font-mono text-4xl font-bold">
                       ${isAnnual ? tier.annualPrice : tier.monthlyPrice}
                     </span>
@@ -90,7 +95,7 @@ export function Pricing() {
                   </div>
                   {isAnnual && (
                     <p className="mt-1 text-xs text-muted-foreground">
-                      billed annually (${tier.annualPrice * 12}/yr)
+                      billed annually (${tier.annualPrice * 12}/yr) — you save ${(tier.monthlyPrice - tier.annualPrice) * 12}/yr
                     </p>
                   )}
                 </div>
@@ -111,8 +116,8 @@ export function Pricing() {
                     size="lg"
                     asChild
                   >
-                    <a href="#">
-                      {tier.highlighted ? "Start free trial" : "Start free"}
+                    <a href="/login">
+                      Get started
                     </a>
                   </Button>
                   <p className="mt-3 text-center text-xs text-muted-foreground italic">
@@ -126,7 +131,7 @@ export function Pricing() {
 
         <FadeInSection delay={0.3}>
           <p className="mt-8 text-center text-sm text-muted-foreground">
-            🔒 14-day free trial · No credit card · 30-day money-back guarantee
+            🔒 No credit card required · 14 days free · 30-day money-back guarantee
           </p>
         </FadeInSection>
       </div>

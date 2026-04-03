@@ -29,15 +29,15 @@ export function Hero() {
 
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
                 <Button size="lg" className="h-12 px-6 text-sm font-semibold" asChild>
-                  <a href="#pricing">
-                    Start my free trial
+                  <a href="/login">
+                    Get started — it's free
                     <ArrowRight className="ml-1 size-4" />
                   </a>
                 </Button>
               </div>
 
               <p className="text-sm text-muted-foreground">
-                Free 14-day trial · No credit card required · Cancel anytime
+                No credit card required · 14 days free · Cancel anytime
               </p>
 
               <div className="flex items-center gap-2 text-sm text-muted-foreground">

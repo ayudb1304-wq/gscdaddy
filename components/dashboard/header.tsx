@@ -19,6 +19,22 @@ interface Site {
   sync_status: string
 }
 
+const PLAN_BADGE_STYLES: Record<string, string> = {
+  free: "bg-muted text-muted-foreground",
+  trial: "bg-muted text-muted-foreground",
+  blogger: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+  pro: "bg-primary/10 text-primary",
+  agency: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
+}
+
+const PLAN_LABELS: Record<string, string> = {
+  free: "Free",
+  trial: "Trial",
+  blogger: "Blogger",
+  pro: "Pro",
+  agency: "Agency",
+}
+
 interface HeaderProps {
   user: {
     name: string | null
@@ -26,11 +42,12 @@ interface HeaderProps {
     avatar_url: string | null
   }
   sites: Site[]
+  plan: string
   daysRemaining?: number
   onToggleSidebar: () => void
 }
 
-export function Header({ user, sites, daysRemaining, onToggleSidebar }: HeaderProps) {
+export function Header({ user, sites, plan, daysRemaining, onToggleSidebar }: HeaderProps) {
   const initials = (user.name || user.email)
     .split(/[\s@]/)
     .slice(0, 2)
@@ -60,11 +77,17 @@ export function Header({ user, sites, daysRemaining, onToggleSidebar }: HeaderPr
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+            <Button variant="ghost" className="relative h-auto gap-2 rounded-full px-2 py-1">
               <Avatar className="h-8 w-8">
                 <AvatarImage src={user.avatar_url || undefined} alt={user.name || "User"} />
                 <AvatarFallback className="text-xs">{initials}</AvatarFallback>
               </Avatar>
+              <Badge
+                variant="secondary"
+                className={`text-[10px] font-semibold ${PLAN_BADGE_STYLES[plan] ?? PLAN_BADGE_STYLES.free}`}
+              >
+                {PLAN_LABELS[plan] ?? plan}
+              </Badge>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">

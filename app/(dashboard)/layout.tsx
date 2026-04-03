@@ -25,6 +25,7 @@ export default async function DashboardLayout({
     <DashboardShell
       user={{ name: user.name, email: user.email, avatar_url: user.avatar_url }}
       sites={sites || []}
+      plan={access.plan}
       daysRemaining={access.daysRemaining}
     >
       {children}
