@@ -14,6 +14,10 @@ export async function GET(request: Request) {
   }
 
   const cookieStore = await cookies()
+
+  // Collect cookies that Supabase sets during exchangeCodeForSession
+  const cookiesToSet: { name: string; value: string; options: Record<string, unknown> }[] = []
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -22,10 +26,12 @@ export async function GET(request: Request) {
         getAll() {
           return cookieStore.getAll()
         },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
+        setAll(cookies) {
+          cookies.forEach(({ name, value, options }) => {
             cookieStore.set(name, value, options)
-          )
+          })
+          // Also save for the redirect response
+          cookiesToSet.push(...cookies)
         },
       },
     }
@@ -76,7 +82,7 @@ export async function GET(request: Request) {
 
   // Store encrypted Google tokens if available
   if (providerToken) {
-    const expiresAt = new Date(Date.now() + 3600 * 1000) // Google tokens typically expire in 1 hour
+    const expiresAt = new Date(Date.now() + 3600 * 1000)
     await storeTokens(
       user.id,
       providerToken,
@@ -85,7 +91,13 @@ export async function GET(request: Request) {
     )
   }
 
-  // Redirect new users to onboarding, returning users to dashboard
+  // Redirect — and forward the session cookies onto the redirect response
   const redirectTo = isNewUser ? "/onboarding" : next
-  return NextResponse.redirect(`${origin}${redirectTo}`)
+  const response = NextResponse.redirect(`${origin}${redirectTo}`)
+
+  cookiesToSet.forEach(({ name, value, options }) => {
+    response.cookies.set(name, value, options as Record<string, string>)
+  })
+
+  return response
 }
