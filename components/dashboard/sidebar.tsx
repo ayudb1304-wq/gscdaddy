@@ -136,8 +136,8 @@ export function Sidebar({ className }: { className?: string }) {
         })}
       </nav>
 
-      {/* Usage counters */}
-      {usage && (
+      {/* Usage counters — only show when user has some usage */}
+      {usage && (usage.sitesUsed > 0 || usage.recsToday > 0) && (
         <div className="border-t border-sidebar-border px-4 py-3 space-y-2.5">
           <UsageCounter
             icon={Globe}
@@ -151,12 +151,14 @@ export function Sidebar({ className }: { className?: string }) {
             used={usage.recsToday}
             limit={usage.recsLimit}
           />
-          <Link
-            href="/settings/billing"
-            className="block text-center text-[11px] text-sidebar-foreground/50 hover:text-sidebar-foreground/70 transition-colors"
-          >
-            Upgrade for more
-          </Link>
+          {(usage.sitesUsed >= usage.sitesLimit || usage.recsToday >= usage.recsLimit) && (
+            <Link
+              href="/settings/billing"
+              className="block text-center text-[11px] text-sidebar-foreground/50 hover:text-sidebar-foreground/70 transition-colors"
+            >
+              Upgrade for more
+            </Link>
+          )}
         </div>
       )}
     </aside>
