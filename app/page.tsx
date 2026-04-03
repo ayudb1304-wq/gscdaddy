@@ -48,6 +48,33 @@ function JsonLd() {
     })),
   }
 
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "GSCdaddy",
+    url: "https://gscdaddy.com",
+    description:
+      "Find your striking distance keywords in Google Search Console and get AI-powered action plans to reach page 1.",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: "https://gscdaddy.com/blog?q={search_term_string}",
+      "query-input": "required name=search_term_string",
+    },
+  }
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://gscdaddy.com",
+      },
+    ],
+  }
+
   return (
     <>
       <script
@@ -57,6 +84,14 @@ function JsonLd() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
     </>
   )

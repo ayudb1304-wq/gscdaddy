@@ -5,9 +5,38 @@ export const metadata = {
   title: "Terms of Service - GSCdaddy",
 }
 
+function BreadcrumbJsonLd() {
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://gscdaddy.com",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Terms of Service",
+        item: "https://gscdaddy.com/terms",
+      },
+    ],
+  }
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+    />
+  )
+}
+
 export default function TermsOfServicePage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-16 md:py-24">
+      <BreadcrumbJsonLd />
       <Link
         href="/"
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8"

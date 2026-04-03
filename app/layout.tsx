@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://gscdaddy.com"),
   title: "GSCdaddy - Find Your Almost-Ranking Keywords",
   description:
-    "GSCdaddy connects to your Google Search Console and shows you which pages are close to page 1 - plus AI-powered action plans to get them there.",
+    "Stop guessing which SEO fixes matter. GSCdaddy finds your almost-ranking keywords and builds AI action plans to push them to page 1. Free 14-day trial.",
   keywords: [
     "Google Search Console",
     "SEO analytics",
