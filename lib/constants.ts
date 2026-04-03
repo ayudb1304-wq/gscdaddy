@@ -128,7 +128,7 @@ export const PRICING_TIERS = [
     description: "For teams & client work",
     features: [
       "25 sites",
-      "Unlimited AI recs",
+      "50 AI recs/day",
       "Everything in Pro",
       "PDF exports",
       "Team access",

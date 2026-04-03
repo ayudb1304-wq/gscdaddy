@@ -25,7 +25,7 @@ export const PLANS = {
   },
   agency: {
     sites: 25,
-    aiRecsPerDay: 999,
+    aiRecsPerDay: 50,
     price: { monthly: 99, annual: 79 },
     features: [
       "striking_distance",
