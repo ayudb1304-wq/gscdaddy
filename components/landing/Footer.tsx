@@ -34,6 +34,9 @@ export function Footer() {
         <div className="mt-6 flex flex-col items-center gap-4 text-xs text-muted-foreground md:flex-row md:justify-between">
           <p>&copy; 2026 GSCdaddy. Built with &#9749; in India.</p>
           <div className="flex gap-4">
+            <a href="/blog" className="transition-colors hover:text-foreground">
+              Blog
+            </a>
             <a href="/privacy" className="transition-colors hover:text-foreground">
               Privacy Policy
             </a>

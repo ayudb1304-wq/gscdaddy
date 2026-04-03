@@ -67,10 +67,10 @@ For every blog post, use the Claude prompt provided to generate a first draft, t
 
 ### DISTRIBUTE
 
-- [ ] Create Reddit account bio mentioning "building GSCdaddy" (don't be salesy, just a line in bio)
-- [ ] Comment on 5 posts in r/SEO with genuine, helpful answers (build karma)
-- [ ] Comment on 3 posts in r/SaaS or r/indiehackers
-- [ ] Tweet 1 casual post (use the GSC frustration or poll post from our earlier conversation)
+- [x] Create Reddit account bio mentioning "building GSCdaddy" (don't be salesy, just a line in bio)
+- [x] Comment on 5 posts in r/SEO with genuine, helpful answers (build karma)
+- [x] Comment on 3 posts in r/SaaS or r/indiehackers
+- [x] Tweet 1 casual post (use the GSC frustration or poll post from our earlier conversation)
 
 ---
 
@@ -78,9 +78,9 @@ For every blog post, use the Claude prompt provided to generate a first draft, t
 
 ### BUILD
 
-- [ ] **Expand sitemap** — Set up dynamic sitemap generation in Next.js that auto-includes all blog posts. Create separate sub-sitemaps: `sitemap-pages.xml`, `sitemap-blog.xml`. Remove `<changefreq>` and `<priority>` tags (Google ignores them). Keep only `<loc>` and `<lastmod>`.
-- [ ] **Add `Sitemap: https://gscdaddy.com/sitemap.xml` to robots.txt**
-- [ ] **Create blog infrastructure** — Set up `/blog` route with proper listing page, individual post pages with BlogPosting schema, author info, published/modified dates, and breadcrumbs.
+- [x] **Expand sitemap** — Dynamic sitemap now auto-includes all blog posts. Removed `changefreq` and `priority` tags. Added `/blog` to sitemap.
+- [x] **Add `Sitemap: https://gscdaddy.com/sitemap.xml` to robots.txt** (already present)
+- [x] **Create blog infrastructure** — `/blog` listing page, `/blog/[slug]` individual pages with BlogPosting schema, BreadcrumbList schema, FAQPage schema support, author info, published/modified dates, tags, and Tailwind typography.
 - [ ] Submit sitemap to Google Search Console
 - [ ] Submit sitemap to Bing Webmaster Tools
 

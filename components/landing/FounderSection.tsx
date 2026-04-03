@@ -53,18 +53,27 @@ export function FounderSection() {
               </a>
             </div>
 
-            <div className="mt-6">
+            <div className="mt-6 flex justify-center">
               <a
                 href="https://trustmrr.com/startup/gscdaddy"
                 target="_blank"
                 rel="noopener noreferrer"
+                className="relative inline-block"
               >
                 <img
                   src={`https://trustmrr.com/api/embed/gscdaddy?format=svg&theme=${badgeTheme === "dark" ? "light" : "dark"}`}
                   alt="TrustMRR verified revenue badge"
                   width={220}
                   height={90}
-                  className="mx-auto"
+                />
+                <img
+                  src={badgeTheme === "dark"
+                    ? "/images/GSCDaddyLogo.png"
+                    : "/images/GSCDaddyLogo_LightMode.png"}
+                  alt=""
+                  width={48}
+                  height={48}
+                  className="absolute left-[15px] top-[21px] size-[48px] rounded-[8px] object-cover"
                 />
               </a>
             </div>
