@@ -1,4 +1,7 @@
+"use client"
+
 import Image from "next/image"
+import { useTheme } from "next-themes"
 import { FOUNDER } from "@/lib/constants"
 import { FadeInSection } from "./FadeInSection"
 
@@ -11,6 +14,9 @@ function XIcon({ className }: { className?: string }) {
 }
 
 export function FounderSection() {
+  const { resolvedTheme } = useTheme()
+  const badgeTheme = resolvedTheme === "dark" ? "dark" : "light"
+
   return (
     <section className="bg-card py-16 md:py-24">
       <div className="mx-auto max-w-6xl px-4 md:px-6">
@@ -35,17 +41,31 @@ export function FounderSection() {
             <div className="mt-6">
               <p className="font-medium">{FOUNDER.name}</p>
               <p className="text-sm text-muted-foreground">{FOUNDER.title}</p>
-            </div>
-
-            <div className="mt-4">
               <a
                 href="https://x.com/ayu_theindiedev?s=21"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground transition-colors hover:text-foreground"
+                className="mt-2 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
                 aria-label="X (Twitter)"
               >
-                <XIcon className="mx-auto size-4" />
+                <XIcon className="size-3.5" />
+                <span>@ayu_theindiedev</span>
+              </a>
+            </div>
+
+            <div className="mt-6">
+              <a
+                href="https://trustmrr.com/startup/gscdaddy"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img
+                  src={`https://trustmrr.com/api/embed/gscdaddy?format=svg&theme=${badgeTheme === "dark" ? "light" : "dark"}`}
+                  alt="TrustMRR verified revenue badge"
+                  width={220}
+                  height={90}
+                  className="mx-auto"
+                />
               </a>
             </div>
           </div>
