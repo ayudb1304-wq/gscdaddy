@@ -50,7 +50,6 @@ export const metadata: Metadata = {
     url: "https://gscdaddy.com",
     siteName: "GSCdaddy",
     type: "website",
-    images: [{ url: "/images/GSCDaddyLogo.png", width: 500, height: 500, alt: "GSCdaddy" }],
   },
   twitter: {
     card: "summary_large_image",
@@ -58,7 +57,6 @@ export const metadata: Metadata = {
     title: "GSCdaddy - Find Your Almost-Ranking Keywords",
     description:
       "Turn your Google Search Console data into actionable insights.",
-    images: ["/images/GSCDaddyLogo.png"],
   },
   robots: { index: true, follow: true },
 }
