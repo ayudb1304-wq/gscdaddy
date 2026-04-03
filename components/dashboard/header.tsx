@@ -97,6 +97,12 @@ export function Header({ user, sites, plan, daysRemaining, onToggleSidebar }: He
             </div>
             <DropdownMenuItem
               className="cursor-pointer"
+              onSelect={() => { window.location.href = "/settings/profile" }}
+            >
+              Settings
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="cursor-pointer"
               onSelect={() => {
                 fetch("/api/auth/logout", { method: "POST" }).then(() => {
                   window.location.href = "/login"

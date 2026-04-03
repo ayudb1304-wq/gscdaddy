@@ -117,13 +117,7 @@ export default function BillingPage() {
   const isFree = usage.plan === "free"
 
   return (
-    <div className="mx-auto max-w-4xl space-y-8 p-6 md:p-8">
-      <div>
-        <h1 className="font-heading text-2xl font-semibold">Billing</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Manage your subscription and plan
-        </p>
-      </div>
+    <div className="space-y-8">
 
       {/* Current plan */}
       <div className="rounded-lg border p-6">

@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
-import { LayoutDashboard, Target, Lightbulb, Settings, Crosshair, ChevronDown, CreditCard, Globe, Sparkles } from "lucide-react"
+import { LayoutDashboard, Target, Lightbulb, Settings, Crosshair, ChevronDown, CreditCard, Globe, Sparkles, User } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const navItems = [
@@ -24,6 +24,8 @@ const navItems = [
     label: "Settings",
     icon: Settings,
     children: [
+      { label: "Profile", href: "/settings/profile", icon: User },
+      { label: "Sites", href: "/settings/sites", icon: Globe },
       { label: "Billing", href: "/settings/billing", icon: CreditCard },
     ],
   },

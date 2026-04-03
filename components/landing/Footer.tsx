@@ -47,13 +47,13 @@ export function Footer() {
         <div className="mt-6 flex flex-col items-center gap-4 text-xs text-muted-foreground md:flex-row md:justify-between">
           <p>&copy; 2026 GSCdaddy. Built with &#9749; in India.</p>
           <div className="flex gap-4">
-            <a href="#" className="transition-colors hover:text-foreground">
+            <a href="/privacy" className="transition-colors hover:text-foreground">
               Privacy Policy
             </a>
-            <a href="#" className="transition-colors hover:text-foreground">
+            <a href="/terms" className="transition-colors hover:text-foreground">
               Terms of Service
             </a>
-            <a href="#" className="transition-colors hover:text-foreground">
+            <a href="mailto:support@gscdaddy.com" className="transition-colors hover:text-foreground">
               Contact
             </a>
           </div>
