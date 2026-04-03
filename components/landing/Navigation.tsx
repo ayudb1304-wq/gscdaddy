@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Menu, X, Crosshair } from "lucide-react"
+import { Menu, X } from "lucide-react"
+import { Logo } from "@/components/logo"
 import { Button } from "@/components/ui/button"
 import { NAV_LINKS } from "@/lib/constants"
 import { cn } from "@/lib/utils"
@@ -27,7 +28,7 @@ export function Navigation() {
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 md:px-6">
         <a href="#" className="flex items-center gap-2 font-heading text-xl font-bold">
-          <Crosshair className="size-5 text-primary" />
+          <Logo size={24} />
           GSCdaddy
         </a>
 

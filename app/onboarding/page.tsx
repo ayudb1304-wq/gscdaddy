@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { Crosshair } from "lucide-react"
+import { Logo } from "@/components/logo"
 import {
   ProgressBar,
   PersonaStep,
@@ -141,7 +141,7 @@ export default function OnboardingPage() {
       <div className="flex min-h-screen flex-col bg-background text-foreground">
         {/* Header */}
         <div className="flex items-center justify-center gap-2 py-6 font-heading text-xl font-bold">
-          <Crosshair className="size-5 text-primary" />
+          <Logo size={24} />
           GSCdaddy
         </div>
 

@@ -142,8 +142,8 @@ export default function TermsOfServicePage() {
           <h2 className="text-lg font-semibold text-foreground">15. Contact</h2>
           <p className="mt-2">
             For questions about these Terms, contact us at{" "}
-            <a href="mailto:support@gscdaddy.com" className="text-primary hover:underline">
-              support@gscdaddy.com
+            <a href="mailto:sushi@gscdaddy.com" className="text-primary hover:underline">
+              sushi@gscdaddy.com
             </a>.
           </p>
         </section>

@@ -119,8 +119,8 @@ export default function PrivacyPolicyPage() {
           <h2 className="text-lg font-semibold text-foreground">11. Contact</h2>
           <p className="mt-2">
             If you have questions about this Privacy Policy, contact us at{" "}
-            <a href="mailto:privacy@gscdaddy.com" className="text-primary hover:underline">
-              privacy@gscdaddy.com
+            <a href="mailto:sushi@gscdaddy.com" className="text-primary hover:underline">
+              sushi@gscdaddy.com
             </a>.
           </p>
         </section>

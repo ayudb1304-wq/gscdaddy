@@ -1,5 +1,6 @@
 import Link from "next/link"
-import { Crosshair, ArrowLeft } from "lucide-react"
+import { ArrowLeft } from "lucide-react"
+import { Logo } from "@/components/logo"
 import { Button } from "@/components/ui/button"
 import { signInWithGoogle } from "./actions"
 
@@ -47,7 +48,7 @@ export default function LoginPage({
           {/* Logo */}
           <div>
             <div className="mx-auto flex items-center justify-center gap-2 font-heading text-2xl font-bold text-foreground">
-              <Crosshair className="size-6 text-primary" />
+              <Logo size={28} />
               GSCdaddy
             </div>
             <p className="mt-3 text-sm text-muted-foreground">

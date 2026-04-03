@@ -4,6 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 import { LayoutDashboard, Target, Lightbulb, Settings, Crosshair, ChevronDown, CreditCard, Globe, Sparkles, User } from "lucide-react"
+import { Logo } from "@/components/logo"
 import { cn } from "@/lib/utils"
 
 const navItems = [
@@ -65,7 +66,7 @@ export function Sidebar({ className }: { className?: string }) {
     >
       {/* Logo */}
       <div className="flex h-14 items-center gap-2 border-b border-sidebar-border px-4">
-        <Crosshair className="h-6 w-6 text-sidebar-primary" />
+        <Logo size={28} />
         <span className="font-heading text-lg font-bold">GSCdaddy</span>
       </div>
 
