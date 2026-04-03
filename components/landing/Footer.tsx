@@ -20,7 +20,7 @@ export function Footer() {
 
           <div className="flex items-center gap-3">
             <a
-              href="https://x.com/AyushBhiogade"
+              href="https://x.com/ayu_theindiedev"
               target="_blank"
               rel="noopener noreferrer"
               className="text-muted-foreground transition-colors hover:text-foreground"
