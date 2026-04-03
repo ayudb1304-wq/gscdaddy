@@ -25,6 +25,7 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://gscdaddy.com"),
   title: "GSCdaddy - Find Your Almost-Ranking Keywords",
   description:
     "GSCdaddy connects to your Google Search Console and shows you which pages are close to page 1 - plus AI-powered action plans to get them there.",
@@ -34,7 +35,14 @@ export const metadata: Metadata = {
     "striking distance keywords",
     "search console tool",
     "SEO recommendations",
+    "GSC tool",
+    "keyword ranking tracker",
+    "SEO action plan",
   ],
+  authors: [{ name: "Ayush", url: "https://x.com/ayu_theindiedev" }],
+  alternates: {
+    canonical: "https://gscdaddy.com",
+  },
   openGraph: {
     title: "GSCdaddy - Find Your Almost-Ranking Keywords",
     description:
@@ -42,12 +50,15 @@ export const metadata: Metadata = {
     url: "https://gscdaddy.com",
     siteName: "GSCdaddy",
     type: "website",
+    images: [{ url: "/images/GSCDaddyLogo.png", width: 500, height: 500, alt: "GSCdaddy" }],
   },
   twitter: {
     card: "summary_large_image",
+    creator: "@ayu_theindiedev",
     title: "GSCdaddy - Find Your Almost-Ranking Keywords",
     description:
       "Turn your Google Search Console data into actionable insights.",
+    images: ["/images/GSCDaddyLogo.png"],
   },
   robots: { index: true, follow: true },
 }
