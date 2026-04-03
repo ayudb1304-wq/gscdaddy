@@ -26,7 +26,7 @@ export function RecentRecs({ data }: { data: Recommendation[] }) {
       <CardContent>
         {data.length === 0 ? (
           <p className="text-sm text-muted-foreground">
-            No recommendations yet. They&apos;ll appear after your first data sync.
+            No recommendations yet. Head to the Recommendations page to generate your first AI-powered action plan.
           </p>
         ) : (
           <div className="space-y-3">

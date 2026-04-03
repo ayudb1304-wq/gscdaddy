@@ -60,7 +60,7 @@ export function PerformanceChart({ data }: { data: ChartDataPoint[] }) {
       <CardContent>
         {data.length === 0 ? (
           <div className="flex h-[300px] items-center justify-center text-sm text-muted-foreground">
-            No data available yet. Sync your site to see performance data.
+            No performance data found for this period. Google Search Console data can take 2-3 days to appear.
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={300}>
