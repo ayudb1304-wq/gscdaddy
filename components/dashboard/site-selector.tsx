@@ -43,14 +43,6 @@ export function SiteSelector({ sites }: { sites: Site[] }) {
 
   if (sites.length === 0) return null
 
-  if (sites.length === 1) {
-    return (
-      <div className="text-sm font-medium text-muted-foreground">
-        {sites[0].display_name || formatSiteUrl(sites[0].site_url)}
-      </div>
-    )
-  }
-
   return (
     <Select value={currentSiteId} onValueChange={handleChange}>
       <SelectTrigger className="w-[220px]">
