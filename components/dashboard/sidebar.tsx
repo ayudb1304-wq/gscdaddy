@@ -2,9 +2,9 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, Target, Lightbulb, Settings, Crosshair, ChevronDown, CreditCard } from "lucide-react"
+import { useEffect, useState } from "react"
+import { LayoutDashboard, Target, Lightbulb, Settings, Crosshair, ChevronDown, CreditCard, Globe, Sparkles } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { useState } from "react"
 
 const navItems = [
   {
@@ -29,9 +29,24 @@ const navItems = [
   },
 ]
 
+interface Usage {
+  sitesUsed: number
+  sitesLimit: number
+  recsToday: number
+  recsLimit: number
+}
+
 export function Sidebar({ className }: { className?: string }) {
   const pathname = usePathname()
   const [expandedSections, setExpandedSections] = useState<string[]>(["Reports"])
+  const [usage, setUsage] = useState<Usage | null>(null)
+
+  useEffect(() => {
+    fetch("/api/billing/usage")
+      .then((r) => r.json())
+      .then(setUsage)
+      .catch(() => {})
+  }, [])
 
   const toggleSection = (label: string) => {
     setExpandedSections((prev) =>
@@ -117,6 +132,75 @@ export function Sidebar({ className }: { className?: string }) {
           )
         })}
       </nav>
+
+      {/* Usage counters */}
+      {usage && (
+        <div className="border-t border-sidebar-border px-4 py-3 space-y-2.5">
+          <UsageCounter
+            icon={Globe}
+            label="Sites"
+            used={usage.sitesUsed}
+            limit={usage.sitesLimit}
+          />
+          <UsageCounter
+            icon={Sparkles}
+            label="AI recs today"
+            used={usage.recsToday}
+            limit={usage.recsLimit}
+          />
+          <Link
+            href="/settings/billing"
+            className="block text-center text-[11px] text-sidebar-foreground/50 hover:text-sidebar-foreground/70 transition-colors"
+          >
+            Upgrade for more
+          </Link>
+        </div>
+      )}
     </aside>
+  )
+}
+
+function UsageCounter({
+  icon: Icon,
+  label,
+  used,
+  limit,
+}: {
+  icon: React.ComponentType<{ className?: string }>
+  label: string
+  used: number
+  limit: number
+}) {
+  const isUnlimited = limit >= 999
+  const remaining = isUnlimited ? null : limit - used
+  const pct = isUnlimited ? 0 : Math.min((used / limit) * 100, 100)
+
+  return (
+    <div className="space-y-1">
+      <div className="flex items-center justify-between text-[11px]">
+        <span className="flex items-center gap-1.5 text-sidebar-foreground/60">
+          <Icon className="h-3 w-3" />
+          {label}
+        </span>
+        <span className="font-medium text-sidebar-foreground/80">
+          {isUnlimited ? `${used}` : `${remaining} left`}
+        </span>
+      </div>
+      <div className="h-1 overflow-hidden rounded-full bg-sidebar-accent">
+        <div
+          className={cn(
+            "h-full rounded-full transition-all",
+            isUnlimited
+              ? "bg-sidebar-primary/40"
+              : pct >= 90
+                ? "bg-destructive"
+                : pct >= 70
+                  ? "bg-yellow-500"
+                  : "bg-sidebar-primary"
+          )}
+          style={{ width: isUnlimited ? "5%" : `${pct}%` }}
+        />
+      </div>
+    </div>
   )
 }

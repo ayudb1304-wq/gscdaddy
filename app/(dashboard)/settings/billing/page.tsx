@@ -257,6 +257,12 @@ export default function BillingPage() {
                         Decay alerts
                       </li>
                     )}
+                    {(config.features as readonly string[]).includes("csv_exports") && (
+                      <li className="flex items-center gap-2">
+                        <Check className="size-3.5 text-primary" />
+                        CSV exports
+                      </li>
+                    )}
                     {(config.features as readonly string[]).includes("pdf_exports") && (
                       <li className="flex items-center gap-2">
                         <Check className="size-3.5 text-primary" />

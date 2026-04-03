@@ -115,6 +115,7 @@ export const PRICING_TIERS = [
       "5 sites",
       "25 AI recs/day",
       "Everything in Blogger",
+      "CSV exports",
       "Priority support",
     ],
     highlighted: true,

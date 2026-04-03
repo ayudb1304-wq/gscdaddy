@@ -18,6 +18,7 @@ export const PLANS = {
       "striking_distance",
       "ai_recs",
       "decay_alerts",
+      "csv_exports",
       "weekly_email",
       "priority_support",
     ],
