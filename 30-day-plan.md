@@ -1,6 +1,6 @@
 # GSCdaddy 30-Day Organic Growth Execution Plan
 
-**Start date:** ___________
+**Start date:** \***\*\_\_\_\*\***
 **Owner:** Ayush (@ayu_theindiedev)
 **Goal:** Go from 0 impressions to first meaningful GSC data on gscdaddy.com
 
@@ -135,11 +135,11 @@ Important rules:
 
 ### BUILD
 
-- [ ] After Claude generates the draft, edit for 30 minutes in your voice
-- [ ] Add relevant screenshots from GSC showing the filters
-- [ ] Add FAQPage schema to this post
-- [ ] Request indexing via GSC URL Inspection tool
-- [ ] Ping IndexNow
+- [x] After Claude generates the draft, edit for 30 minutes in your voice
+- [x] Add relevant screenshots from GSC showing the filters
+- [x] Add FAQPage schema to this post
+- [x] Request indexing via GSC URL Inspection tool
+- [x] Ping IndexNow
 
 ### DISTRIBUTE
 
@@ -706,6 +706,7 @@ Do not use ":" in headings, em dashes, or "game-changer" language.
 ```
 
 **Terms to publish today:**
+
 1. What is Crawl Budget
 2. What is Keyword Difficulty
 3. What is Search Intent
@@ -804,6 +805,7 @@ Rules:
 ```
 
 **Pages to publish:**
+
 1. `/blog/ahrefs-alternatives` — "Best Ahrefs Alternatives in 2026"
 2. `/blog/semrush-alternatives` — "Best Semrush Alternatives in 2026"
 3. `/blog/moz-alternatives` — "Best Moz Alternatives in 2026"
@@ -933,6 +935,7 @@ No "game-changer" language, no em dashes, no colons in headings.
 ```
 
 **Also publish 3 more glossary pages:**
+
 - `/blog/what-is-domain-authority`
 - `/blog/what-is-a-backlink`
 - `/blog/what-is-indexing-in-seo`
@@ -1032,6 +1035,7 @@ Rules:
 ```
 
 **Also publish 2 more alternatives pages:**
+
 - `/blog/se-ranking-alternatives` — "Best SE Ranking Alternatives"
 - `/blog/ubersuggest-alternatives` — "Best Ubersuggest Alternatives"
 
@@ -1146,6 +1150,7 @@ Rules:
 ```
 
 **Also publish 3 more glossary pages:**
+
 - `/blog/what-is-e-e-a-t`
 - `/blog/what-is-a-sitemap`
 - `/blog/what-is-a-canonical-url`
@@ -1448,23 +1453,23 @@ Rules:
 
 Track these numbers and fill them in as you go:
 
-| Metric | Week 1 | Week 2 | Week 3 | Week 4 | Total |
-|---|---|---|---|---|---|
-| Blog posts published | | | | | |
-| Glossary pages published | | | | | |
-| Alternatives pages published | | | | | |
-| Total pages indexed (GSC) | | | | | |
-| Total impressions (GSC) | | | | | |
-| Total clicks (GSC) | | | | | |
-| Striking distance keywords | | | | | |
-| Backlinks (Ahrefs WT) | | | | | |
-| Directory submissions | | | | | |
-| Reddit posts | | | | | |
-| Reddit comments | | | | | |
-| Twitter posts | | | | | |
-| Newsletter pitches sent | | | | | |
-| Guest post pitches sent | | | | | |
-| Trial signups | | | | | |
+| Metric                       | Week 1 | Week 2 | Week 3 | Week 4 | Total |
+| ---------------------------- | ------ | ------ | ------ | ------ | ----- |
+| Blog posts published         |        |        |        |        |       |
+| Glossary pages published     |        |        |        |        |       |
+| Alternatives pages published |        |        |        |        |       |
+| Total pages indexed (GSC)    |        |        |        |        |       |
+| Total impressions (GSC)      |        |        |        |        |       |
+| Total clicks (GSC)           |        |        |        |        |       |
+| Striking distance keywords   |        |        |        |        |       |
+| Backlinks (Ahrefs WT)        |        |        |        |        |       |
+| Directory submissions        |        |        |        |        |       |
+| Reddit posts                 |        |        |        |        |       |
+| Reddit comments              |        |        |        |        |       |
+| Twitter posts                |        |        |        |        |       |
+| Newsletter pitches sent      |        |        |        |        |       |
+| Guest post pitches sent      |        |        |        |        |       |
+| Trial signups                |        |        |        |        |       |
 
 ---
 
@@ -1473,6 +1478,7 @@ Track these numbers and fill them in as you go:
 Check off as you publish:
 
 **Editorial Posts:**
+
 - [ ] Day 3: Striking Distance Keywords Guide (Pillar)
 - [ ] Day 4: Low-Hanging Fruit Keywords in GSC
 - [ ] Day 5: GSC Beginners Guide (Pillar)
@@ -1494,6 +1500,7 @@ Check off as you publish:
 - [ ] Day 30: Bootstrapped SaaS SEO Strategy
 
 **Glossary Pages:**
+
 - [ ] Day 15: What is Crawl Budget
 - [ ] Day 15: What is Keyword Difficulty
 - [ ] Day 15: What is Search Intent
@@ -1507,6 +1514,7 @@ Check off as you publish:
 - [ ] Day 24: What is a Canonical URL
 
 **Alternatives/Comparison Pages:**
+
 - [ ] Day 17: Ahrefs Alternatives
 - [ ] Day 17: Semrush Alternatives
 - [ ] Day 17: Moz Alternatives
@@ -1514,6 +1522,7 @@ Check off as you publish:
 - [ ] Day 22: Ubersuggest Alternatives
 
 **Directory Submissions:**
+
 - [ ] Day 2: AlternativeTo, F6S, StartuPage
 - [ ] Day 3: SaaSHub
 - [ ] Day 5: SourceForge, StackShare, Product Hunt (prep)

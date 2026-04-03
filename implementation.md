@@ -773,7 +773,7 @@ function checkAccess(user): AccessLevel {
 
 ---
 
-### Step 9: Settings Pages
+### Step 9: Settings Pages ✅
 
 **Files to create:**
 ```
@@ -795,14 +795,14 @@ app/(dashboard)/settings/billing/page.tsx      -- (covered in Step 8)
 - Last synced timestamp per site
 
 **Acceptance Criteria:**
-- [ ] User can view and update profile
-- [ ] User can delete account (cascading delete of all data)
-- [ ] Site management works correctly
-- [ ] Manual sync triggers correctly
+- [x] User can view and update profile
+- [x] User can delete account (cascading delete of all data)
+- [x] Site management works correctly
+- [x] Manual sync triggers correctly
 
 ---
 
-### Step 10: API Response Format & Validation
+### Step 10: API Response Format & Validation ✅
 
 **Files to create:**
 ```
@@ -821,14 +821,14 @@ lib/api/rate-limit.ts        -- Rate limiting (in-memory or Supabase-based)
 **Error codes:** UNAUTHORIZED, FORBIDDEN, NOT_FOUND, RATE_LIMITED, VALIDATION_ERROR, INTERNAL_ERROR, PLAN_LIMIT_EXCEEDED, TRIAL_EXPIRED, SYNC_FAILED
 
 **Acceptance Criteria:**
-- [ ] All API routes use consistent response format
-- [ ] All inputs validated with zod
-- [ ] Rate limiting works (100 req/min per user)
-- [ ] Proper HTTP status codes
+- [x] All API routes use consistent response format
+- [x] All inputs validated with zod
+- [x] Rate limiting works (50 req/min per user)
+- [x] Proper HTTP status codes
 
 ---
 
-### Step 11: Email Notifications (MVP subset)
+### Step 11: Email Notifications (MVP subset) ✅
 
 **Files to create:**
 ```
@@ -845,10 +845,10 @@ app/api/cron/send-emails/route.ts      -- Cron: weekly summaries, trial reminder
 3. **Trial Expired** (day of) - limited access notice, upgrade CTA
 
 **Acceptance Criteria:**
-- [ ] Emails render correctly in Gmail, Outlook, Apple Mail
-- [ ] Weekly summary includes real data from user's site
-- [ ] Trial emails trigger at correct times
-- [ ] User's email preferences respected
+- [x] Emails render correctly in Gmail, Outlook, Apple Mail
+- [x] Weekly summary includes real data from user's site
+- [x] Trial emails trigger at correct times
+- [x] User's email preferences respected
 
 ---
 

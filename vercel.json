@@ -1,7 +1,1 @@
-{
-  "crons": [
-    { "path": "/api/cron/sync-gsc", "schedule": "0 4 * * *" },
-    { "path": "/api/cron/refresh-views", "schedule": "30 4 * * *" },
-    { "path": "/api/cron/generate-recs", "schedule": "0 5 * * 0" }
-  ]
-}
+{}

@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
+import { rateLimit } from "@/lib/api/rate-limit"
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
@@ -28,6 +29,27 @@ export async function updateSession(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser()
+
+  // Rate limit API routes for authenticated users
+  if (user && request.nextUrl.pathname.startsWith("/api/")) {
+    const { allowed, remaining, resetAt } = rateLimit(user.id)
+    if (!allowed) {
+      return NextResponse.json(
+        { success: false, error: { code: "RATE_LIMITED", message: "Too many requests, try again later" } },
+        {
+          status: 429,
+          headers: {
+            "X-RateLimit-Limit": "50",
+            "X-RateLimit-Remaining": "0",
+            "X-RateLimit-Reset": String(Math.ceil(resetAt / 1000)),
+          },
+        }
+      )
+    }
+    supabaseResponse.headers.set("X-RateLimit-Limit", "50")
+    supabaseResponse.headers.set("X-RateLimit-Remaining", String(remaining))
+    supabaseResponse.headers.set("X-RateLimit-Reset", String(Math.ceil(resetAt / 1000)))
+  }
 
   const isProtectedRoute =
     request.nextUrl.pathname.startsWith("/dashboard") ||

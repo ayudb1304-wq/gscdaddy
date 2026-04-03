@@ -1,0 +1,89 @@
+name: Scheduled Crons
+
+on:
+  schedule:
+    - cron: "0 4 * * *"   # Daily 9:30 AM IST — sync GSC data
+    - cron: "30 4 * * *"  # Daily 10:00 AM IST — refresh materialized views
+    - cron: "0 5 * * 0"   # Sundays 10:30 AM IST — generate AI recommendations
+    - cron: "0 9 * * *"   # Daily 2:30 PM IST — send emails
+  workflow_dispatch:
+    inputs:
+      job:
+        description: "Which cron to run manually"
+        required: true
+        type: choice
+        options:
+          - sync-gsc
+          - refresh-views
+          - generate-recs
+          - send-emails
+
+jobs:
+  sync-gsc:
+    if: github.event.schedule == '0 4 * * *' || github.event.inputs.job == 'sync-gsc'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx tsx scripts/cron-sync-gsc.ts
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+
+  refresh-views:
+    if: github.event.schedule == '30 4 * * *' || github.event.inputs.job == 'refresh-views'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx tsx scripts/cron-refresh-views.ts
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
+  generate-recs:
+    if: github.event.schedule == '0 5 * * 0' || github.event.inputs.job == 'generate-recs'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx tsx scripts/cron-generate-recs.ts
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+  send-emails:
+    if: github.event.schedule == '0 9 * * *' || github.event.inputs.job == 'send-emails'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx tsx scripts/cron-send-emails.ts
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          NEXT_PUBLIC_APP_URL: https://gscdaddy.com
