@@ -1,3 +1,5 @@
+import { strikingDistanceKeywordsGuide } from "@/content/blog/striking-distance-keywords-guide"
+
 export interface BlogPost {
   slug: string
   title: string
@@ -15,8 +17,7 @@ export interface BlogPost {
 }
 
 const posts: BlogPost[] = [
-  // Blog posts will be added here as they are published.
-  // Each post follows the BlogPost interface above.
+  strikingDistanceKeywordsGuide,
 ]
 
 export function getAllPosts(): BlogPost[] {

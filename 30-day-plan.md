@@ -81,17 +81,17 @@ For every blog post, use the Claude prompt provided to generate a first draft, t
 - [x] **Expand sitemap** — Dynamic sitemap now auto-includes all blog posts. Removed `changefreq` and `priority` tags. Added `/blog` to sitemap.
 - [x] **Add `Sitemap: https://gscdaddy.com/sitemap.xml` to robots.txt** (already present)
 - [x] **Create blog infrastructure** — `/blog` listing page, `/blog/[slug]` individual pages with BlogPosting schema, BreadcrumbList schema, FAQPage schema support, author info, published/modified dates, tags, and Tailwind typography.
-- [ ] Submit sitemap to Google Search Console
-- [ ] Submit sitemap to Bing Webmaster Tools
+- [x] Submit sitemap to Google Search Console
+- [x] Submit sitemap to Bing Webmaster Tools
 
 ### DISTRIBUTE
 
-- [ ] **Submit to directories (batch 1):**
-  - [ ] AlternativeTo — list as alternative to Ahrefs, Semrush, Moz, SE Ranking
-  - [ ] F6S — instant auto-approval, dofollow link
-  - [ ] StartuPage — instant dofollow, no queue
-- [ ] Comment on 5 posts across r/SEO and r/juststart
-- [ ] **Post the TrustMRR tweet** (today is Tuesday, optimal timing). Post at 8:30-9:30am IST. Drop the follow-up reply 15-20 minutes later.
+- [x] **Submit to directories (batch 1):**
+  - [ ] AlternativeTo — moved to Day 9 (7-day account age requirement)
+  - [x] F6S — instant auto-approval, dofollow link
+  - [x] StartuPage — skipped, site doesn't exist
+- [x] Comment on 5 posts across r/SEO and r/juststart
+- [x] **Post the TrustMRR tweet** (today is Tuesday, optimal timing). Post at 8:30-9:30am IST. Drop the follow-up reply 15-20 minutes later.
 
 ---
 
@@ -430,6 +430,7 @@ Rules:
 
 ### DISTRIBUTE
 
+- [ ] **Submit to AlternativeTo** (7-day account age requirement met) — list as alternative to Ahrefs, Semrush, Moz, SE Ranking
 - [ ] Share on Twitter
 - [ ] Comment on 5 Reddit posts
 - [ ] Respond to any journalist queries from Featured.com or HABW
