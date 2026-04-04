@@ -16,32 +16,27 @@ export const strikingDistanceKeywordsGuide: BlogPost = {
     {
       question: "How long does it take to move from position 8 to position 3?",
       answer:
-        "It depends on the keyword difficulty and competition, but most striking distance keywords can move to page 1 within 2 to 8 weeks after optimization. Lower-competition keywords with decent impressions tend to move faster. High-competition keywords in crowded niches may take 3 to 6 months.",
+        "Most people see movement in 2 to 4 weeks after making on-page changes. Full stabilization of a new position can take 6 to 8 weeks. Do not judge a change as a failure until at least 30 days have passed.",
     },
     {
-      question: "What is a good CTR for position 5 vs position 10?",
+      question: "What is a good CTR for position 5 versus position 10?",
       answer:
-        "Position 5 typically gets around 5% CTR, while position 10 hovers around 1.5%. If your CTR is significantly below these benchmarks, your title tag and meta description likely need work. Improving CTR alone can sometimes nudge your rankings up because Google interprets higher click rates as a relevance signal.",
+        "Position 5 typically sees 5 to 7% CTR. Position 10 sees 1 to 2.5% CTR. If your page is significantly below these benchmarks for its position, the problem is your title tag and meta description, not your ranking.",
     },
     {
-      question: "Should I focus on striking distance keywords or new keyword research?",
+      question: "How many striking distance keywords should I work on at once?",
       answer:
-        "Striking distance keywords should almost always come first. You already rank for them, Google already associates your page with that topic, and the effort to move from position 8 to position 3 is far less than ranking a brand new page from scratch. New keyword research matters, but only after you have captured the low-hanging wins.",
+        "Pick 5 to 10 and do them properly. Spreading effort across 30 keywords at once leads to shallow changes that move nothing. Depth on a small batch beats shallow work on a large batch every time.",
     },
     {
-      question: "How many striking distance keywords should I optimize at once?",
+      question: "Do striking distance keywords work for brand new sites with no data yet?",
       answer:
-        "Start with 5 to 10 keywords per month. Pick the ones with the highest impressions and worst CTR first. Trying to optimize 50 keywords at once leads to shallow work on each one. Focused effort on a handful of high-potential keywords will produce better results than spreading yourself thin.",
+        "No. You need enough GSC data to identify which keywords you are actually ranking for. Typically this means at least 2 to 3 months of indexed content. For brand new sites, the priority is getting content indexed and building topical authority first.",
     },
     {
-      question: "Can I find striking distance keywords without any paid tools?",
+      question: "What is the difference between striking distance keywords and low-hanging fruit keywords?",
       answer:
-        "Yes. Google Search Console gives you everything you need for free. Go to Performance, enable Average Position, filter for positions between 5 and 15, and sort by impressions. That is your striking distance list. Paid tools just automate this process and add prioritization on top.",
-    },
-    {
-      question: "What if my page is stuck at position 11 and nothing works?",
-      answer:
-        "If a page has been stuck at position 11 for over 8 weeks despite optimization, look at three things. First, check if a stronger page on your own site is competing for the same keyword (cannibalization). Second, study the top 3 results and identify what they cover that you do not. Third, consider whether the search intent has shifted and your content no longer matches what Google wants to show.",
+        "Striking distance refers specifically to positions 5 to 15. Low-hanging fruit is a broader term for any keyword that is easy to improve. Striking distance is a subset of low-hanging fruit.",
     },
   ],
   content: `
@@ -157,11 +152,11 @@ export const strikingDistanceKeywordsGuide: BlogPost = {
 
 <h2>What I Learned Using This on My Own Site</h2>
 
-<p>When I started applying this framework to gscdaddy.com itself, I found 12 keywords sitting between positions 7 and 14. Most of them had decent impressions but terrible CTR because my title tags were generic and my content was thinner than the competition.</p>
+<p>gscdaddy.com launched this week with zero data. Zero clicks, zero impressions, zero ranking keywords. I am running this exact experiment in public right now. Connecting my own tool to my own brand new site and sharing everything that happens weekly.</p>
 
-<p>I spent one weekend improving title tags, expanding three posts with missing sections, and adding internal links from my homepage and pillar pages. Within 3 weeks, 7 of those 12 keywords moved to page 1. The total traffic increase from those 7 keywords alone was more than what I was getting from all my other SEO efforts combined.</p>
+<p>Every week I will share what GSCdaddy finds on its own site, which keywords enter striking distance, which ones I pushed to page 1, and which AI recommendations actually worked. Including the ones that did not.</p>
 
-<p>That experience is what convinced me that striking distance optimization should be the first thing any website owner does before chasing new keywords.</p>
+<p>If you want to follow along in real time, I am documenting the whole thing on Twitter at <a href="https://x.com/ayu_theindiedev">@ayu_theindiedev</a>.</p>
 
 <h2>Your Next Steps</h2>
 
@@ -176,6 +171,18 @@ export const strikingDistanceKeywordsGuide: BlogPost = {
 </ol>
 
 <p>If you want to skip the manual spreadsheet work, <a href="https://gscdaddy.com">GSCdaddy</a> automates the entire process. It connects to your Google Search Console, finds your striking distance keywords, scores them by opportunity, and gives you AI-generated action plans for each one. But the framework above works perfectly well on its own.</p>
+
+<h2>Frequently Asked Questions</h2>
+
+<p><strong>How long does it take to move from position 8 to position 3?</strong><br/>Most people see movement in 2 to 4 weeks after making on-page changes. Full stabilization of a new position can take 6 to 8 weeks. Do not judge a change as a failure until at least 30 days have passed.</p>
+
+<p><strong>What is a good CTR for position 5 versus position 10?</strong><br/>Position 5 typically sees 5 to 7% CTR. Position 10 sees 1 to 2.5% CTR. If your page is significantly below these benchmarks for its position, the problem is your title tag and meta description, not your ranking.</p>
+
+<p><strong>How many striking distance keywords should I work on at once?</strong><br/>Pick 5 to 10 and do them properly. Spreading effort across 30 keywords at once leads to shallow changes that move nothing. Depth on a small batch beats shallow work on a large batch every time.</p>
+
+<p><strong>Do striking distance keywords work for brand new sites with no data yet?</strong><br/>No. You need enough GSC data to identify which keywords you are actually ranking for. Typically this means at least 2 to 3 months of indexed content. For brand new sites, the priority is getting content indexed and building topical authority first. The striking distance opportunity comes later.</p>
+
+<p><strong>What is the difference between striking distance keywords and low-hanging fruit keywords?</strong><br/>They are often used interchangeably but striking distance is more specific. Striking distance means positions 5 to 15 specifically. Low-hanging fruit is a broader term that can include any keyword that is easy to improve, including ones outside that range. Striking distance is a subset of low-hanging fruit.</p>
 
 <p>The keywords you need are already in your data. You just have to go find them.</p>
 `,
