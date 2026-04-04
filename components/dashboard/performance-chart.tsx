@@ -34,10 +34,28 @@ function formatDate(dateStr: string): string {
   return d.toLocaleDateString("en-US", { month: "short", day: "numeric" })
 }
 
+function generateEmptyData(): ChartDataPoint[] {
+  const points: ChartDataPoint[] = []
+  const now = new Date()
+  for (let i = 27; i >= 0; i--) {
+    const d = new Date(now)
+    d.setDate(d.getDate() - i)
+    points.push({
+      date: d.toISOString().split("T")[0],
+      clicks: 0,
+      impressions: 0,
+      position: 0,
+    })
+  }
+  return points
+}
+
 export function PerformanceChart({ data }: { data: ChartDataPoint[] }) {
   const [activeMetric, setActiveMetric] = useState<Metric>("clicks")
 
   const metric = metrics.find((m) => m.key === activeMetric)!
+  const isEmpty = data.length === 0
+  const chartData = isEmpty ? generateEmptyData() : data
 
   return (
     <Card>
@@ -58,13 +76,9 @@ export function PerformanceChart({ data }: { data: ChartDataPoint[] }) {
         </div>
       </CardHeader>
       <CardContent>
-        {data.length === 0 ? (
-          <div className="flex h-[300px] items-center justify-center text-sm text-muted-foreground">
-            No performance data found for this period. Google Search Console data can take 2-3 days to appear.
-          </div>
-        ) : (
+        <div className="relative">
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={data}>
+            <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
               <XAxis
                 dataKey="date"
@@ -75,7 +89,8 @@ export function PerformanceChart({ data }: { data: ChartDataPoint[] }) {
               <YAxis
                 className="text-xs"
                 tick={{ fill: "var(--color-muted-foreground)" }}
-                reversed={activeMetric === "position"}
+                reversed={!isEmpty && activeMetric === "position"}
+                domain={isEmpty ? [0, 3] : undefined}
               />
               <Tooltip
                 contentStyle={{
@@ -96,7 +111,14 @@ export function PerformanceChart({ data }: { data: ChartDataPoint[] }) {
               />
             </LineChart>
           </ResponsiveContainer>
-        )}
+          {isEmpty && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <p className="rounded-md bg-background/80 px-3 py-1.5 text-sm text-muted-foreground">
+                No data yet. Google Search Console data can take 2-3 days to appear.
+              </p>
+            </div>
+          )}
+        </div>
       </CardContent>
     </Card>
   )

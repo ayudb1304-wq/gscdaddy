@@ -49,11 +49,15 @@ const STATUS_STYLES: Record<string, { label: string; variant: "default" | "secon
   failed: { label: "Failed", variant: "destructive" },
 }
 
+const SYNC_DOTS_FRAMES = ["", ".", "..", "..."]
+
 export default function SitesPage() {
   const [sites, setSites] = useState<Site[]>([])
   const [usage, setUsage] = useState<Usage | null>(null)
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState<string | null>(null)
+  const [syncProgress, setSyncProgress] = useState<Record<string, string>>({})
+  const [dotFrame, setDotFrame] = useState(0)
   const [addDialogOpen, setAddDialogOpen] = useState(false)
   const [availableSites, setAvailableSites] = useState<AvailableSite[]>([])
   const [loadingAvailable, setLoadingAvailable] = useState(false)
@@ -74,6 +78,54 @@ export default function SitesPage() {
   useEffect(() => {
     fetchSites()
   }, [fetchSites])
+
+  // Animate dots for syncing sites
+  useEffect(() => {
+    const hasSyncing = sites.some((s) => s.sync_status === "syncing")
+    if (!hasSyncing) return
+    const id = setInterval(() => setDotFrame((f) => (f + 1) % SYNC_DOTS_FRAMES.length), 400)
+    return () => clearInterval(id)
+  }, [sites])
+
+  // Poll sync status for any site that is syncing
+  useEffect(() => {
+    const syncingSites = sites.filter((s) => s.sync_status === "syncing")
+    if (syncingSites.length === 0) return
+
+    const id = setInterval(async () => {
+      for (const site of syncingSites) {
+        try {
+          const res = await fetch(`/api/sites/${site.id}/sync/status`)
+          if (!res.ok) continue
+          const data = await res.json()
+          const payload = data.data || data
+
+          if (payload.syncProgress) {
+            setSyncProgress((prev) => ({ ...prev, [site.id]: payload.syncProgress }))
+          }
+
+          if (payload.syncStatus && payload.syncStatus !== "syncing") {
+            setSites((prev) =>
+              prev.map((s) =>
+                s.id === site.id
+                  ? { ...s, sync_status: payload.syncStatus, last_synced_at: payload.lastSyncedAt || s.last_synced_at }
+                  : s
+              )
+            )
+            setSyncProgress((prev) => {
+              const next = { ...prev }
+              delete next[site.id]
+              return next
+            })
+          }
+        } catch {
+          // ignore polling errors
+        }
+      }
+    }, 3000)
+
+    return () => clearInterval(id)
+  }, [sites])
 
   async function handleSync(siteId: string) {
     setSyncing(siteId)
@@ -230,12 +282,19 @@ export default function SitesPage() {
                     <p className="truncate text-sm font-medium">
                       {formatUrl(site.site_url)}
                     </p>
-                    <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
-                      <Badge variant={status.variant} className="text-[10px] px-1.5 py-0">
-                        {status.label}
-                      </Badge>
-                      {site.last_synced_at && (
-                        <span>Last synced {timeAgo(site.last_synced_at)}</span>
+                    <div className="mt-0.5 flex flex-col gap-0.5 text-xs text-muted-foreground">
+                      <div className="flex items-center gap-2">
+                        <Badge variant={status.variant} className="text-[10px] px-1.5 py-0">
+                          {status.label}
+                        </Badge>
+                        {site.last_synced_at && site.sync_status !== "syncing" && (
+                          <span>Last synced {timeAgo(site.last_synced_at)}</span>
+                        )}
+                      </div>
+                      {site.sync_status === "syncing" && (
+                        <span className="text-[11px] text-muted-foreground/80 animate-pulse">
+                          {syncProgress[site.id] || "Starting sync"}{SYNC_DOTS_FRAMES[dotFrame]}
+                        </span>
                       )}
                     </div>
                   </div>
@@ -250,7 +309,7 @@ export default function SitesPage() {
                     disabled={syncing === site.id || site.sync_status === "syncing"}
                     title="Sync now"
                   >
-                    <RefreshCw className={`size-3.5 ${syncing === site.id ? "animate-spin" : ""}`} />
+                    <RefreshCw className={`size-3.5 ${syncing === site.id || site.sync_status === "syncing" ? "animate-spin" : ""}`} />
                   </Button>
 
                   <AlertDialog>
