@@ -89,13 +89,14 @@ export default async function Image() {
             style={{
               display: "flex",
               flexDirection: "column",
+              fontFamily: "system-ui, sans-serif",
               fontSize: "54px",
               fontWeight: 800,
               lineHeight: 1.15,
               letterSpacing: "-2px",
             }}
           >
-            <span style={{ color: "#ffffff" }}>Find your <span style={{ fontFamily: "Caveat" }}>almost-ranking</span></span>
+            <span style={{ color: "#ffffff" }}>Find your <span style={{ fontFamily: "Caveat", fontWeight: 700, letterSpacing: "0px" }}>almost-ranking</span></span>
             <span style={{ color: "#ffffff" }}>
               keywords.{" "}
               <span style={{ color: "#4ade80" }}>Act on them.</span>
