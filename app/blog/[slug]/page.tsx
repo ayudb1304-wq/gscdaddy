@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { notFound } from "next/navigation"
-import { getAllSlugs, getPostBySlug } from "@/lib/blog"
+import { getAllSlugs, getAllPosts, getPostBySlug } from "@/lib/blog"
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -206,6 +206,76 @@ export default async function BlogPostPage({ params }: Props) {
         className="prose prose-lg prose-neutral dark:prose-invert mt-10 max-w-none prose-headings:font-heading prose-headings:font-semibold prose-headings:mt-12 prose-headings:mb-4 prose-p:my-6 prose-p:leading-relaxed prose-ul:my-6 prose-ol:my-6 prose-li:my-2 prose-a:text-primary prose-a:underline-offset-2 prose-figure:my-10 prose-blockquote:my-8"
         dangerouslySetInnerHTML={{ __html: post.content }}
       />
+
+      <RelatedPosts currentSlug={post.slug} currentTags={post.tags} />
+
+      <section className="mt-12 rounded-xl border bg-card p-8 text-center">
+        <h2 className="font-heading text-lg font-semibold">
+          Stop guessing. Start fixing.
+        </h2>
+        <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+          GSCdaddy finds your striking distance keywords and tells you exactly
+          what to change. Free for 14 days, no credit card required.
+        </p>
+        <Link
+          href="/login"
+          className="mt-5 inline-flex h-10 items-center rounded-md bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+        >
+          Try GSCdaddy free
+        </Link>
+      </section>
     </article>
+  )
+}
+
+function RelatedPosts({
+  currentSlug,
+  currentTags,
+}: {
+  currentSlug: string
+  currentTags: string[]
+}) {
+  const allPosts = getAllPosts().filter((p) => p.slug !== currentSlug)
+  if (allPosts.length === 0) return null
+
+  // Score by shared tags, take top 3
+  const scored = allPosts
+    .map((p) => ({
+      post: p,
+      score: p.tags.filter((t) => currentTags.includes(t)).length,
+    }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3)
+
+  return (
+    <section className="mt-16 border-t pt-10">
+      <h2 className="font-heading text-xl font-semibold">Keep reading</h2>
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {scored.map(({ post: p }) => (
+          <Link
+            key={p.slug}
+            href={`/blog/${p.slug}`}
+            className="group rounded-lg border p-5 transition-colors hover:bg-muted"
+          >
+            <h3 className="font-heading text-sm font-semibold leading-snug group-hover:text-primary">
+              {p.title}
+            </h3>
+            <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">
+              {p.description}
+            </p>
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {p.tags.slice(0, 2).map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </Link>
+        ))}
+      </div>
+    </section>
   )
 }

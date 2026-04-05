@@ -7,6 +7,7 @@ import { Features } from "@/components/landing/Features"
 import { Comparison } from "@/components/landing/Comparison"
 import { FounderSection } from "@/components/landing/FounderSection"
 import { BuildInPublic } from "@/components/landing/BuildInPublic"
+import { BlogSection } from "@/components/landing/BlogSection"
 import { Pricing } from "@/components/landing/Pricing"
 import { FAQ } from "@/components/landing/FAQ"
 import { FinalCTA } from "@/components/landing/FinalCTA"
@@ -132,6 +133,7 @@ export default function Page() {
         <Comparison />
         <FounderSection />
         <BuildInPublic />
+        <BlogSection />
         <Pricing />
         <FAQ />
         <FinalCTA />
