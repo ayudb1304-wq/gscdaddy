@@ -1,12 +1,17 @@
 import { ImageResponse } from "next/og"
-
-export const runtime = "edge"
+import { readFile } from "node:fs/promises"
+import { join } from "node:path"
 
 export const alt = "GSCdaddy - Find Your Almost-Ranking Keywords"
 export const size = { width: 1200, height: 630 }
 export const contentType = "image/png"
 
 export default async function Image() {
+  const logoData = await readFile(
+    join(process.cwd(), "public/images/GSCDaddyLogo_LightMode.png")
+  )
+  const logoBase64 = `data:image/png;base64,${logoData.toString("base64")}`
+
   return new ImageResponse(
     (
       <div
@@ -15,131 +20,142 @@ export default async function Image() {
           height: "100%",
           display: "flex",
           flexDirection: "column",
-          justifyContent: "center",
-          padding: "60px 80px",
-          background: "linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%)",
+          justifyContent: "space-between",
+          padding: "64px 80px",
+          background: "#0a0a0a",
           fontFamily: "system-ui, sans-serif",
+          position: "relative",
+          overflow: "hidden",
         }}
       >
-        {/* Top accent line */}
+        {/* Background radar graphic */}
+        <svg
+          viewBox="0 0 600 600"
+          style={{
+            position: "absolute",
+            right: "-80px",
+            top: "50%",
+            transform: "translateY(-50%)",
+            width: "550px",
+            height: "550px",
+            opacity: 0.08,
+          }}
+        >
+          <circle cx="300" cy="300" r="280" stroke="white" strokeWidth="1" fill="none" />
+          <circle cx="300" cy="300" r="210" stroke="white" strokeWidth="1" fill="none" />
+          <circle cx="300" cy="300" r="140" stroke="white" strokeWidth="1" fill="none" />
+          <circle cx="300" cy="300" r="70" stroke="white" strokeWidth="1" fill="none" />
+          <line x1="300" y1="16" x2="300" y2="584" stroke="white" strokeWidth="0.5" />
+          <line x1="16" y1="300" x2="584" y2="300" stroke="white" strokeWidth="0.5" />
+        </svg>
+
+        {/* Green accent bar at top */}
         <div
           style={{
             position: "absolute",
             top: 0,
             left: 0,
             right: 0,
-            height: "4px",
-            background: "linear-gradient(90deg, #4ade80, #22c55e, #16a34a)",
+            height: "5px",
+            background: "linear-gradient(90deg, #4ade80, #16a34a, #4ade80)",
           }}
         />
 
-        {/* Content */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-          {/* Logo + brand */}
-          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-            <div
-              style={{
-                width: "56px",
-                height: "56px",
-                borderRadius: "14px",
-                background: "linear-gradient(135deg, #22c55e, #16a34a)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: "28px",
-                fontWeight: 800,
-                color: "#fff",
-              }}
-            >
-              G
-            </div>
-            <span
-              style={{
-                fontSize: "32px",
-                fontWeight: 700,
-                color: "#ffffff",
-                letterSpacing: "-0.5px",
-              }}
-            >
-              GSCdaddy
+        {/* Top: Logo + brand */}
+        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={logoBase64} alt="" width={52} height={52} />
+          <span
+            style={{
+              fontSize: "30px",
+              fontWeight: 700,
+              color: "#ffffff",
+              letterSpacing: "-0.5px",
+            }}
+          >
+            GSCdaddy
+          </span>
+        </div>
+
+        {/* Middle: Headline + subtext */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "20px", maxWidth: "820px" }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              fontSize: "54px",
+              fontWeight: 800,
+              lineHeight: 1.15,
+              letterSpacing: "-2px",
+            }}
+          >
+            <span style={{ color: "#ffffff" }}>Find your almost-ranking</span>
+            <span style={{ color: "#ffffff" }}>
+              keywords.{" "}
+              <span style={{ color: "#4ade80" }}>Act on them.</span>
             </span>
           </div>
 
-          {/* Headline */}
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              fontSize: "56px",
-              fontWeight: 800,
-              color: "#ffffff",
-              lineHeight: 1.15,
-              letterSpacing: "-1.5px",
-              maxWidth: "900px",
-            }}
-          >
-            <span>Find your almost-ranking keywords. </span>
-            <span style={{ color: "#4ade80" }}>Know exactly what to do next.</span>
-          </div>
-
-          {/* Subtext */}
           <div
             style={{
               fontSize: "22px",
-              color: "#a1a1aa",
+              color: "#737373",
               lineHeight: 1.5,
-              maxWidth: "700px",
+              maxWidth: "600px",
             }}
           >
-            Turn your Google Search Console data into actionable insights with AI-powered
-            recommendations.
-          </div>
-
-          {/* Bottom bar with features */}
-          <div
-            style={{
-              display: "flex",
-              gap: "32px",
-              marginTop: "12px",
-            }}
-          >
-            {["Striking Distance Keywords", "AI Action Plans", "Free to Start"].map((item) => (
-              <div
-                key={item}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  fontSize: "18px",
-                  color: "#d4d4d8",
-                }}
-              >
-                <div
-                  style={{
-                    width: "8px",
-                    height: "8px",
-                    borderRadius: "50%",
-                    background: "#22c55e",
-                  }}
-                />
-                {item}
-              </div>
-            ))}
+            Google Search Console analytics with AI-powered action plans to push your pages to page 1.
           </div>
         </div>
 
-        {/* URL at bottom */}
+        {/* Bottom: Feature pills + URL */}
         <div
           style={{
-            position: "absolute",
-            bottom: "40px",
-            right: "80px",
-            fontSize: "20px",
-            color: "#71717a",
-            fontWeight: 500,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
           }}
         >
-          gscdaddy.com
+          <div style={{ display: "flex", gap: "16px" }}>
+            {["Striking Distance Keywords", "AI Recommendations", "Free 14-Day Trial"].map(
+              (item) => (
+                <div
+                  key={item}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    fontSize: "16px",
+                    color: "#a3a3a3",
+                    background: "rgba(255,255,255,0.05)",
+                    borderRadius: "100px",
+                    padding: "8px 18px",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: "7px",
+                      height: "7px",
+                      borderRadius: "50%",
+                      background: "#4ade80",
+                    }}
+                  />
+                  {item}
+                </div>
+              )
+            )}
+          </div>
+
+          <div
+            style={{
+              fontSize: "18px",
+              color: "#525252",
+              fontWeight: 500,
+            }}
+          >
+            gscdaddy.com
+          </div>
         </div>
       </div>
     ),
