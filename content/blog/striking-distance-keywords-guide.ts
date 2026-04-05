@@ -172,6 +172,8 @@ export const strikingDistanceKeywordsGuide: BlogPost = {
 
 <p>If you want to skip the manual spreadsheet work, <a href="https://gscdaddy.com">GSCdaddy</a> automates the entire process. It connects to your Google Search Console, finds your striking distance keywords, scores them by opportunity, and gives you AI-generated action plans for each one. But the framework above works perfectly well on its own.</p>
 
+<p>If you want a broader view beyond positions 5 to 15, read my tutorial on <a href="/blog/low-hanging-fruit-keywords-gsc">how to find low-hanging fruit keywords in Google Search Console</a>. It covers the wider range of positions 5 to 20 and includes three quick wins you can implement in under an hour.</p>
+
 <h2>Frequently Asked Questions</h2>
 
 <p><strong>How long does it take to move from position 8 to position 3?</strong><br/>Most people see movement in 2 to 4 weeks after making on-page changes. Full stabilization of a new position can take 6 to 8 weeks. Do not judge a change as a failure until at least 30 days have passed.</p>
