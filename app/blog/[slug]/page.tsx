@@ -216,6 +216,24 @@ export default async function BlogPostPage({ params }: Props) {
             className="prose prose-lg prose-neutral dark:prose-invert mt-10 max-w-none prose-headings:font-heading prose-headings:font-semibold prose-headings:mt-12 prose-headings:mb-4 prose-p:my-6 prose-p:leading-relaxed prose-ul:my-6 prose-ol:my-6 prose-li:my-2 prose-a:text-primary prose-a:underline-offset-2 prose-figure:my-10 prose-blockquote:my-8 prose-headings:scroll-mt-20"
             dangerouslySetInnerHTML={{ __html: contentWithIds }}
           />
+
+          <RelatedPosts currentSlug={post.slug} currentTags={post.tags} />
+
+          <section className="mt-12 rounded-xl border bg-card p-8 text-center">
+            <h2 className="font-heading text-lg font-semibold">
+              Stop guessing. Start fixing.
+            </h2>
+            <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+              GSCdaddy finds your striking distance keywords and tells you exactly
+              what to change. Free for 14 days, no credit card required.
+            </p>
+            <Link
+              href="/login"
+              className="mt-5 inline-flex h-10 items-center rounded-md bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            >
+              Try GSCdaddy free
+            </Link>
+          </section>
         </article>
 
         {/* Sidebar TOC — sticky on desktop, hidden on mobile */}
@@ -224,27 +242,6 @@ export default async function BlogPostPage({ params }: Props) {
             <TableOfContents headings={headings} />
           </div>
         </aside>
-      </div>
-
-      {/* Below content — full width */}
-      <div className="mx-auto max-w-3xl">
-        <RelatedPosts currentSlug={post.slug} currentTags={post.tags} />
-
-        <section className="mt-12 rounded-xl border bg-card p-8 text-center">
-          <h2 className="font-heading text-lg font-semibold">
-            Stop guessing. Start fixing.
-          </h2>
-          <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-            GSCdaddy finds your striking distance keywords and tells you exactly
-            what to change. Free for 14 days, no credit card required.
-          </p>
-          <Link
-            href="/login"
-            className="mt-5 inline-flex h-10 items-center rounded-md bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            Try GSCdaddy free
-          </Link>
-        </section>
       </div>
     </div>
   )
