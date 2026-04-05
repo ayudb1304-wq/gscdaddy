@@ -17,7 +17,7 @@ export function Hero() {
             </p>
 
             <h1 className="font-heading text-4xl font-bold tracking-tight md:text-[56px] md:leading-[1.1]">
-              Find your <span className="whitespace-nowrap">almost-ranking</span> keywords.{" "}
+              Find your <em className="whitespace-nowrap italic">almost-ranking</em> keywords.{" "}
               <span className="text-primary">Know exactly what to do next.</span>
             </h1>
 

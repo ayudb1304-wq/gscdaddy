@@ -89,7 +89,7 @@ export default async function Image() {
               letterSpacing: "-2px",
             }}
           >
-            <span style={{ color: "#ffffff" }}>Find your almost-ranking</span>
+            <span style={{ color: "#ffffff" }}>Find your <span style={{ fontStyle: "italic" }}>almost-ranking</span></span>
             <span style={{ color: "#ffffff" }}>
               keywords.{" "}
               <span style={{ color: "#4ade80" }}>Act on them.</span>
