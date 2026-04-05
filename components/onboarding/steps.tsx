@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import { Check, Pen, Users, Building2, Shield, Lock, RefreshCw, Globe, Loader2 } from "lucide-react"
+import { Check, Pen, Users, Building2, Shield, Lock, RefreshCw, Globe, Loader2, Target, Sparkles, Mail, BarChart3, FileDown, TrendingUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -130,41 +130,45 @@ export function PersonaStep({
 
 // ─── Step 3a: Pre-Permission Priming ─────────────────────────────
 
+const TRIAL_FEATURES = [
+  { icon: Target, label: "Striking Distance Keywords" },
+  { icon: Sparkles, label: "AI Recommendations" },
+  { icon: BarChart3, label: "Performance Dashboard" },
+  { icon: Mail, label: "Weekly Email Summary" },
+  { icon: FileDown, label: "CSV Exports" },
+  { icon: TrendingUp, label: "Opportunity Scoring" },
+]
+
 export function PrimingStep({ onConnect, loading }: { onConnect: () => void; loading: boolean }) {
   return (
-    <div className="mx-auto max-w-md text-center">
-      <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-full bg-primary/10">
-        <Globe className="size-7 text-primary" />
-      </div>
-
-      <h1 className="font-heading text-2xl font-bold md:text-3xl">Connect Google Search Console</h1>
+    <div className="mx-auto max-w-lg text-center">
+      <h1 className="font-heading text-2xl font-bold md:text-3xl">
+        Your 14-day trial includes everything
+      </h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        GSCdaddy needs read-only access to your Search Console data to find your:
+        Connect your Google Search Console to get started. You immediately get:
       </p>
 
-      <ul className="mt-6 space-y-3 text-left text-sm">
-        <li className="flex items-start gap-2">
-          <Check className="mt-0.5 size-4 shrink-0 text-primary" />
-          <span>Striking-distance keywords (positions 5-15)</span>
-        </li>
-        <li className="flex items-start gap-2">
-          <Check className="mt-0.5 size-4 shrink-0 text-primary" />
-          <span>Click and impression trends over time</span>
-        </li>
-        <li className="flex items-start gap-2">
-          <Check className="mt-0.5 size-4 shrink-0 text-primary" />
-          <span>AI-powered action plans for quick wins</span>
-        </li>
-      </ul>
+      <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3">
+        {TRIAL_FEATURES.map((feature) => (
+          <div
+            key={feature.label}
+            className="flex items-center gap-2.5 rounded-lg border p-3 text-left text-sm"
+          >
+            <feature.icon className="size-4 shrink-0 text-primary" />
+            <span className="leading-tight">{feature.label}</span>
+          </div>
+        ))}
+      </div>
 
       <div className="mt-8 space-y-2 rounded-lg border border-border bg-muted/30 p-4 text-xs text-muted-foreground">
         <div className="flex items-center gap-2">
           <Shield className="size-3.5 shrink-0 text-primary" />
-          <span><strong className="text-foreground">Read-only access</strong> - we never modify your data or settings</span>
+          <span><strong className="text-foreground">Read-only access</strong> — we never modify your data or settings</span>
         </div>
         <div className="flex items-center gap-2">
           <Lock className="size-3.5 shrink-0 text-primary" />
-          <span>Your data is encrypted with AES-256 and never sold</span>
+          <span>Your data is encrypted and never sold</span>
         </div>
         <div className="flex items-center gap-2">
           <RefreshCw className="size-3.5 shrink-0 text-primary" />
@@ -187,6 +191,10 @@ export function PrimingStep({ onConnect, loading }: { onConnect: () => void; loa
           "Connect Google Search Console"
         )}
       </Button>
+
+      <p className="mt-3 text-xs text-muted-foreground">
+        Free for 14 days. No credit card required.
+      </p>
     </div>
   )
 }
