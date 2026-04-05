@@ -2,7 +2,8 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { notFound } from "next/navigation"
-import { getAllSlugs, getAllPosts, getPostBySlug } from "@/lib/blog"
+import { getAllSlugs, getAllPosts, getPostBySlug, getReadingTime, extractHeadings, addHeadingIds } from "@/lib/blog"
+import { TableOfContents } from "@/components/blog/table-of-contents"
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -136,6 +137,10 @@ export default async function BlogPostPage({ params }: Props) {
   const post = getPostBySlug(slug)
   if (!post) notFound()
 
+  const readTime = getReadingTime(post.content)
+  const headings = extractHeadings(post.content)
+  const contentWithIds = addHeadingIds(post.content)
+
   return (
     <article className="mx-auto max-w-3xl px-4 py-16 md:py-24">
       <BlogPostJsonLd post={post} />
@@ -187,6 +192,8 @@ export default async function BlogPostPage({ params }: Props) {
               </span>
             </>
           )}
+          <span>&middot;</span>
+          <span>{readTime} min read</span>
         </div>
         {post.tags.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-2">
@@ -202,9 +209,13 @@ export default async function BlogPostPage({ params }: Props) {
         )}
       </header>
 
+      <div className="mt-10">
+        <TableOfContents headings={headings} />
+      </div>
+
       <div
-        className="prose prose-lg prose-neutral dark:prose-invert mt-10 max-w-none prose-headings:font-heading prose-headings:font-semibold prose-headings:mt-12 prose-headings:mb-4 prose-p:my-6 prose-p:leading-relaxed prose-ul:my-6 prose-ol:my-6 prose-li:my-2 prose-a:text-primary prose-a:underline-offset-2 prose-figure:my-10 prose-blockquote:my-8"
-        dangerouslySetInnerHTML={{ __html: post.content }}
+        className="prose prose-lg prose-neutral dark:prose-invert max-w-none prose-headings:font-heading prose-headings:font-semibold prose-headings:mt-12 prose-headings:mb-4 prose-p:my-6 prose-p:leading-relaxed prose-ul:my-6 prose-ol:my-6 prose-li:my-2 prose-a:text-primary prose-a:underline-offset-2 prose-figure:my-10 prose-blockquote:my-8 prose-headings:scroll-mt-20"
+        dangerouslySetInnerHTML={{ __html: contentWithIds }}
       />
 
       <RelatedPosts currentSlug={post.slug} currentTags={post.tags} />

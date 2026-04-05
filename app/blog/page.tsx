@@ -1,7 +1,8 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
-import { getAllPosts } from "@/lib/blog"
+import { ArrowRight } from "lucide-react"
+import { getAllPosts, getReadingTime } from "@/lib/blog"
 
 export const metadata: Metadata = {
   title: "Blog - GSCdaddy",
@@ -64,33 +65,48 @@ export default function BlogPage() {
           First posts coming soon. Stay tuned.
         </p>
       ) : (
-        <div className="mt-10 space-y-8">
-          {posts.map((post) => (
-            <article key={post.slug} className="group">
-              <Link href={`/blog/${post.slug}`} className="block">
-                <h2 className="font-heading text-xl font-semibold transition-colors group-hover:text-primary">
-                  {post.title}
-                </h2>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {post.description}
-                </p>
-                <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
-                  <time dateTime={post.publishedAt}>
-                    {new Date(post.publishedAt).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                  </time>
-                  {post.tags.length > 0 && (
-                    <span className="rounded-full bg-muted px-2 py-0.5">
-                      {post.tags[0]}
-                    </span>
-                  )}
-                </div>
-              </Link>
-            </article>
-          ))}
+        <div className="mt-10 space-y-6">
+          {posts.map((post) => {
+            const readTime = getReadingTime(post.content)
+            return (
+              <article key={post.slug}>
+                <Link
+                  href={`/blog/${post.slug}`}
+                  className="group block rounded-xl border p-6 transition-colors hover:bg-muted"
+                >
+                  <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                    <time dateTime={post.publishedAt}>
+                      {new Date(post.publishedAt).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </time>
+                    <span>&middot;</span>
+                    <span>{readTime} min read</span>
+                    {post.tags.length > 0 && (
+                      <>
+                        <span>&middot;</span>
+                        <span className="rounded-full bg-muted px-2 py-0.5 group-hover:bg-background">
+                          {post.tags[0]}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                  <h2 className="mt-3 font-heading text-xl font-semibold transition-colors group-hover:text-primary">
+                    {post.title}
+                  </h2>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {post.description}
+                  </p>
+                  <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary">
+                    Read article
+                    <ArrowRight className="size-3.5" />
+                  </span>
+                </Link>
+              </article>
+            )
+          })}
         </div>
       )}
     </div>
