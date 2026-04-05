@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server"
+import { after } from "next/server"
 import { createServerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { storeTokens } from "@/lib/google/tokens"
+import { sendEmail } from "@/lib/email/resend"
+import { WelcomeEmail } from "@/lib/email/templates/welcome"
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
@@ -89,6 +92,18 @@ export async function GET(request: Request) {
       providerRefreshToken || "",
       expiresAt
     )
+  }
+
+  // Send welcome email to new users (in background)
+  if (isNewUser && user.email) {
+    const userName = userData.name as string || ""
+    after(async () => {
+      await sendEmail({
+        to: user.email!,
+        subject: "Welcome to GSCdaddy — your SEO data has stories to tell",
+        react: WelcomeEmail({ name: userName }),
+      })
+    })
   }
 
   // Redirect — and forward the session cookies onto the redirect response
