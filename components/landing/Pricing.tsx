@@ -103,8 +103,15 @@ export function Pricing() {
                 <ul className="mt-6 flex-1 space-y-3">
                   {tier.features.map((feature, j) => (
                     <li key={j} className="flex items-start gap-2 text-sm">
-                      <Check className="mt-0.5 size-4 shrink-0 text-primary" />
-                      {feature}
+                      <Check className={cn("mt-0.5 size-4 shrink-0", feature.comingSoon ? "text-muted-foreground/40" : "text-primary")} />
+                      <span className={feature.comingSoon ? "text-muted-foreground" : ""}>
+                        {feature.text}
+                        {feature.comingSoon && (
+                          <span className="ml-1.5 inline-block rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+                            Soon
+                          </span>
+                        )}
+                      </span>
                     </li>
                   ))}
                 </ul>
