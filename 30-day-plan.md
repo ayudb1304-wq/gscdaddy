@@ -144,8 +144,8 @@ Important rules:
 ### DISTRIBUTE
 
 - [x] Share the post link on Twitter with a short hook: "Wrote everything I know about striking distance keywords. This is the strategy I built GSCdaddy around."
-- [ ] Comment on 5 Reddit posts (keep building karma)
-- [ ] Submit to SaaSHub (dofollow backlink)
+- [x] Comment on 5 Reddit posts (keep building karma)
+- [x] Submit to SaaSHub (dofollow backlink)
 
 ---
 
@@ -197,7 +197,7 @@ Rules:
 - [x] Edit draft, add screenshots of GSC filters
 - [x] Ensure internal link from this post to the pillar page (Post #1)
 - [x] Ensure pillar page links back to this post
-- [ ] Request indexing via GSC
+- [x] Request indexing via GSC
 - [x] Ping IndexNow (runs automatically on deploy)
 
 ### DISTRIBUTE
