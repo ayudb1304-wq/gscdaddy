@@ -11,12 +11,26 @@ export async function GET(request: NextRequest) {
 
   const admin = createAdminClient()
 
-  // Find all sites that need syncing: never synced or last synced > 24h ago
+  // Only sync sites belonging to users with active trial or paid subscription
   const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+  const now = new Date().toISOString()
+
+  // Get active user IDs (trial not expired OR has active subscription)
+  const { data: activeUsers } = await admin
+    .from("users")
+    .select("id, trial_ends_at, subscriptions(status)")
+    .or(`trial_ends_at.gt.${now},subscriptions.status.eq.active`)
+
+  const activeUserIds = (activeUsers || []).map((u) => u.id)
+
+  if (activeUserIds.length === 0) {
+    return NextResponse.json({ message: "No active users", synced: 0 })
+  }
 
   const { data: sites, error } = await admin
     .from("sites")
     .select("id, site_url")
+    .in("user_id", activeUserIds)
     .or(`last_synced_at.is.null,last_synced_at.lt.${twentyFourHoursAgo}`)
     .neq("sync_status", "syncing")
 

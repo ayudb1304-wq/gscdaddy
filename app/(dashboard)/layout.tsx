@@ -4,7 +4,7 @@ import { getCurrentUser } from "@/lib/auth"
 import { checkAccess } from "@/lib/billing/access"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { DashboardShell } from "@/components/dashboard/dashboard-shell"
-import { WelcomeModal } from "@/components/dashboard/welcome-modal"
+import { AccessGate } from "@/components/dashboard/access-gate"
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -34,8 +34,9 @@ export default async function DashboardLayout({
       plan={access.plan}
       daysRemaining={access.daysRemaining}
     >
-      <WelcomeModal />
-      {children}
+      <AccessGate hasAccess={access.hasAccess}>
+        {children}
+      </AccessGate>
     </DashboardShell>
   )
 }
