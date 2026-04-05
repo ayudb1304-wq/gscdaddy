@@ -94,11 +94,11 @@ export default function KeywordCalculatorPage() {
       </Link>
 
       <header>
-        <div className="flex items-center gap-2">
+        <Link href="/" className="flex items-center gap-2">
           <Logo size={24} />
-          <span className="text-xs font-medium text-muted-foreground">Free Tool</span>
-        </div>
-        <h1 className="mt-4 font-heading text-3xl font-bold leading-tight md:text-4xl">
+          <span className="font-heading text-sm font-bold">GSCdaddy</span>
+        </Link>
+        <h1 className="mt-6 font-heading text-3xl font-bold leading-tight md:text-4xl">
           Keyword Opportunity Calculator
         </h1>
         <p className="mt-3 max-w-xl text-muted-foreground">
