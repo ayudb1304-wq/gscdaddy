@@ -8,9 +8,7 @@ function formatDate(date: Date): string {
 
 function getDateRange(lastSyncedAt: string | null): { startDate: string; endDate: string } {
   const now = new Date()
-  // GSC data has 2-3 day delay, so end date is 3 days ago
   const endDate = new Date(now)
-  endDate.setDate(endDate.getDate() - 3)
 
   const startDate = new Date(now)
   if (!lastSyncedAt) {

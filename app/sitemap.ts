@@ -5,7 +5,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://gscdaddy.com"
 
   const pages: MetadataRoute.Sitemap = [
-    { url: baseUrl, lastModified: new Date() },
+    {
+      url: baseUrl,
+      lastModified: new Date(),
+      images: [`${baseUrl}/images/dashboard-screenshot.png`],
+    },
     { url: `${baseUrl}/blog`, lastModified: new Date() },
     { url: `${baseUrl}/login`, lastModified: new Date() },
     { url: `${baseUrl}/privacy`, lastModified: new Date() },
@@ -15,6 +19,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const blogPosts: MetadataRoute.Sitemap = getAllPosts().map((post) => ({
     url: `${baseUrl}/blog/${post.slug}`,
     lastModified: new Date(post.updatedAt ?? post.publishedAt),
+    images: [`${baseUrl}/images/filters.png`],
   }))
 
   return [...pages, ...blogPosts]

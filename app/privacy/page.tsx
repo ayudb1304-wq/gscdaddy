@@ -3,6 +3,9 @@ import { ArrowLeft } from "lucide-react"
 
 export const metadata = {
   title: "Privacy Policy - GSCdaddy",
+  description:
+    "Learn how GSCdaddy collects, uses, and protects your data. We only request read-only access to your Google Search Console.",
+  alternates: { canonical: "https://gscdaddy.com/privacy" },
 }
 
 function BreadcrumbJsonLd() {

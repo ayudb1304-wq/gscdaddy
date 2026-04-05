@@ -3,6 +3,9 @@ import { ArrowLeft } from "lucide-react"
 
 export const metadata = {
   title: "Terms of Service - GSCdaddy",
+  description:
+    "Terms of Service for GSCdaddy. Read the rules and conditions for using our Google Search Console analytics tool.",
+  alternates: { canonical: "https://gscdaddy.com/terms" },
 }
 
 function BreadcrumbJsonLd() {

@@ -70,7 +70,7 @@ export function FounderSection() {
                   src={badgeTheme === "dark"
                     ? "/images/GSCDaddyLogo.png"
                     : "/images/GSCDaddyLogo_LightMode.png"}
-                  alt=""
+                  alt="GSCdaddy logo"
                   width={48}
                   height={48}
                   className="absolute left-[15px] top-[21px] size-[48px] rounded-[8px] object-cover"

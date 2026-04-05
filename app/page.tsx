@@ -53,6 +53,7 @@ function JsonLd() {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: "GSCdaddy",
+    alternateName: ["GSC daddy", "GSC Daddy"],
     url: "https://gscdaddy.com",
     description:
       "Find your striking distance keywords in Google Search Console and get AI-powered action plans to reach page 1.",
@@ -61,6 +62,22 @@ function JsonLd() {
       target: "https://gscdaddy.com/blog?q={search_term_string}",
       "query-input": "required name=search_term_string",
     },
+  }
+
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "GSCdaddy",
+    url: "https://gscdaddy.com",
+    logo: "https://gscdaddy.com/images/GSCDaddyLogo.png",
+    description:
+      "Google Search Console analytics tool that finds striking-distance keywords and provides AI-powered SEO recommendations.",
+    founder: {
+      "@type": "Person",
+      name: "Ayush",
+      url: "https://x.com/ayu_theindiedev",
+    },
+    sameAs: ["https://x.com/ayu_theindiedev"],
   }
 
   const breadcrumbSchema = {
@@ -89,6 +106,10 @@ function JsonLd() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
       />
       <script
         type="application/ld+json"

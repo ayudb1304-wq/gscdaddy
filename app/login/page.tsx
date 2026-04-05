@@ -1,8 +1,16 @@
+import type { Metadata } from "next"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { Logo } from "@/components/logo"
 import { Button } from "@/components/ui/button"
 import { signInWithGoogle } from "./actions"
+
+export const metadata: Metadata = {
+  title: "Log In - GSCdaddy",
+  description:
+    "Sign in to GSCdaddy to access your Google Search Console dashboard, striking distance keywords, and AI-powered SEO recommendations.",
+  alternates: { canonical: "https://gscdaddy.com/login" },
+}
 
 function GoogleIcon({ className }: { className?: string }) {
   return (

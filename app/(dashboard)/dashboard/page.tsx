@@ -65,7 +65,6 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const dateRange = 28
   const now = new Date()
   const endDate = new Date(now)
-  endDate.setDate(endDate.getDate() - 3)
   const currentStart = new Date(endDate)
   currentStart.setDate(currentStart.getDate() - dateRange)
   const priorEnd = new Date(currentStart)
