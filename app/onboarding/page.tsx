@@ -132,6 +132,10 @@ export default function OnboardingPage() {
     return () => clearInterval(interval)
   }, [step, syncStatus])
 
+  function handleSkip() {
+    router.push("/dashboard")
+  }
+
   function handleGoToDashboard() {
     router.push("/dashboard")
   }
@@ -154,13 +158,14 @@ export default function OnboardingPage() {
           )}
 
           {step === 3 && !showSitePicker && (
-            <PrimingStep onConnect={handleConnect} loading={loading} />
+            <PrimingStep onConnect={handleConnect} onSkip={handleSkip} loading={loading} />
           )}
 
           {step === 3 && showSitePicker && (
             <SitePickerStep
               sites={availableSites}
               onSelect={handleSiteSelect}
+              onSkip={handleSkip}
               loading={loading}
             />
           )}

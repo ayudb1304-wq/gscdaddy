@@ -139,7 +139,7 @@ const TRIAL_FEATURES = [
   { icon: TrendingUp, label: "Opportunity Scoring" },
 ]
 
-export function PrimingStep({ onConnect, loading }: { onConnect: () => void; loading: boolean }) {
+export function PrimingStep({ onConnect, onSkip, loading }: { onConnect: () => void; onSkip: () => void; loading: boolean }) {
   return (
     <div className="mx-auto max-w-lg text-center">
       <h1 className="font-heading text-2xl font-bold md:text-3xl">
@@ -195,6 +195,13 @@ export function PrimingStep({ onConnect, loading }: { onConnect: () => void; loa
       <p className="mt-3 text-xs text-muted-foreground">
         Free for 14 days. No credit card required.
       </p>
+
+      <button
+        onClick={onSkip}
+        className="mt-4 text-xs text-muted-foreground underline underline-offset-2 transition-colors hover:text-foreground"
+      >
+        Skip and add later
+      </button>
     </div>
   )
 }
@@ -210,10 +217,12 @@ interface AvailableSite {
 export function SitePickerStep({
   sites,
   onSelect,
+  onSkip,
   loading,
 }: {
   sites: AvailableSite[]
   onSelect: (siteUrl: string, permissionLevel: string) => void
+  onSkip: () => void
   loading: boolean
 }) {
   if (sites.length === 0) {
@@ -221,14 +230,22 @@ export function SitePickerStep({
       <div className="mx-auto max-w-md text-center">
         <h1 className="font-heading text-2xl font-bold">No sites found</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          We couldn't find any Google Search Console properties linked to your account.
-          Make sure you've verified at least one site in Google Search Console.
+          We couldn&apos;t find any Google Search Console properties linked to your account.
+          Make sure you&apos;ve verified at least one site in Google Search Console.
         </p>
         <Button variant="outline" className="mt-6" asChild>
           <a href="https://search.google.com/search-console" target="_blank" rel="noopener noreferrer">
             Open Google Search Console
           </a>
         </Button>
+        <div className="mt-4">
+          <button
+            onClick={onSkip}
+            className="text-xs text-muted-foreground underline underline-offset-2 transition-colors hover:text-foreground"
+          >
+            Skip and add later from Settings
+          </button>
+        </div>
       </div>
     )
   }
