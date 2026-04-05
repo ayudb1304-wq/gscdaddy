@@ -7,9 +7,15 @@ export const size = { width: 1200, height: 630 }
 export const contentType = "image/png"
 
 export default async function Image() {
-  const logoData = await readFile(
-    join(process.cwd(), "public/images/GSCDaddyLogo_LightMode.png")
-  )
+  const [logoData, caveatFont] = await Promise.all([
+    readFile(join(process.cwd(), "public/images/GSCDaddyLogo_LightMode.png")),
+    fetch("https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap")
+      .then((res) => res.text())
+      .then((css) => {
+        const url = css.match(/src: url\((.+?)\)/)?.[1]
+        return url ? fetch(url).then((r) => r.arrayBuffer()) : null
+      }),
+  ])
   const logoBase64 = `data:image/png;base64,${logoData.toString("base64")}`
 
   return new ImageResponse(
@@ -89,7 +95,7 @@ export default async function Image() {
               letterSpacing: "-2px",
             }}
           >
-            <span style={{ color: "#ffffff" }}>Find your <span style={{ fontStyle: "italic" }}>almost-ranking</span></span>
+            <span style={{ color: "#ffffff" }}>Find your <span style={{ fontFamily: "Caveat" }}>almost-ranking</span></span>
             <span style={{ color: "#ffffff" }}>
               keywords.{" "}
               <span style={{ color: "#4ade80" }}>Act on them.</span>
@@ -159,6 +165,11 @@ export default async function Image() {
         </div>
       </div>
     ),
-    { ...size }
+    {
+      ...size,
+      fonts: caveatFont
+        ? [{ name: "Caveat", data: caveatFont, weight: 700 as const }]
+        : [],
+    }
   )
 }

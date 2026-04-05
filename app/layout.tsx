@@ -1,4 +1,4 @@
-import { Inter, JetBrains_Mono, Oxanium } from "next/font/google"
+import { Inter, JetBrains_Mono, Oxanium, Caveat } from "next/font/google"
 import type { Metadata } from "next"
 
 import "./globals.css"
@@ -21,6 +21,12 @@ const inter = Inter({
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
+  display: "swap",
+})
+
+const caveat = Caveat({
+  subsets: ["latin"],
+  variable: "--font-cursive",
   display: "swap",
 })
 
@@ -80,7 +86,8 @@ export default function RootLayout({
         "antialiased",
         inter.variable,
         oxanium.variable,
-        jetbrainsMono.variable
+        jetbrainsMono.variable,
+        caveat.variable
       )}
     >
       <body>
