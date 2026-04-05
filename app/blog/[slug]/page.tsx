@@ -142,7 +142,7 @@ export default async function BlogPostPage({ params }: Props) {
   const contentWithIds = addHeadingIds(post.content)
 
   return (
-    <article className="mx-auto max-w-3xl px-4 py-16 md:py-24">
+    <div className="mx-auto max-w-6xl px-4 py-16 md:py-24">
       <BlogPostJsonLd post={post} />
 
       <Link
@@ -153,89 +153,100 @@ export default async function BlogPostPage({ params }: Props) {
         Back to blog
       </Link>
 
-      <header>
-        <h1 className="font-heading text-3xl font-bold leading-tight md:text-4xl">
-          {post.title}
-        </h1>
-        <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-          <span>
-            By{" "}
-            <a
-              href={post.author.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline underline-offset-2 transition-colors hover:text-foreground"
-            >
-              {post.author.name}
-            </a>
-          </span>
-          <span>&middot;</span>
-          <time dateTime={post.publishedAt}>
-            {new Date(post.publishedAt).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
-          </time>
-          {post.updatedAt && post.updatedAt !== post.publishedAt && (
-            <>
-              <span>&middot;</span>
+      <div className="lg:grid lg:grid-cols-[1fr_220px] lg:gap-12">
+        {/* Main content */}
+        <article className="min-w-0">
+          <header>
+            <h1 className="font-heading text-3xl font-bold leading-tight md:text-4xl">
+              {post.title}
+            </h1>
+            <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
               <span>
-                Updated{" "}
-                <time dateTime={post.updatedAt}>
-                  {new Date(post.updatedAt).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </time>
+                By{" "}
+                <a
+                  href={post.author.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline underline-offset-2 transition-colors hover:text-foreground"
+                >
+                  {post.author.name}
+                </a>
               </span>
-            </>
-          )}
-          <span>&middot;</span>
-          <span>{readTime} min read</span>
-        </div>
-        {post.tags.length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-2">
-            {post.tags.map((tag) => (
-              <span
-                key={tag}
-                className="rounded-full bg-muted px-2.5 py-0.5 text-xs text-muted-foreground"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        )}
-      </header>
+              <span>&middot;</span>
+              <time dateTime={post.publishedAt}>
+                {new Date(post.publishedAt).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </time>
+              {post.updatedAt && post.updatedAt !== post.publishedAt && (
+                <>
+                  <span>&middot;</span>
+                  <span>
+                    Updated{" "}
+                    <time dateTime={post.updatedAt}>
+                      {new Date(post.updatedAt).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </time>
+                  </span>
+                </>
+              )}
+              <span>&middot;</span>
+              <span>{readTime} min read</span>
+            </div>
+            {post.tags.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {post.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="rounded-full bg-muted px-2.5 py-0.5 text-xs text-muted-foreground"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+          </header>
 
-      <div className="mt-10">
-        <TableOfContents headings={headings} />
+          <div
+            className="prose prose-lg prose-neutral dark:prose-invert mt-10 max-w-none prose-headings:font-heading prose-headings:font-semibold prose-headings:mt-12 prose-headings:mb-4 prose-p:my-6 prose-p:leading-relaxed prose-ul:my-6 prose-ol:my-6 prose-li:my-2 prose-a:text-primary prose-a:underline-offset-2 prose-figure:my-10 prose-blockquote:my-8 prose-headings:scroll-mt-20"
+            dangerouslySetInnerHTML={{ __html: contentWithIds }}
+          />
+        </article>
+
+        {/* Sidebar TOC — sticky on desktop, hidden on mobile */}
+        <aside className="hidden lg:block">
+          <div className="sticky top-24">
+            <TableOfContents headings={headings} />
+          </div>
+        </aside>
       </div>
 
-      <div
-        className="prose prose-lg prose-neutral dark:prose-invert max-w-none prose-headings:font-heading prose-headings:font-semibold prose-headings:mt-12 prose-headings:mb-4 prose-p:my-6 prose-p:leading-relaxed prose-ul:my-6 prose-ol:my-6 prose-li:my-2 prose-a:text-primary prose-a:underline-offset-2 prose-figure:my-10 prose-blockquote:my-8 prose-headings:scroll-mt-20"
-        dangerouslySetInnerHTML={{ __html: contentWithIds }}
-      />
+      {/* Below content — full width */}
+      <div className="mx-auto max-w-3xl">
+        <RelatedPosts currentSlug={post.slug} currentTags={post.tags} />
 
-      <RelatedPosts currentSlug={post.slug} currentTags={post.tags} />
-
-      <section className="mt-12 rounded-xl border bg-card p-8 text-center">
-        <h2 className="font-heading text-lg font-semibold">
-          Stop guessing. Start fixing.
-        </h2>
-        <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-          GSCdaddy finds your striking distance keywords and tells you exactly
-          what to change. Free for 14 days, no credit card required.
-        </p>
-        <Link
-          href="/login"
-          className="mt-5 inline-flex h-10 items-center rounded-md bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-        >
-          Try GSCdaddy free
-        </Link>
-      </section>
-    </article>
+        <section className="mt-12 rounded-xl border bg-card p-8 text-center">
+          <h2 className="font-heading text-lg font-semibold">
+            Stop guessing. Start fixing.
+          </h2>
+          <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+            GSCdaddy finds your striking distance keywords and tells you exactly
+            what to change. Free for 14 days, no credit card required.
+          </p>
+          <Link
+            href="/login"
+            className="mt-5 inline-flex h-10 items-center rounded-md bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            Try GSCdaddy free
+          </Link>
+        </section>
+      </div>
+    </div>
   )
 }
 

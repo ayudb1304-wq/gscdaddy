@@ -35,19 +35,21 @@ export function TableOfContents({ headings }: { headings: Heading[] }) {
   if (headings.length < 3) return null
 
   return (
-    <nav className="mb-10 rounded-lg border bg-muted/30 p-5">
-      <p className="text-sm font-semibold">In this article</p>
-      <ul className="mt-3 space-y-1.5">
+    <nav>
+      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        On this page
+      </p>
+      <ul className="mt-3 space-y-1 border-l">
         {headings.map((h) => (
           <li key={h.id}>
             <a
               href={`#${h.id}`}
               className={cn(
-                "block text-sm transition-colors hover:text-foreground",
-                h.level === 3 && "pl-4",
+                "-ml-px block border-l-2 py-1 text-[13px] leading-snug transition-colors hover:text-foreground",
+                h.level === 3 ? "pl-6" : "pl-3",
                 activeId === h.id
-                  ? "font-medium text-primary"
-                  : "text-muted-foreground"
+                  ? "border-primary font-medium text-foreground"
+                  : "border-transparent text-muted-foreground"
               )}
             >
               {h.text}
