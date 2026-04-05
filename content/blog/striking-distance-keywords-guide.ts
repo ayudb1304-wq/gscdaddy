@@ -107,8 +107,8 @@ export const strikingDistanceKeywordsGuide: BlogPost = {
 
 <p>Your title tag is the single biggest lever for both rankings and CTR. For striking distance keywords, make sure your target keyword appears in the title, ideally near the beginning. Add a compelling reason to click. Numbers, the current year, and words like "complete," "proven," or "free" all increase click rates.</p>
 
-<p>Before: "Keyword Research Tips for Your Blog"</p>
-<p>After: "7 Keyword Research Tips That Actually Work in 2026 (With Examples)"</p>
+<p>Before. "Keyword Research Tips for Your Blog"</p>
+<p>After. "7 Keyword Research Tips That Actually Work in 2026 (With Examples)"</p>
 
 <p>That second version is more specific, includes a number, has the year, and promises something concrete.</p>
 

@@ -55,7 +55,7 @@ export const lowHangingFruitKeywordsGsc: BlogPost = {
 
 <h3>Step 1. Go to Performance and click Search Results</h3>
 
-<p>Open Google Search Console for your site. Click Performance in the left sidebar, then click Search Results. Make sure all four metric boxes are enabled at the top: Clicks, Impressions, CTR, and Average Position.</p>
+<p>Open Google Search Console for your site. Click Performance in the left sidebar, then click Search Results. Make sure all four metric boxes are enabled at the top. Clicks, Impressions, CTR, and Average Position.</p>
 
 <h3>Step 2. Set the date range to the last 3 months</h3>
 
@@ -93,8 +93,8 @@ export const lowHangingFruitKeywordsGsc: BlogPost = {
 
 <p>Your title tag is the single biggest lever for improving both rankings and CTR. For each low-hanging fruit keyword, make sure your target keyword appears in the title. Add a specific number, the current year, or a compelling reason to click.</p>
 
-<p>Before: "Tips for Better SEO Results"</p>
-<p>After: "9 SEO Tips That Moved 12 Pages to Page 1 in 2026"</p>
+<p>Before. "Tips for Better SEO Results"</p>
+<p>After. "9 SEO Tips That Moved 12 Pages to Page 1 in 2026"</p>
 
 <p>That second version is more specific, creates curiosity, and includes proof of results.</p>
 
