@@ -35,34 +35,6 @@ function GoogleIcon({ className }: { className?: string }) {
   )
 }
 
-function RadarGraphic() {
-  return (
-    <svg
-      viewBox="0 0 300 300"
-      className="mx-auto w-64 opacity-60"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      {/* Concentric circles */}
-      <circle cx="150" cy="150" r="120" stroke="currentColor" strokeWidth="0.5" opacity="0.3" />
-      <circle cx="150" cy="150" r="90" stroke="currentColor" strokeWidth="0.5" opacity="0.25" />
-      <circle cx="150" cy="150" r="60" stroke="currentColor" strokeWidth="0.5" opacity="0.2" />
-      <circle cx="150" cy="150" r="30" stroke="currentColor" strokeWidth="0.5" opacity="0.15" />
-      {/* Crosshair lines */}
-      <line x1="150" y1="28" x2="150" y2="272" stroke="currentColor" strokeWidth="0.5" opacity="0.2" />
-      <line x1="28" y1="150" x2="272" y2="150" stroke="currentColor" strokeWidth="0.5" opacity="0.2" />
-      <line x1="65" y1="65" x2="235" y2="235" stroke="currentColor" strokeWidth="0.5" opacity="0.15" />
-      <line x1="235" y1="65" x2="65" y2="235" stroke="currentColor" strokeWidth="0.5" opacity="0.15" />
-      {/* Center dot — primary green */}
-      <circle cx="150" cy="150" r="4" fill="oklch(0.648 0.2 131.684)" />
-      {/* Data points */}
-      <circle cx="190" cy="100" r="2" fill="oklch(0.648 0.2 131.684)" opacity="0.6" />
-      <circle cx="110" cy="190" r="2.5" fill="oklch(0.648 0.2 131.684)" opacity="0.5" />
-      <circle cx="200" cy="180" r="1.5" fill="oklch(0.648 0.2 131.684)" opacity="0.4" />
-      <circle cx="90" cy="120" r="2" fill="oklch(0.648 0.2 131.684)" opacity="0.35" />
-    </svg>
-  )
-}
 
 export default function LoginPage({
   searchParams,
@@ -94,18 +66,15 @@ export default function LoginPage({
           GSCdaddy
         </Link>
 
-        {/* Radar graphic + tagline */}
-        <div className="space-y-8">
-          <RadarGraphic />
-          <div className="text-center">
-            <h2 className="font-heading text-2xl font-bold leading-tight">
-              Your SEO data has<br />
-              <span className="text-primary">stories to tell.</span>
-            </h2>
-            <p className="mx-auto mt-4 max-w-xs text-sm text-neutral-400 dark:text-neutral-500">
-              Strategic SEO intelligence powered by AI. Not another checklist of meaningless scores.
-            </p>
-          </div>
+        {/* Tagline */}
+        <div className="text-center">
+          <h2 className="font-heading text-2xl font-bold leading-tight">
+            Your SEO data has<br />
+            <span className="text-primary">stories to tell.</span>
+          </h2>
+          <p className="mx-auto mt-4 max-w-xs text-sm text-neutral-400 dark:text-neutral-500">
+            Strategic SEO intelligence powered by AI. Not another checklist of meaningless scores.
+          </p>
         </div>
 
         {/* Footer */}
