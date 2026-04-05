@@ -6,6 +6,7 @@ import { Logo } from "@/components/logo"
 import { Button } from "@/components/ui/button"
 import { NAV_LINKS } from "@/lib/constants"
 import { cn } from "@/lib/utils"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -43,6 +44,7 @@ export function Navigation() {
               {link.label}
             </a>
           ))}
+          <ThemeToggle className="size-8" />
           <a
             href="/login"
             className="text-sm text-muted-foreground transition-colors hover:text-foreground"
@@ -54,14 +56,16 @@ export function Navigation() {
           </Button>
         </div>
 
-        {/* Mobile hamburger */}
-        <button
-          className="md:hidden"
-          onClick={() => setIsMobileOpen(!isMobileOpen)}
-          aria-label="Toggle menu"
-        >
-          {isMobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
-        </button>
+        {/* Mobile hamburger + theme toggle */}
+        <div className="flex items-center gap-1 md:hidden">
+          <ThemeToggle className="size-8" />
+          <button
+            onClick={() => setIsMobileOpen(!isMobileOpen)}
+            aria-label="Toggle menu"
+          >
+            {isMobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile menu */}

@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { SiteSelector } from "./site-selector"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 interface Site {
   id: string
@@ -68,7 +69,8 @@ export function Header({ user, sites, plan, daysRemaining, onToggleSidebar }: He
         <SiteSelector sites={sites} />
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
+        <ThemeToggle className="size-8" />
         {daysRemaining !== undefined && daysRemaining > 0 && (
           <Badge variant="secondary" className="text-xs">
             {daysRemaining} day{daysRemaining !== 1 ? "s" : ""} left in trial
