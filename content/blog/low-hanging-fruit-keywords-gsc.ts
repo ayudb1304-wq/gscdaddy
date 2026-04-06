@@ -55,7 +55,7 @@ export const lowHangingFruitKeywordsGsc: BlogPost = {
 
 <h3>Step 1. Go to Performance and click Search Results</h3>
 
-<p>Open Google Search Console for your site. Click Performance in the left sidebar, then click Search Results. Make sure all four metric boxes are enabled at the top. Clicks, Impressions, CTR, and Average Position.</p>
+<p>Open <a href="/blog/google-search-console-beginners-guide">Google Search Console</a> for your site. Click Performance in the left sidebar, then click Search Results. Make sure all four metric boxes are enabled at the top. Clicks, Impressions, CTR, and Average Position.</p>
 
 <h3>Step 2. Set the date range to the last 3 months</h3>
 

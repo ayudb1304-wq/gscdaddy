@@ -39,7 +39,7 @@ For every blog post, use the Claude prompt provided to generate a first draft, t
 
 ---
 
-## Day 1 (Monday) — Technical SEO foundation
+## Day 1 (Thursday Apr 2) — Technical SEO foundation
 
 ### BUILD
 
@@ -74,7 +74,7 @@ For every blog post, use the Claude prompt provided to generate a first draft, t
 
 ---
 
-## Day 2 (Tuesday) — Sitemap + Blog infrastructure + First directory submissions
+## Day 2 (Friday Apr 3) — Sitemap + Blog infrastructure + First directory submissions
 
 ### BUILD
 
@@ -95,7 +95,7 @@ For every blog post, use the Claude prompt provided to generate a first draft, t
 
 ---
 
-## Day 3 (Wednesday) — Publish Blog Post #1: Pillar Page
+## Day 3 (Saturday Apr 4) — Publish Blog Post #1: Pillar Page
 
 ### PUBLISH
 
@@ -149,7 +149,7 @@ Important rules:
 
 ---
 
-## Day 4 (Thursday) — Blog Post #2: GSC Tutorial
+## Day 4 (Sunday Apr 5) — Blog Post #2: GSC Tutorial
 
 ### PUBLISH
 
@@ -202,13 +202,13 @@ Rules:
 
 ### DISTRIBUTE
 
-- [ ] Share on Twitter as a tip thread (break the key steps into 4-5 tweets)
-- [ ] Comment on 5 Reddit posts
-- [ ] Submit to Capterra (free listing under "SEO Software")
+- [x] Share on Twitter as a tip thread (break the key steps into 4-5 tweets)
+- [x] Comment on 5 Reddit posts
+- [x] Submit to Capterra (free listing under "SEO Software")
 
 ---
 
-## Day 5 (Friday) — Blog Post #3 + Directory push
+## Day 5 (Monday Apr 6) — Blog Post #3 + Directory push
 
 ### PUBLISH
 
@@ -251,9 +251,9 @@ Rules:
 
 ### BUILD
 
-- [ ] Edit draft, add screenshots
-- [ ] Internal link to Post #1 and Post #2
-- [ ] Request indexing + IndexNow ping
+- [x] Edit draft, add screenshots
+- [x] Internal link to Post #1 and Post #2
+- [x] Request indexing + IndexNow ping (auto on deploy)
 
 ### DISTRIBUTE
 
@@ -266,7 +266,7 @@ Rules:
 
 ---
 
-## Day 6 (Saturday) — Blog Post #4 + Catch up
+## Day 6 (Tuesday Apr 7) — Blog Post #4 + Catch up
 
 ### PUBLISH
 
@@ -315,7 +315,7 @@ Rules:
 
 ---
 
-## Day 7 (Sunday) — Rest + Plan + Community
+## Day 7 (Wednesday Apr 8) — Rest + Plan + Community
 
 ### BUILD
 
@@ -338,7 +338,7 @@ Rules:
 
 ---
 
-## Day 8 (Monday) — Blog Post #5: First Comparison Page
+## Day 8 (Thursday Apr 9) — Blog Post #5: First Comparison Page
 
 ### PUBLISH
 
@@ -389,7 +389,7 @@ Rules:
 
 ---
 
-## Day 9 (Tuesday) — Blog Post #6
+## Day 9 (Friday Apr 10) — Blog Post #6
 
 ### PUBLISH
 
@@ -437,7 +437,7 @@ Rules:
 
 ---
 
-## Day 10 (Wednesday) — First Alternatives Page + Reddit Post
+## Day 10 (Saturday Apr 11) — First Alternatives Page + Reddit Post
 
 ### PUBLISH
 
@@ -495,7 +495,7 @@ Rules:
 
 ---
 
-## Day 11 (Thursday) — Blog Post #8: Tutorial
+## Day 11 (Sunday Apr 12) — Blog Post #8: Tutorial
 
 ### PUBLISH
 
@@ -541,7 +541,7 @@ Rules:
 
 ---
 
-## Day 12 (Friday) — Blog Post #9: Programmatic Template Launch
+## Day 12 (Monday Apr 13) — Blog Post #9: Programmatic Template Launch
 
 ### PUBLISH
 
@@ -594,7 +594,7 @@ Rules:
 
 ---
 
-## Day 13 (Saturday) — Blog Post #10 + Internal Linking Audit
+## Day 13 (Tuesday Apr 14) — Blog Post #10 + Internal Linking Audit
 
 ### PUBLISH
 
@@ -651,7 +651,7 @@ Rules:
 
 ---
 
-## Day 14 (Sunday) — Rest + Review + Plan
+## Day 14 (Wednesday Apr 15) — Rest + Review + Plan
 
 ### BUILD
 
@@ -676,7 +676,7 @@ Rules:
 
 ---
 
-## Day 15 (Monday) — Programmatic Glossary Pages (Batch 1)
+## Day 15 (Thursday Apr 16) — Programmatic Glossary Pages (Batch 1)
 
 ### PUBLISH
 
@@ -723,7 +723,7 @@ Do not use ":" in headings, em dashes, or "game-changer" language.
 
 ---
 
-## Day 16 (Tuesday) — Blog Post #11: Educational Deep Dive
+## Day 16 (Friday Apr 17) — Blog Post #11: Educational Deep Dive
 
 ### PUBLISH
 
@@ -770,7 +770,7 @@ No "game-changer" language, no em dashes, no colons in headings.
 
 ---
 
-## Day 17 (Wednesday) — Alternatives Pages (Batch 1)
+## Day 17 (Saturday Apr 18) — Alternatives Pages (Batch 1)
 
 ### PUBLISH
 
@@ -818,7 +818,7 @@ Rules:
 
 ---
 
-## Day 18 (Thursday) — Blog Post #12 + Newsletter Pitches
+## Day 18 (Sunday Apr 19) — Blog Post #12 + Newsletter Pitches
 
 ### PUBLISH
 
@@ -869,7 +869,7 @@ Rules:
 
 ---
 
-## Day 19 (Friday) — Blog Post #13 + More Glossary
+## Day 19 (Monday Apr 20) — Blog Post #13 + More Glossary
 
 ### PUBLISH
 
@@ -949,7 +949,7 @@ No "game-changer" language, no em dashes, no colons in headings.
 
 ---
 
-## Day 20 (Saturday) — Light day + Community catch-up
+## Day 20 (Tuesday Apr 21) — Light day + Community catch-up
 
 ### BUILD
 
@@ -967,7 +967,7 @@ No "game-changer" language, no em dashes, no colons in headings.
 
 ---
 
-## Day 21 (Sunday) — Rest + Week 3 Review
+## Day 21 (Wednesday Apr 22) — Rest + Week 3 Review
 
 ### BUILD
 
@@ -992,7 +992,7 @@ No "game-changer" language, no em dashes, no colons in headings.
 
 ---
 
-## Day 22 (Monday) — Blog Post #14 + More Alternatives
+## Day 22 (Thursday Apr 23) — Blog Post #14 + More Alternatives
 
 ### PUBLISH
 
@@ -1049,7 +1049,7 @@ Rules:
 
 ---
 
-## Day 23 (Tuesday) — Blog Post #15 + Product Hunt Prep
+## Day 23 (Friday Apr 24) — Blog Post #15 + Product Hunt Prep
 
 ### PUBLISH
 
@@ -1111,7 +1111,7 @@ Rules:
 
 ---
 
-## Day 24 (Wednesday) — Blog Post #16 + More Glossary
+## Day 24 (Saturday Apr 25) — Blog Post #16 + More Glossary
 
 ### PUBLISH
 
@@ -1163,7 +1163,7 @@ Rules:
 
 ---
 
-## Day 25 (Thursday) — Product Hunt Launch Day
+## Day 25 (Sunday Apr 26) — Product Hunt Launch Day
 
 ### BUILD
 
@@ -1186,7 +1186,7 @@ No new blog post today. Focus entirely on the Product Hunt launch.
 
 ---
 
-## Day 26 (Friday) — Post-Launch Content + Blog Post #17
+## Day 26 (Monday Apr 27) — Post-Launch Content + Blog Post #17
 
 ### PUBLISH
 
@@ -1235,7 +1235,7 @@ Rules:
 
 ---
 
-## Day 27 (Saturday) — Blog Post #18 + Internal Linking Overhaul
+## Day 27 (Tuesday Apr 28) — Blog Post #18 + Internal Linking Overhaul
 
 ### PUBLISH
 
@@ -1306,7 +1306,7 @@ Rules:
 
 ---
 
-## Day 28 (Sunday) — Rest + Comprehensive Review
+## Day 28 (Wednesday Apr 29) — Rest + Comprehensive Review
 
 ### BUILD
 
@@ -1330,7 +1330,7 @@ Rules:
 
 ---
 
-## Day 29 (Monday) — The Experiment Summary Post
+## Day 29 (Thursday Apr 30) — The Experiment Summary Post
 
 ### PUBLISH
 
@@ -1394,7 +1394,7 @@ Rules:
 
 ---
 
-## Day 30 (Tuesday) — Publish Final Post + Set Up Month 2
+## Day 30 (Friday May 1) — Publish Final Post + Set Up Month 2
 
 ### PUBLISH
 
