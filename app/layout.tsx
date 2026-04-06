@@ -48,6 +48,9 @@ export const metadata: Metadata = {
   authors: [{ name: "Ayush", url: "https://x.com/ayu_theindiedev" }],
   alternates: {
     canonical: "https://gscdaddy.com",
+    types: {
+      "application/rss+xml": "https://gscdaddy.com/feed.xml",
+    },
   },
   openGraph: {
     title: "GSCdaddy - Find Your Almost-Ranking Keywords",
