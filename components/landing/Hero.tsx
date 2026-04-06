@@ -55,7 +55,7 @@ export function Hero() {
         <FadeInSection delay={0.2}>
           <div className="mt-14 overflow-hidden rounded-xl border border-border shadow-[0_8px_40px_-12px_rgba(0,0,0,0.15)] dark:shadow-[0_8px_40px_-12px_rgba(0,0,0,0.5)]">
             <Image
-              src="/images/dashboard-screenshot.png"
+              src="/images/dashboard-screenshot.jpg"
               alt="GSCdaddy Dashboard showing performance metrics, striking distance keywords, and AI recommendations"
               width={1400}
               height={900}

@@ -122,9 +122,9 @@ function JsonLd() {
 
 export default function Page() {
   return (
-    <div>
-      <div className="min-h-screen bg-background text-foreground">
-        <Navigation />
+    <div className="min-h-screen bg-background text-foreground">
+      <Navigation />
+      <main>
         <Hero />
         <TrustBar />
         <ProblemSection />
@@ -137,9 +137,9 @@ export default function Page() {
         <Pricing />
         <FAQ />
         <FinalCTA />
-        <Footer />
-        <JsonLd />
-      </div>
+      </main>
+      <Footer />
+      <JsonLd />
     </div>
   )
 }

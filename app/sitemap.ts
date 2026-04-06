@@ -8,7 +8,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     {
       url: baseUrl,
       lastModified: new Date(),
-      images: [`${baseUrl}/images/dashboard-screenshot.png`],
+      images: [`${baseUrl}/images/dashboard-screenshot.jpg`],
     },
     { url: `${baseUrl}/blog`, lastModified: new Date() },
     { url: `${baseUrl}/tools/keyword-calculator`, lastModified: new Date() },
