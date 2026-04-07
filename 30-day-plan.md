@@ -304,7 +304,7 @@ Rules:
 ### BUILD
 
 - [x] Edit, add screenshots, cross-link to all previous posts
-- [ ] Request indexing + IndexNow
+- [x] Request indexing + IndexNow
 - [x] Do a quick internal linking audit: make sure all 4 posts link to each other where relevant and all link to the homepage
 
 ### DISTRIBUTE
