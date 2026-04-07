@@ -71,7 +71,7 @@ export const lowHangingFruitKeywordsGsc: BlogPost = {
 
 <h3>Step 5. Look for keywords with high impressions but low CTR</h3>
 
-<p>This is where the gold is. A keyword with 500 impressions and 0.5% CTR at position 12 means 500 people saw your listing and only 2 or 3 clicked. If you can move that to position 5 and improve your CTR to 5%, that is 25 clicks per month from one keyword. Multiply that across 10 or 15 keywords and the impact adds up fast.</p>
+<p>This is where the gold is. A keyword with 500 impressions and 0.5% CTR at position 12 means 500 people saw your listing and only 2 or 3 clicked. If you can move that to position 5 and <a href="/blog/improve-ctr-google-search-console">improve your CTR</a> to 5%, that is 25 clicks per month from one keyword. Multiply that across 10 or 15 keywords and the impact adds up fast.</p>
 
 <h3>Step 6. Export and prioritize</h3>
 

@@ -1,6 +1,7 @@
 import { strikingDistanceKeywordsGuide } from "@/content/blog/striking-distance-keywords-guide"
 import { lowHangingFruitKeywordsGsc } from "@/content/blog/low-hanging-fruit-keywords-gsc"
 import { googleSearchConsoleBeginnersGuide } from "@/content/blog/google-search-console-beginners-guide"
+import { improveCtrGoogleSearchConsole } from "@/content/blog/improve-ctr-google-search-console"
 
 export interface BlogPost {
   slug: string
@@ -22,6 +23,7 @@ const posts: BlogPost[] = [
   strikingDistanceKeywordsGuide,
   lowHangingFruitKeywordsGsc,
   googleSearchConsoleBeginnersGuide,
+  improveCtrGoogleSearchConsole,
 ]
 
 export function getAllPosts(): BlogPost[] {

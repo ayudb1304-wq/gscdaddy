@@ -82,7 +82,7 @@ export const googleSearchConsoleBeginnersGuide: BlogPost = {
 
 <p><strong>Impressions.</strong> How many times your site appeared in search results, whether someone clicked or not.</p>
 
-<p><strong>CTR (Click-Through Rate).</strong> The percentage of impressions that resulted in a click. If your site appeared 100 times and got 5 clicks, your CTR is 5%.</p>
+<p><strong>CTR (Click-Through Rate).</strong> The percentage of impressions that resulted in a click. If your site appeared 100 times and got 5 clicks, your CTR is 5%. If your CTR seems low for your position, check out our guide on <a href="/blog/improve-ctr-google-search-console">how to improve your CTR using GSC data</a>.</p>
 
 <p><strong>Average Position.</strong> Your average ranking position across all the keywords you appear for. Position 1 is the top result. Position 10 is the bottom of page 1. Anything above 10 means you are on page 2 or beyond.</p>
 

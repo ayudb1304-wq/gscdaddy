@@ -35,7 +35,7 @@ export function TableOfContents({ headings }: { headings: Heading[] }) {
   if (headings.length < 3) return null
 
   return (
-    <nav>
+    <nav className="max-h-[calc(100vh-8rem)] overflow-y-auto">
       <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
         On this page
       </p>

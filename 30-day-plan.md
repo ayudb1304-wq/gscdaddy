@@ -258,9 +258,9 @@ Rules:
 ### DISTRIBUTE
 
 - [ ] Share on Twitter with a personal angle: "I wrote the GSC guide I wish existed when I started"
-- [ ] **Submit to directories (batch 2):**
-  - [ ] SourceForge (dofollow)
-  - [ ] StackShare (dofollow)
+- [x] **Submit to directories (batch 2):**
+  - [x] SourceForge (dofollow)
+  - [x] StackShare (dofollow)
   - [ ] Product Hunt (start preparing launch, set date for Week 3 or 4)
 - [ ] Comment on 5 Reddit posts (you should have ~100+ karma by now)
 
@@ -303,9 +303,9 @@ Rules:
 
 ### BUILD
 
-- [ ] Edit, add screenshots, cross-link to all previous posts
+- [x] Edit, add screenshots, cross-link to all previous posts
 - [ ] Request indexing + IndexNow
-- [ ] Do a quick internal linking audit: make sure all 4 posts link to each other where relevant and all link to the homepage
+- [x] Do a quick internal linking audit: make sure all 4 posts link to each other where relevant and all link to the homepage
 
 ### DISTRIBUTE
 
@@ -1482,7 +1482,7 @@ Check off as you publish:
 - [ ] Day 3: Striking Distance Keywords Guide (Pillar)
 - [ ] Day 4: Low-Hanging Fruit Keywords in GSC
 - [ ] Day 5: GSC Beginners Guide (Pillar)
-- [ ] Day 6: Improve CTR Using GSC
+- [x] Day 6: Improve CTR Using GSC
 - [ ] Day 8: Ahrefs vs Semrush vs GSC
 - [ ] Day 9: Keyword Cannibalization in GSC
 - [ ] Day 10: GSC Alternatives and Companion Tools
@@ -1525,7 +1525,7 @@ Check off as you publish:
 
 - [ ] Day 2: AlternativeTo, F6S, StartuPage
 - [ ] Day 3: SaaSHub
-- [ ] Day 5: SourceForge, StackShare, Product Hunt (prep)
+- [x] Day 5: SourceForge, StackShare, Product Hunt (prep)
 - [ ] Day 8: BetaList, G2, GetApp, Indie Hackers
 - [ ] Day 11: TrustRadius, Trustpilot, SaaSWorthy, Crunchbase
 - [ ] Day 15: TAAFT, ToolPilot, SaaSBison

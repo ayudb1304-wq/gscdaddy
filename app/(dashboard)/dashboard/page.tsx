@@ -153,10 +153,8 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     return Math.round(((curr - prev) / prev) * 1000) / 10
   }
 
-  // Count striking distance keywords in current period
-  const strikingDistanceCount = current.filter(
-    (r) => r.position >= 5 && r.position <= 15
-  ).length
+  // Use the same source as Top Opportunities so the count matches the list
+  const strikingDistanceCount = (opportunitiesResult.data || []).length
 
   const metricsData = {
     current: currentMetrics,

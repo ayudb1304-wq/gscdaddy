@@ -132,7 +132,7 @@ export const strikingDistanceKeywordsGuide: BlogPost = {
 
 <h3>5. Improve CTR with a Better Meta Description</h3>
 
-<p>Your meta description does not directly affect rankings, but it affects CTR, and CTR sends engagement signals to Google. Write a meta description that includes your keyword, states a clear benefit, and creates curiosity or urgency.</p>
+<p>Your meta description does not directly affect rankings, but it affects CTR, and CTR sends engagement signals to Google. Write a meta description that includes your keyword, states a clear benefit, and creates curiosity or urgency. For a deep dive on this, read our full guide on <a href="/blog/improve-ctr-google-search-console">improving CTR using Google Search Console data</a>.</p>
 
 <p>Keep it under 155 characters. Include a specific number or result if you can. "Learn the 5-step process that moved 23 keywords to page 1 in under 6 weeks" is more clickable than "A guide to improving your keyword rankings."</p>
 
