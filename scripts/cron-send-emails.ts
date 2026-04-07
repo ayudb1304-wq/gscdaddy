@@ -7,6 +7,7 @@ import { render } from "@react-email/components"
 import { WeeklySummaryEmail, getWeeklySummarySubject } from "../lib/email/templates/weekly-summary"
 import { TrialEndingEmail, getTrialEndingSubject } from "../lib/email/templates/trial-ending"
 import { TrialExpiredEmail, getTrialExpiredSubject } from "../lib/email/templates/trial-expired"
+import { NudgeRecommendationsEmail, getNudgeRecommendationsSubject } from "../lib/email/templates/nudge-recommendations"
 
 const admin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -25,7 +26,7 @@ async function send(to: string, subject: string, element: React.ReactElement) {
 
 async function main() {
   const now = new Date()
-  const results = { weeklySent: 0, trialEndingSent: 0, trialExpiredSent: 0 }
+  const results = { weeklySent: 0, trialEndingSent: 0, trialExpiredSent: 0, nudgeSent: 0 }
 
   // --- WEEKLY SUMMARY (Sundays only) ---
   if (now.getUTCDay() === 0) {
@@ -42,6 +43,10 @@ async function main() {
   // --- TRIAL EXPIRED ---
   console.log("Checking trial-expired users...")
   results.trialExpiredSent = await sendTrialExpiredEmails(now)
+
+  // --- NUDGE: data synced + opportunities but no recommendations ---
+  console.log("Checking for users to nudge...")
+  results.nudgeSent = await sendNudgeRecommendationsEmails(now)
 
   console.log("\nResults:", results)
 }
@@ -223,6 +228,103 @@ async function sendTrialExpiredEmails(now: Date) {
       sent++
     } catch (err) {
       console.error(`  ✗ Trial expired failed for ${user.email}:`, err)
+    }
+  }
+
+  return sent
+}
+
+// --- Nudge: recommendations not generated ---
+
+async function sendNudgeRecommendationsEmails(now: Date) {
+  let sent = 0
+
+  // Users who signed up more than 24 hours ago
+  const oneDayAgo = new Date(now.getTime() - 86400000).toISOString()
+
+  const { data: users } = await admin
+    .from("users")
+    .select("id, email, name, trial_ends_at")
+    .lte("created_at", oneDayAgo)
+    .or("email_unsubscribed.is.null,email_unsubscribed.eq.false")
+
+  if (!users?.length) { console.log("  No users to nudge"); return 0 }
+
+  for (const user of users) {
+    // Must have active access
+    const { data: sub } = await admin
+      .from("subscriptions")
+      .select("status")
+      .eq("user_id", user.id)
+      .eq("status", "active")
+      .limit(1)
+      .maybeSingle()
+
+    const hasActiveSub = !!sub
+    const hasActiveTrial = user.trial_ends_at && new Date(user.trial_ends_at) > now
+    if (!hasActiveSub && !hasActiveTrial) continue
+
+    // Get completed sites that haven't been nudged yet
+    const { data: sites } = await admin
+      .from("sites")
+      .select("id, site_url, display_name")
+      .eq("user_id", user.id)
+      .eq("sync_status", "completed")
+      .is("nudge_email_sent_at", null)
+
+    if (!sites?.length) continue
+
+    for (const site of sites) {
+      try {
+        // Skip if recommendations already exist
+        const { count: recsCount } = await admin
+          .from("recommendations")
+          .select("*", { count: "exact", head: true })
+          .eq("site_id", site.id)
+
+        if (recsCount && recsCount > 0) continue
+
+        // Check for striking distance keywords
+        const { data: keywords } = await admin
+          .from("striking_distance_keywords")
+          .select("query, avg_position, total_impressions, opportunity_score")
+          .eq("site_id", site.id)
+          .order("opportunity_score", { ascending: false })
+          .limit(1)
+
+        if (!keywords?.length) continue
+
+        const { count: totalOpportunities } = await admin
+          .from("striking_distance_keywords")
+          .select("*", { count: "exact", head: true })
+          .eq("site_id", site.id)
+
+        if (!totalOpportunities || totalOpportunities === 0) continue
+
+        const topKw = keywords[0]
+        const siteName = site.display_name || site.site_url.replace(/^(sc-domain:|https?:\/\/)/, "").replace(/\/$/, "")
+
+        await send(
+          user.email,
+          getNudgeRecommendationsSubject(siteName),
+          NudgeRecommendationsEmail({
+            userName: user.name || user.email,
+            siteName,
+            topKeyword: topKw.query,
+            topKeywordPosition: Number(topKw.avg_position),
+            topKeywordImpressions: Number(topKw.total_impressions),
+            totalOpportunities,
+          })
+        )
+
+        // Mark as nudged so we don't send again
+        await admin.from("sites").update({ nudge_email_sent_at: new Date().toISOString() }).eq("id", site.id)
+
+        console.log(`  ✓ Nudge email sent to ${user.email} for ${siteName} (${totalOpportunities} opportunities)`)
+        sent++
+      } catch (err) {
+        console.error(`  ✗ Nudge failed for ${user.email}:`, err)
+      }
     }
   }
 

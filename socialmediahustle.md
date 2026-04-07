@@ -337,98 +337,96 @@ gscdaddy.com/tools/keyword-calculator
 **Tweet 1 (hook)**
 
 ```
-Most people think getting more Google traffic means ranking higher.
-
-That is only half the story.
-
-The other half is getting more people to click on your result once they see it.
-```
-
----
-
-**Tweet 2 (the numbers)**
-
-```
-Position 1 in Google gets about 27% of clicks.
-Position 5 gets about 5%.
-Position 10 gets about 1.5%.
-
-But these are averages. Some pages at position 10 get 3% CTR and some get 0.5%.
-
-That gap is entirely determined by your title tag and meta description.
-```
-
----
-
-**Tweet 3 (the math)**
-
-```
-If you are at position 10 with 1.5% CTR and push it to 3%, you just doubled your clicks.
-
-No backlinks needed. No new content. Just a better title tag.
-
-This is the most underrated SEO tactic because it is not exciting. But it works.
-```
-
----
-
-**Tweet 4 (the method)**
-
-```
-How to find your worst CTR pages in Google Search Console.
-
-1. Go to Performance report
-2. Turn on all 4 metrics
-3. Click the Pages tab
-4. Sort by impressions (highest first)
-5. Compare each page's CTR to the benchmark for its position
-
-Any page significantly below the benchmark is a free win waiting to happen.
-```
-
----
-
-**Tweet 5 (the title tag formula)**
-
-```
-The title tag formula that improves CTR every time.
-
-- Include a number
-- Add parentheses or brackets at the end
-- Include the current year
-- Front-load your primary keyword
-- Use one power word (not five)
-
-Before: "Best SEO Tools"
-After: "11 Best Free SEO Tools for 2026 [Ranked by an SEO Who Uses Them Daily]"
-
-CTR went from 3.4% to 7.1%.
-```
-
----
-
-**Tweet 6 (the plug)**
-
-```
-I wrote the full guide with CTR benchmarks by position, title tag examples, meta description tactics, and a 15-minute weekly audit routine.
-
-gscdaddy.com/blog/improve-ctr-google-search-console
-
-Also the 4th blog post in 6 days. Content compounds.
-```
-
----
-
-**Tweet 7 (vulnerable close)**
-
-```
 Day 6 of building GSCdaddy in public.
 
-1 click. 18 impressions. Average position 28.
+Shipped a new blog post, found a bug in my own dashboard, and fixed it in 20 minutes.
 
-The numbers are tiny. But 6 days ago they were zero.
+The kind of day that makes solo dev life feel real.
+```
 
-Every day the chart moves a little bit to the right. That is all I need right now.
+---
+
+**Tweet 2 (the bug)**
+
+```
+The bug was embarrassing.
+
+My dashboard showed "2 striking distance keywords" in the stat card at the top.
+
+But the section below said "No striking distance keywords found yet."
+
+Same dashboard. Two different answers. Not a great look for an SEO tool.
+```
+
+---
+
+**Tweet 3 (the root cause)**
+
+```
+The stat card was counting raw rows from the database where position was between 5 and 15. No minimum impressions.
+
+The opportunities section used a materialized view that requires at least 50 impressions per keyword.
+
+Two components. Two different data sources. Two different thresholds.
+
+Classic "it works on my machine" except both were on my machine.
+```
+
+---
+
+**Tweet 4 (the fix)**
+
+```
+The fix was one line.
+
+Changed the stat card to read from the same data source as the opportunities list.
+
+Now if the list says zero, the count says zero. If the list shows 5, the count shows 5.
+
+Sounds obvious. But when you build fast, these mismatches sneak in.
+```
+
+---
+
+**Tweet 5 (the lesson)**
+
+```
+Building in public means showing the bugs too.
+
+I could have just quietly fixed it. But this is exactly the kind of thing that happens when you are a solo dev shipping every day.
+
+You move fast. Things break. You fix them. You keep going.
+```
+
+---
+
+**Tweet 6 (what else shipped)**
+
+```
+Also shipped today:
+
+- Blog post #4: How to improve CTR using GSC data
+- Cross-linked all 4 blog posts to each other
+- Made the table of contents scrollable (it was overflowing on long posts)
+- Fixed the before/after examples table for dark mode
+
+4 blog posts in 6 days. The SEO flywheel is spinning.
+```
+
+---
+
+**Tweet 7 (the numbers)**
+
+```
+Current stats for gscdaddy.com:
+
+1 click. 18 impressions. Average position 28. 2 striking distance keywords.
+
+6 days ago every number was zero.
+
+The dashboard I built to track other people's SEO progress is now tracking my own. And it is working.
+
+gscdaddy.com/blog/improve-ctr-google-search-console
 ```
 
 ---
@@ -436,13 +434,11 @@ Every day the chart moves a little bit to the right. That is all I need right no
 ### First Reply (15-20 min after thread)
 
 ```
-Real data from my own dashboard today.
+The irony of building an SEO tool and dogfooding it on a site with 1 click is not lost on me.
 
-1 click. 18 impressions. 2 striking distance keywords appearing.
+But that is the whole point. If it works when the numbers are tiny, it will work when they are big.
 
-The site barely exists in Google's eyes yet. But it is showing up.
-
-Building the plane while flying it.
+Every tool should be built by someone who uses it daily.
 ```
 
 ---
