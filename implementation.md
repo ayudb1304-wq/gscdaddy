@@ -843,12 +843,58 @@ app/api/cron/send-emails/route.ts      -- Cron: weekly summaries, trial reminder
 1. **Weekly Summary** (Sunday 9 AM) - top opportunities, metrics overview, CTA
 2. **Trial Ending** (3 days before) - progress made, upgrade CTA
 3. **Trial Expired** (day of) - limited access notice, upgrade CTA
+4. **Nudge: Recommendations** (daily check) - sent once per site when user has synced GSC data + striking distance keywords but hasn't generated recommendations yet. Highlights their top keyword by opportunity score with real data. Uses `nudge_email_sent_at` column on sites table to prevent repeat sends.
+
+**Additional files:**
+```
+lib/email/templates/nudge-recommendations.tsx  -- Nudge email for users stuck before generating recs
+supabase/migrations/012_add_nudge_email_sent_at.sql  -- Adds nudge_email_sent_at to sites table
+```
 
 **Acceptance Criteria:**
 - [x] Emails render correctly in Gmail, Outlook, Apple Mail
 - [x] Weekly summary includes real data from user's site
 - [x] Trial emails trigger at correct times
 - [x] User's email preferences respected
+- [x] Nudge email sends only once per site (tracked via nudge_email_sent_at)
+- [x] Nudge email includes real keyword data (top keyword, position, impressions, total opportunities)
+- [x] Nudge skips users who already generated recommendations
+
+---
+
+### Step 12: Blog & Content Marketing ✅
+
+**12.1 Blog System**
+
+Static blog using TypeScript content files rendered as HTML. No MDX or CMS needed.
+
+**Files:**
+```
+lib/blog.ts                                              -- Blog post type, getAllPosts, getPostBySlug, reading time, heading extraction
+app/blog/page.tsx                                        -- Blog index page
+app/blog/[slug]/page.tsx                                 -- Blog post page with TOC sidebar, JSON-LD, related posts
+components/blog/table-of-contents.tsx                    -- Sticky TOC with scroll-spy, scrollable overflow
+content/blog/striking-distance-keywords-guide.ts         -- Post #1
+content/blog/low-hanging-fruit-keywords-gsc.ts           -- Post #2
+content/blog/google-search-console-beginners-guide.ts    -- Post #3
+content/blog/improve-ctr-google-search-console.ts        -- Post #4
+app/feed.xml/route.ts                                    -- RSS feed (auto-generates from getAllPosts)
+```
+
+**Features:**
+- BlogPosting + BreadcrumbList + FAQPage JSON-LD schema per post
+- Table of contents sidebar with IntersectionObserver scroll-spy
+- TOC is scrollable when it overflows the viewport (`max-h-[calc(100vh-8rem)]`)
+- Related posts section scored by shared tags
+- Reading time estimate
+- RSS feed at `/feed.xml` with auto-discovery link
+- All posts cross-linked to each other where relevant
+
+**12.2 Dashboard Bug Fixes**
+
+- Fixed striking distance stat card counting raw `gsc_data` rows (no impression threshold) while Top Opportunities used materialized view (requires >= 50 impressions). Stat card now reads from same data source as opportunities list.
+
+**STATUS: COMPLETE**
 
 ---
 
@@ -927,9 +973,26 @@ lib/
   sync/gsc-sync.ts, rate-limiter.ts
   algorithms/opportunity-score.ts
   api/response.ts, errors.ts, validate.ts, rate-limit.ts
-  email/resend.ts, templates/weekly-summary.tsx, trial-ending.tsx, trial-expired.tsx
+  email/resend.ts
+  email/templates/weekly-summary.tsx, trial-ending.tsx, trial-expired.tsx
+  email/templates/welcome.tsx, nudge-recommendations.tsx, shared.tsx
+  blog.ts
   constants.ts (already exists)
   utils.ts (already exists)
+
+content/
+  blog/
+    striking-distance-keywords-guide.ts
+    low-hanging-fruit-keywords-gsc.ts
+    google-search-console-beginners-guide.ts
+    improve-ctr-google-search-console.ts
+
+scripts/
+  cron-sync-gsc.ts
+  cron-refresh-views.ts
+  cron-generate-recs.ts
+  cron-send-emails.ts
+  test-emails.ts
 
 middleware.ts
 vercel.json
