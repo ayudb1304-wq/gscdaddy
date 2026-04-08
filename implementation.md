@@ -1137,3 +1137,207 @@ Build in this order within Phase 1. Each step depends on the previous:
 - [ ] CORS configured for production domain
 - [ ] No GSC data shared between users
 - [ ] GDPR: users can export/delete their data
+
+---
+
+## Phase 4: Free SEO Tools — Lead-Gen Strategy
+
+### Strategy
+
+Build **8 free SEO tools** on gscdaddy.com/tools/ that:
+
+1. **Strengthen topical authority** around "Google Search Console" and SEO
+2. **Drive organic traffic** via low-KD, SEO-adjacent keywords
+3. **Funnel visitors to paid GSCDaddy features** (every tool page has a CTA to sign up)
+4. **Are 100% client-side** — no backend, no auth required, zero incremental cost
+
+These are NOT generic utility tools (mortgage calculators, BMI, etc.). Every tool directly relates to what a GSCDaddy user cares about: SEO, keywords, content optimization, and technical SEO.
+
+---
+
+### The 8 Tools
+
+#### Already Built
+| # | Tool | Slug | Status |
+|---|------|------|--------|
+| 1 | Keyword Opportunity Calculator | `/tools/keyword-calculator` | Done |
+
+#### To Build
+| # | Tool | Slug | Primary Keyword | US/Mo | KD | CPC | Why It Fits GSCDaddy |
+|---|------|------|-----------------|-------|----|----|----------------------|
+| 2 | Meta Tag Generator | `/tools/meta-tag-generator` | meta tag generator | 56,000 | 20 | $2.20 | Users optimizing pages from GSCDaddy recommendations need meta tags |
+| 3 | Open Graph Generator | `/tools/open-graph-generator` | open graph meta tag generator | 29,250 | 14 | $2.40 | Direct follow-up after fixing title tags — improves social CTR |
+| 4 | Robots.txt Generator | `/tools/robots-txt-generator` | robots txt generator | 38,000 | 16 | $2.50 | Technical SEO — complements GSCDaddy's indexing insights |
+| 5 | Keyword Density Checker | `/tools/keyword-density-checker` | keyword density checker | 42,000 | 25 | $2.10 | Content optimization — users paste their page content, check keyword usage |
+| 6 | Readability Score Checker | `/tools/readability-checker` | readability score checker | 18,000 | 16 | $2.20 | Content quality — pairs with GSCDaddy's "improve this page" recommendations |
+| 7 | SERP Snippet Preview | `/tools/serp-preview` | google serp preview tool | ~12,000 | 12 | $1.80 | Users preview how their title/description looks in Google before publishing |
+| 8 | Slug Generator | `/tools/slug-generator` | slug generator | 22,000 | 12 | $1.60 | URL optimization — referenced in GSCDaddy blog posts |
+
+**Combined estimated US search volume: ~217,250/mo**
+**Average KD: 16.4** (all rankable within 2-3 months)
+
+---
+
+### Why These 7 (and Not Others from SEOTOOLS-IMPLEMENTATION.md)
+
+**Included — SEO relevance to GSCDaddy users:**
+- Every tool solves a problem that GSCDaddy surfaces: "your title tag is too long" → Meta Tag Generator. "This page has low CTR" → SERP Snippet Preview. "You're not indexed" → Robots.txt Generator.
+- Each tool page links back to the relevant GSCDaddy feature or blog post, creating an internal linking web around SEO topics.
+- The audience searching for these tools overlaps ~80% with GSCDaddy's target market.
+
+**Excluded — Tools that don't fit:**
+- **Mortgage/BMI/Salary Calculators** — Zero topical relevance. Hurts domain authority signals.
+- **JSON Formatter, Base64, UUID Generator** — Developer tools, not SEO tools. Different audience.
+- **Password Generator, QR Code Generator** — High volume but wrong audience entirely.
+- **Word Counter, Case Converter** — Generic text tools. Weak funnel to GSCDaddy.
+- **Sitemap Generator** — Requires server-side crawling to be useful. Can't do client-side properly.
+
+If you want to build those, start a separate project on a separate domain.
+
+---
+
+### Tool Page Template Spec
+
+Every tool page follows the same structure (matching the existing keyword-calculator pattern):
+
+```
+/app/tools/[tool-slug]/
+  page.tsx          — Metadata, JSON-LD schema, page layout
+  [tool]-form.tsx   — Client component with the interactive tool UI
+```
+
+#### Page Structure
+```
+┌─────────────────────────────────────────────┐
+│ Logo + "← Back to Tools" breadcrumb         │
+├─────────────────────────────────────────────┤
+│ H1: {Tool Name}                             │
+│ Short description (1-2 sentences)           │
+├─────────────────────────────────────────────┤
+│ ┌─────────────────────────────────────────┐ │
+│ │ TOOL UI (client component)              │ │
+│ │ - Input fields                          │ │
+│ │ - Output / results                      │ │
+│ │ - Copy to clipboard button              │ │
+│ └─────────────────────────────────────────┘ │
+├─────────────────────────────────────────────┤
+│ CTA BANNER                                  │
+│ "Want to find which pages need these fixes? │
+│  GSCDaddy scans your Search Console data    │
+│  and tells you exactly what to optimize."   │
+│ [Try GSCDaddy Free →]                       │
+├─────────────────────────────────────────────┤
+│ How to Use (3-4 steps)                      │
+├─────────────────────────────────────────────┤
+│ Why Use This Tool (3-4 bullet points)       │
+├─────────────────────────────────────────────┤
+│ FAQ (5 unique questions, with FAQ schema)    │
+├─────────────────────────────────────────────┤
+│ Related Tools (links to other /tools/ pages) │
+│ Related Blog Posts (links to /blog/ posts)   │
+├─────────────────────────────────────────────┤
+│ Footer                                      │
+└─────────────────────────────────────────────┘
+```
+
+#### SEO Per Page
+- Unique `<title>`: `{Tool Name} - Free Online Tool | GSCDaddy`
+- Unique `<meta description>` targeting primary + 1 secondary keyword
+- Canonical URL: `https://gscdaddy.com/tools/{slug}`
+- JSON-LD: `WebApplication` schema (matching keyword-calculator pattern)
+- JSON-LD: `FAQPage` schema
+- JSON-LD: `BreadcrumbList` schema
+- Open Graph + Twitter Card meta
+
+---
+
+### Build Order & Estimates
+
+All tools are client-side only. Each follows the established pattern from keyword-calculator.
+
+| Priority | Tool | Complexity | Notes |
+|----------|------|------------|-------|
+| 1 | SERP Snippet Preview | Low | Text inputs → live Google-styled preview. Great visual appeal. |
+| 2 | Meta Tag Generator | Low | Form fields → generates `<meta>` tags with copy button. Character count validation. |
+| 3 | Open Graph Generator | Low | Form + image URL → generates OG tags + live preview card. |
+| 4 | Slug Generator | Trivial | Text input → slugified output. Add options (separator, lowercase, transliteration). |
+| 5 | Robots.txt Generator | Low | Checkbox/select UI → generates robots.txt content. |
+| 6 | Keyword Density Checker | Medium | Textarea → parse text, count word/phrase frequency, show density %. |
+| 7 | Readability Score Checker | Medium | Textarea → Flesch-Kincaid, Gunning Fog, sentence/word stats. All client-side math. |
+
+---
+
+### Internal Linking Strategy
+
+Each tool page links to:
+1. **2-3 other tools** in the "Related Tools" section
+2. **1-2 blog posts** in the "Related Blog Posts" section
+3. **GSCDaddy signup** via the CTA banner
+
+Each blog post should link to relevant tools where natural:
+- "Beginners Guide to GSC" → link to Keyword Opportunity Calculator
+- "Improve CTR" → link to SERP Snippet Preview, Meta Tag Generator
+- "Low Hanging Fruit Keywords" → link to Keyword Density Checker
+- "Striking Distance Keywords" → link to Keyword Opportunity Calculator
+
+#### Link Map
+```
+keyword-calculator ←→ keyword-density-checker
+meta-tag-generator ←→ open-graph-generator ←→ serp-preview
+robots-txt-generator ←→ slug-generator
+readability-checker ←→ keyword-density-checker
+
+Blog: improve-ctr → serp-preview, meta-tag-generator
+Blog: beginners-guide → keyword-calculator, robots-txt-generator
+Blog: low-hanging-fruit → keyword-density-checker, keyword-calculator
+Blog: striking-distance → keyword-calculator
+```
+
+---
+
+### Tools Index Page
+
+Create `/app/tools/page.tsx` — a listing page for all free tools.
+
+- H1: "Free SEO Tools"
+- Grid of tool cards (icon, name, one-line description, link)
+- Grouped by category if >6 tools
+- CTA at bottom: "These tools fix individual pages. GSCDaddy finds which pages need fixing across your entire site."
+- Target keyword: `free seo tools` (KD ~35, 180K US/mo — ambitious but the page builds authority over time)
+
+---
+
+### Funnel Logic
+
+```
+Google Search → "/tools/meta-tag-generator" (free, no signup)
+                         │
+                         ▼
+            User finds tool useful
+                         │
+                         ▼
+         CTA: "GSCDaddy tells you WHICH pages
+               need better meta tags"
+                         │
+                         ▼
+              /login → free trial signup
+                         │
+                         ▼
+               Dashboard → paid conversion
+```
+
+Every tool solves ONE problem manually. GSCDaddy solves that problem at scale, automatically. That's the pitch on every tool page.
+
+---
+
+### What NOT to Build on gscdaddy.com
+
+To keep GSCDaddy focused, do NOT add:
+- Generic developer tools (JSON formatter, base64, regex tester)
+- Calculator tools (mortgage, BMI, salary, tip)
+- Converter tools (binary, temperature, hex)
+- Text utility tools (word counter, case converter, lorem ipsum)
+- Any tool requiring a backend API call
+- Any tool requiring user authentication
+
+If you want to build those, start a separate project on a separate domain per SEOTOOLS-IMPLEMENTATION.md.
