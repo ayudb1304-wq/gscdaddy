@@ -6,6 +6,14 @@ export const metadata = {
   description:
     "Terms of Service for GSCdaddy. Read the rules and conditions for using our Google Search Console analytics tool.",
   alternates: { canonical: "https://gscdaddy.com/terms" },
+  openGraph: {
+    title: "Terms of Service - GSCdaddy",
+    description:
+      "Terms of Service for GSCdaddy. Rules and conditions for using our SEO tool.",
+    url: "https://gscdaddy.com/terms",
+    siteName: "GSCdaddy",
+    type: "website",
+  },
 }
 
 function BreadcrumbJsonLd() {

@@ -10,6 +10,14 @@ export const metadata: Metadata = {
   description:
     "Sign in to GSCdaddy to access your Google Search Console dashboard, striking distance keywords, and AI-powered SEO recommendations.",
   alternates: { canonical: "https://gscdaddy.com/login" },
+  openGraph: {
+    title: "Log In - GSCdaddy",
+    description:
+      "Sign in to access your SEO dashboard and AI-powered recommendations.",
+    url: "https://gscdaddy.com/login",
+    siteName: "GSCdaddy",
+    type: "website",
+  },
 }
 
 function GoogleIcon({ className }: { className?: string }) {

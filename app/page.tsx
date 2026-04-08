@@ -36,18 +36,14 @@ function JsonLd() {
     operatingSystem: "Web",
     description:
       "Google Search Console analytics tool that finds striking-distance keywords and provides AI-powered action plans.",
-    offers: PRICING_TIERS.map((tier) => ({
-      "@type": "Offer",
-      name: tier.name,
-      price: tier.monthlyPrice.toString(),
+    image: "https://gscdaddy.com/images/dashboard-screenshot.png",
+    offers: {
+      "@type": "AggregateOffer",
+      lowPrice: "19",
+      highPrice: "99",
       priceCurrency: "USD",
-      priceSpecification: {
-        "@type": "UnitPriceSpecification",
-        price: tier.monthlyPrice.toString(),
-        priceCurrency: "USD",
-        unitText: "MONTH",
-      },
-    })),
+      offerCount: PRICING_TIERS.length.toString(),
+    },
   }
 
   const websiteSchema = {

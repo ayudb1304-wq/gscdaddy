@@ -6,6 +6,14 @@ export const metadata = {
   description:
     "Learn how GSCdaddy collects, uses, and protects your data. We only request read-only access to your Google Search Console.",
   alternates: { canonical: "https://gscdaddy.com/privacy" },
+  openGraph: {
+    title: "Privacy Policy - GSCdaddy",
+    description:
+      "Learn how GSCdaddy collects, uses, and protects your data.",
+    url: "https://gscdaddy.com/privacy",
+    siteName: "GSCdaddy",
+    type: "website",
+  },
 }
 
 function BreadcrumbJsonLd() {

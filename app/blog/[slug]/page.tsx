@@ -32,6 +32,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       authors: [post.author.name],
       url: `https://gscdaddy.com/blog/${post.slug}`,
       siteName: "GSCdaddy",
+      images: [
+        {
+          url: "https://gscdaddy.com/images/dashboard-screenshot.png",
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
@@ -52,6 +60,7 @@ function BlogPostJsonLd({
     "@type": "BlogPosting",
     headline: post.title,
     description: post.description,
+    image: "https://gscdaddy.com/images/dashboard-screenshot.png",
     datePublished: post.publishedAt,
     dateModified: post.updatedAt ?? post.publishedAt,
     author: {
@@ -63,6 +72,10 @@ function BlogPostJsonLd({
       "@type": "Organization",
       name: "GSCdaddy",
       url: "https://gscdaddy.com",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://gscdaddy.com/images/GSCDaddyLogo.png",
+      },
     },
     mainEntityOfPage: {
       "@type": "WebPage",

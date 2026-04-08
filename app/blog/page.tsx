@@ -9,6 +9,14 @@ export const metadata: Metadata = {
   description:
     "SEO guides, Google Search Console tutorials, and striking distance keyword strategies from the GSCdaddy team.",
   alternates: { canonical: "https://gscdaddy.com/blog" },
+  openGraph: {
+    title: "Blog - GSCdaddy",
+    description:
+      "SEO guides, Google Search Console tutorials, and striking distance keyword strategies.",
+    url: "https://gscdaddy.com/blog",
+    siteName: "GSCdaddy",
+    type: "website",
+  },
 }
 
 function BreadcrumbJsonLd() {
