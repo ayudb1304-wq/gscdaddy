@@ -52,7 +52,7 @@ export function Navigation() {
             Log in
           </a>
           <Button size="sm" asChild>
-            <a href="/login">Get Started</a>
+            <a href="/login">Start Free Trial</a>
           </Button>
         </div>
 
@@ -90,7 +90,7 @@ export function Navigation() {
               Log in
             </a>
             <Button size="sm" asChild>
-              <a href="/login">Get Started</a>
+              <a href="/login">Start Free Trial</a>
             </Button>
           </div>
         </div>

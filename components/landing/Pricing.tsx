@@ -124,7 +124,7 @@ export function Pricing() {
                     asChild
                   >
                     <a href="/login">
-                      Get started
+                      Start my free trial
                     </a>
                   </Button>
                   <p className="mt-3 text-center text-xs text-muted-foreground italic">

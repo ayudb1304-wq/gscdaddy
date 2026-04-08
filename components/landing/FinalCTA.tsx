@@ -23,7 +23,7 @@ export function FinalCTA() {
             <div className="mt-8">
               <Button size="lg" className="h-12 px-8 text-sm font-semibold" asChild>
                 <a href="/login">
-                  Get started — it's free
+                  Show me what I&apos;m missing
                   <ArrowRight className="ml-1 size-4" />
                 </a>
               </Button>

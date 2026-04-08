@@ -1,6 +1,5 @@
 import Image from "next/image"
 import { Check } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
 import { FEATURES } from "@/lib/constants"
 import { FadeInSection } from "./FadeInSection"
 
@@ -77,11 +76,6 @@ export function Features() {
                 <div className={feature.imagePosition === "left" ? "md:[direction:ltr]" : ""}>
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-medium text-primary">{feature.eyebrow}</p>
-                    {"comingSoon" in feature && feature.comingSoon && (
-                      <Badge variant="secondary" className="text-[10px]">
-                        Coming Soon
-                      </Badge>
-                    )}
                   </div>
 
                   <h3 className="mt-3 font-heading text-2xl font-semibold leading-tight">

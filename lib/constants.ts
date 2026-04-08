@@ -58,19 +58,6 @@ export const FEATURES = [
     ],
     imagePosition: "left" as const,
   },
-  {
-    eyebrow: "Content Decay Alerts",
-    title: "Know when your rankings start slipping",
-    description:
-      "Get notified automatically when pages lose 20%+ traffic. Catch problems before they become disasters.",
-    bullets: [
-      "Daily monitoring of all your pages",
-      "Alerts via email or dashboard",
-      "AI-suggested recovery actions",
-    ],
-    imagePosition: "right" as const,
-    comingSoon: true,
-  },
 ] as const
 
 export const COMPARISON = {
@@ -102,7 +89,6 @@ export const PRICING_TIERS = [
       { text: "1 site", comingSoon: false },
       { text: "5 AI recs/day", comingSoon: false },
       { text: "Striking distance keywords", comingSoon: false },
-      { text: "Content decay alerts", comingSoon: true },
       { text: "Weekly email summary", comingSoon: false },
     ],
     highlighted: false,
@@ -132,9 +118,7 @@ export const PRICING_TIERS = [
       { text: "25 sites", comingSoon: false },
       { text: "50 AI recs/day", comingSoon: false },
       { text: "Everything in Pro", comingSoon: false },
-      { text: "PDF exports", comingSoon: true },
-      { text: "Team access", comingSoon: true },
-      { text: "White-label reports", comingSoon: true },
+      { text: "Dedicated support", comingSoon: false },
     ],
     highlighted: false,
     dematerialization: "One missed client costs more than a year of GSCdaddy",

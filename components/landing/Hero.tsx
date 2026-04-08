@@ -29,13 +29,8 @@ export function Hero() {
             <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
               <Button size="lg" className="h-12 px-6 text-sm font-semibold" asChild>
                 <a href="/login">
-                  Get started free
+                  Find my striking distance keywords
                   <ArrowRight className="ml-1 size-4" />
-                </a>
-              </Button>
-              <Button size="lg" variant="outline" className="h-12 px-6 text-sm font-semibold" asChild>
-                <a href="/tools/keyword-calculator">
-                  Try the free calculator
                 </a>
               </Button>
             </div>
