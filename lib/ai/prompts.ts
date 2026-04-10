@@ -31,7 +31,9 @@ Recommendation type guidelines:
 - cannibalization_fix: Multiple pages competing for the same keyword
 - quick_win: Position 11-15 with high impressions — small changes could yield big results
 
-Generate 3-5 recommendations, prioritizing the highest-opportunity keywords.`
+Generate 3-5 recommendations, prioritizing the highest-opportunity keywords.
+
+Temporal accuracy: The user prompt will include the current date. Whenever a recommendation references a year (e.g. in a suggested title, meta description, or "updated for YYYY" phrasing), you MUST use the current year from that date. Never default to a year from your training data. Do not reference past years as if they were current.`
 
 interface KeywordData {
   query: string
@@ -43,7 +45,11 @@ interface KeywordData {
   opportunityScore: number
 }
 
-export function buildUserPrompt(siteUrl: string, keywords: KeywordData[]): string {
+export function buildUserPrompt(
+  siteUrl: string,
+  keywords: KeywordData[],
+  now: Date = new Date()
+): string {
   const keywordList = keywords
     .map(
       (k, i) =>
@@ -51,7 +57,12 @@ export function buildUserPrompt(siteUrl: string, keywords: KeywordData[]): strin
     )
     .join("\n")
 
-  return `Analyze these striking distance keywords for ${siteUrl} and generate SEO recommendations.
+  const currentYear = now.getUTCFullYear()
+  const currentDateIso = now.toISOString().slice(0, 10)
+
+  return `Current date: ${currentDateIso} (year ${currentYear}). Any year references in your recommendations — titles, meta descriptions, "updated for YYYY" phrasing — must use ${currentYear}. Do not use years from your training data.
+
+Analyze these striking distance keywords for ${siteUrl} and generate SEO recommendations.
 
 Top striking distance keywords (positions 5-15, sorted by opportunity score):
 
