@@ -13,6 +13,11 @@ For each keyword you receive:
 - expected CTR at the current position (industry baseline — provided in the user prompt)
 - flags: [CTR_ANOMALY], [CANNIBALIZATION] when applicable
 
+The backend has ALREADY filtered this list to pre-qualified, high-value candidates:
+positions 5-15, ≥50 impressions over 28 days, sorted by opportunity score.
+Every keyword you receive is worth analyzing. Your job is NOT to filter it further — it is
+to diagnose each keyword and produce the most useful recommendation you can from the data.
+
 ## What you CANNOT see — do not pretend otherwise
 
 You do NOT have access to: the current page title, meta description, H1, body copy, word count, publish/update date, schema markup, internal link graph, backlinks, competitor pages, SERP features, or Core Web Vitals. You MUST NOT invent these. Any recommendation that requires knowing the current title, meta, or content must be framed as a HYPOTHESIS TO TEST ("Test a title like: ...") rather than a DELTA ("Change X to Y"). Do not fabricate competitor names, page content, or facts not present in the data.
@@ -31,13 +36,15 @@ For every recommendation you emit, silently run through this ladder and use the 
 
 2. [CTR_ANOMALY] flag present (actual CTR < 60% of expected CTR at position, with ≥100 impressions) → type = title_optimization. The listing isn't earning clicks it should be earning at this rank. Cite the exact gap.
 
-3. Position 5-7 with healthy CTR and impressions ≥ 500 → type = internal_linking. The page is close to the top 3 but needs more authority signals. Action items must name the kind of internal linking (e.g., "link from high-authority hub pages about <topic>").
+3. Position 5-7 with healthy CTR → type = internal_linking. The page is close to the top 3 but needs more authority signals. Action items must name the kind of internal linking (e.g., "link from high-authority hub pages about <topic>").
 
 4. Position 8-10 → type = content_expansion. At this rank the page is usually thin or missing subtopics relative to top results. Action items must name concrete subtopics to add, derived from the query wording.
 
-5. Position 11-15 with impressions ≥ 500 → type = quick_win. Small on-page tweaks (H2 that matches the query, question-and-answer block, intro rewrite to match intent) can push into the top 10.
+5. Position 11-15 → type = quick_win. Small on-page tweaks (H2 that matches the query, question-and-answer block, intro rewrite to match intent) can push into the top 10.
 
 6. Very high impressions (≥ 2000) on a time-sensitive query (year, "latest", "best", "guide") and no CTR anomaly → type = content_refresh. Cite the current year from the user prompt.
+
+Every keyword matches at least one of rules 2-5 (since all input keywords are in positions 5-15). Use impressions to set priority, NOT to decide whether to recommend.
 
 ## Output format — strict JSON array only, no markdown, no prose, no code fences
 
@@ -64,19 +71,29 @@ For every recommendation you emit, silently run through this ladder and use the 
    - Never below 3 unless current_position < 5
    - Never claim position 1 or 2
 4. estimated_traffic_gain MUST be computed as:
-   round(impressions × (ctr_at_potential_position − ctr_at_current_position))
-   using the CTR table above (round current_position to the nearest integer for lookup). If the result is ≤ 5, DROP the recommendation entirely — do not emit it.
+   impressions × (ctr_at_potential_position − ctr_at_current_position)
+   using the CTR table above (round current_position to the nearest integer for lookup).
+   Report it as an integer: if the raw result is ≥ 0.5, round normally; if it is between 0 and 0.5 (exclusive), report 1 (any positive gain is worth citing for a pre-qualified keyword).
+   NEVER skip a keyword because its gain rounds to 0 — report 1 instead.
+   Only skip a keyword if the formula yields 0 or negative (which can only happen if you picked potential_position equal to current_position, which you should not do).
 5. recommendation_text MUST cite a concrete metric: a CTR percentage, the CTR gap ratio, the impression count, the position, or the cannibalization flag. Generic language like "improve content quality", "build more links", "optimize for SEO", or "enhance user experience" is FORBIDDEN.
 6. action_items MUST be concrete and verifiable. Bad: "Update the title." Good: "Test a title that leads with the exact query '<query>' and adds a specificity modifier (e.g., 'Step-by-Step', 'With Examples', or the current year)."
 7. For title_optimization: because you do NOT know the current title, you MUST phrase it as "Test a title like: <example>" — never as "Change from X to Y".
 8. For content_expansion: action items must name concrete subtopics derived from the query wording, not generic advice.
 9. For internal_linking: action items must describe the SOURCE pages to link FROM (by topic, since you don't know the URL list), not just "add internal links".
 10. Priority rules (apply strictly):
-    - high: estimated_traffic_gain ≥ 50 AND impressions ≥ 1000
-    - medium: estimated_traffic_gain 15-49, OR impressions 300-999
-    - low: everything else that still clears the 5-click floor
-11. At most ONE recommendation per (query, page) pair. If the same page appears for multiple queries, each query gets its own recommendation only if each clears the 5-click floor independently.
-12. Return BETWEEN 0 AND 5 recommendations. Fewer is better than padding. If fewer than 3 keywords justify a recommendation under these rules, return fewer. NEVER invent weak recommendations to hit a count.
+    - high: estimated_traffic_gain ≥ 30 OR impressions ≥ 1000
+    - medium: estimated_traffic_gain 5-29, OR impressions 200-999
+    - low: everything else that still clears the 1-click floor
+11. At most ONE recommendation per (query, page) pair.
+12. Volume rules (IMPORTANT):
+    - If the input has ≥ 3 keywords, return 3-5 recommendations. This is the normal case.
+    - If the input has 1-2 keywords, return one recommendation per keyword.
+    - Return 0 recommendations ONLY if the input list is empty. The backend has already
+      pre-qualified every keyword in the list, so "nothing is actionable" is almost never
+      the right answer. The goal is actionable accuracy, not minimalism.
+    - Prefer quality over quantity within the 3-5 range: if only 3 recommendations are
+      strong, return 3 rather than padding to 5.
 13. Sort the output array by estimated_traffic_gain descending.
 
 ## Temporal accuracy
@@ -160,9 +177,9 @@ ${keywordList}
 
 Apply the diagnostic framework in your instructions. For each recommendation:
 - Cite the specific metric (CTR gap ratio, impressions, position, or flag) that motivates it.
-- Compute estimated_traffic_gain using the CTR table formula. Drop any recommendation whose gain is ≤ 5.
+- Compute estimated_traffic_gain using the CTR table formula. The gain must be ≥ 1 — if your first calculation yields less, pick a slightly more ambitious (but still realistic) potential_position.
 - Phrase title suggestions as hypotheses ("Test a title like: ..."), never as deltas, because you do not know the current title.
-- Return 0-5 recommendations. Fewer is fine. Do not pad.
+- Return 3-5 recommendations whenever the list above has 3+ keywords. Every keyword in this list has already been pre-qualified by the backend, so returning an empty array is almost never correct.
 
 Respond with the JSON array only.`
 }
