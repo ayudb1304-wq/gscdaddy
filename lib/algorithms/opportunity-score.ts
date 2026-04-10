@@ -1,4 +1,4 @@
-const CTR_BY_POSITION: Record<number, number> = {
+export const CTR_BY_POSITION: Record<number, number> = {
   1: 0.30, 2: 0.15, 3: 0.10, 4: 0.07, 5: 0.05,
   6: 0.04, 7: 0.03, 8: 0.025, 9: 0.02, 10: 0.018,
   11: 0.015, 12: 0.013, 13: 0.011, 14: 0.010, 15: 0.009,

@@ -72,8 +72,10 @@ export async function generateRecommendations(siteId: string) {
     opportunityScore: Math.round(Number(k.opportunity_score)),
   }))
 
-  // Build prompt and call Claude
-  const userPrompt = buildUserPrompt(site.site_url, keywordData)
+  // Build prompt and call Claude. Pass `new Date()` so the model always
+  // knows the current date and doesn't fall back to years from its training
+  // data when generating titles or "updated for YYYY" phrasing.
+  const userPrompt = buildUserPrompt(site.site_url, keywordData, new Date())
 
   const response = await anthropic.messages.create({
     model: "claude-sonnet-4-20250514",
