@@ -2,6 +2,7 @@ import { strikingDistanceKeywordsGuide } from "@/content/blog/striking-distance-
 import { lowHangingFruitKeywordsGsc } from "@/content/blog/low-hanging-fruit-keywords-gsc"
 import { googleSearchConsoleBeginnersGuide } from "@/content/blog/google-search-console-beginners-guide"
 import { improveCtrGoogleSearchConsole } from "@/content/blog/improve-ctr-google-search-console"
+import { ahrefsVsSemrushVsGoogleSearchConsole } from "@/content/blog/ahrefs-vs-semrush-vs-google-search-console"
 
 export interface BlogPost {
   slug: string
@@ -24,6 +25,7 @@ const posts: BlogPost[] = [
   lowHangingFruitKeywordsGsc,
   googleSearchConsoleBeginnersGuide,
   improveCtrGoogleSearchConsole,
+  ahrefsVsSemrushVsGoogleSearchConsole,
 ]
 
 export function getAllPosts(): BlogPost[] {

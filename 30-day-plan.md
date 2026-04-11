@@ -319,16 +319,16 @@ Rules:
 
 ### BUILD
 
-- [ ] No new content today. Review all 4 published posts for typos, broken links, missing alt text
-- [ ] Check GSC for any indexing issues
-- [ ] Install Ahrefs Webmaster Tools (free) and run first site audit
+- [x] No new content today. Review all 4 published posts for typos, broken links, missing alt text
+- [x] Check GSC for any indexing issues
+- [x] Install Ahrefs Webmaster Tools (free) and run first site audit
 
 ### DISTRIBUTE
 
-- [ ] Spend 30-45 minutes on Reddit commenting helpfully (aim for 10 quality comments)
-- [ ] Engage on Twitter (reply to 15-20 people)
-- [ ] Plan Week 2 content calendar
-- [ ] Sign up for journalist query platforms: Featured.com (free), Help a B2B Writer (free), Source of Sources (free)
+- [x] Spend 30-45 minutes on Reddit commenting helpfully (aim for 10 quality comments)
+- [x] Engage on Twitter (reply to 15-20 people)
+- [x] Plan Week 2 content calendar
+- [x] Sign up for journalist query platforms: Featured.com (free), Help a B2B Writer (free), Source of Sources (free)
 
 ---
 
