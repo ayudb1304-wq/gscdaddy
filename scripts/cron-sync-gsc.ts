@@ -13,12 +13,9 @@ const admin = createClient(
 async function main() {
   console.log("Starting GSC sync cron...")
 
-  const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
-
   const { data: sites, error } = await admin
     .from("sites")
     .select("id, site_url")
-    .or(`last_synced_at.is.null,last_synced_at.lt.${twentyFourHoursAgo}`)
     .neq("sync_status", "syncing")
 
   if (error) {
