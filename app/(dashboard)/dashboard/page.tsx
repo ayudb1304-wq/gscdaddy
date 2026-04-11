@@ -5,6 +5,7 @@ import { MetricsCards } from "@/components/dashboard/metrics-cards"
 import { PerformanceChart } from "@/components/dashboard/performance-chart"
 import { TopOpportunities } from "@/components/dashboard/top-opportunities"
 import { RecentRecs } from "@/components/dashboard/recent-recs"
+import { SyncRecsBar } from "@/components/dashboard/sync-recs-bar"
 
 interface DashboardPageProps {
   searchParams: Promise<{ siteId?: string }>
@@ -20,7 +21,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   // Get user's sites to determine which to show
   const { data: sites } = await admin
     .from("sites")
-    .select("id, site_url, sync_status")
+    .select("id, site_url, sync_status, last_synced_at")
     .eq("user_id", user.id)
     .order("created_at", { ascending: true })
 
@@ -38,7 +39,11 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const siteId = siteIdParam || sites[0].id
   const site = sites.find((s) => s.id === siteId) || sites[0]
 
-  if (site.sync_status === "syncing") {
+  // Only show the full-page "syncing" placeholder for a site's FIRST sync
+  // (when there's no prior data to display). For subsequent re-syncs triggered
+  // from the SyncRecsBar, we keep the dashboard visible with stale data so the
+  // user retains context while the background sync runs.
+  if (site.sync_status === "syncing" && !site.last_synced_at) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
@@ -74,7 +79,8 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const fmt = (d: Date) => d.toISOString().split("T")[0]
 
   // Fetch all data in parallel
-  const [currentResult, priorResult, chartResult, opportunitiesResult, recsResult] = await Promise.all([
+  const nowIso = new Date().toISOString()
+  const [currentResult, priorResult, chartResult, opportunitiesResult, recsResult, freshRecsCountResult] = await Promise.all([
     admin
       .from("gsc_data")
       .select("clicks, impressions, position")
@@ -132,6 +138,13 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           })),
         }
       }),
+    // Count non-expired recommendations for this site so SyncRecsBar can decide
+    // whether to show the prominent "Generate AI recommendations" CTA.
+    admin
+      .from("recommendations")
+      .select("*", { count: "exact", head: true })
+      .eq("site_id", siteId)
+      .gt("expires_at", nowIso),
   ])
 
   const current = currentResult.data || []
@@ -184,11 +197,21 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       Math.round((vals.positions.reduce((a, b) => a + b, 0) / vals.positions.length) * 10) / 10,
   }))
 
+  const hasFreshRecs = (freshRecsCountResult.count || 0) > 0
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Dashboard</h1>
-        <p className="text-sm text-muted-foreground">Last 28 days performance overview</p>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">Dashboard</h1>
+          <p className="text-sm text-muted-foreground">Last 28 days performance overview</p>
+        </div>
+        <SyncRecsBar
+          siteId={site.id}
+          initialSyncStatus={site.sync_status}
+          initialLastSyncedAt={site.last_synced_at}
+          hasFreshRecs={hasFreshRecs}
+        />
       </div>
 
       <MetricsCards data={metricsData} />
