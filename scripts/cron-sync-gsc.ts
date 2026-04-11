@@ -45,6 +45,24 @@ async function main() {
     }
   }
 
+  // Refresh the striking-distance materialized view so today's recommendations
+  // cron (which fires at 05:00 UTC, 60 minutes after sync-gsc at 04:00 UTC)
+  // reads fresh data. Without this the generate-recs cron would operate on
+  // yesterday's snapshot until the dedicated refresh-views job runs at 04:30 —
+  // which is a 60-minute race window. Calling it here closes that gap.
+  if (succeeded > 0) {
+    try {
+      const { error: refreshError } = await admin.rpc("refresh_striking_distance")
+      if (refreshError) {
+        console.error("Post-sync view refresh failed:", refreshError)
+      } else {
+        console.log("Striking-distance view refreshed")
+      }
+    } catch (e) {
+      console.error("Post-sync view refresh threw:", e)
+    }
+  }
+
   console.log(`Done: ${succeeded} succeeded, ${failed} failed`)
   if (failed > 0) process.exit(1)
 }

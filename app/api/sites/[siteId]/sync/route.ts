@@ -39,6 +39,18 @@ export async function POST(
         return
       }
 
+      // Refresh the striking-distance materialized view so the user's freshly-
+      // synced data is visible in recommendations immediately — not tomorrow
+      // when the daily refresh-views cron fires. Critical for first-time users:
+      // without this step, a new user's very first sync completes but the view
+      // still shows nothing until the next day. Non-fatal on failure because
+      // the daily cron is a safety net.
+      try {
+        await admin.rpc("refresh_striking_distance")
+      } catch (err) {
+        console.error(`Post-sync view refresh failed for site ${siteId}:`, err)
+      }
+
       // Post-sync: auto-generate recommendations for first-time users
       // so they land on the dashboard with something to act on immediately.
       // Gated on "zero non-expired recs" so repeat syncs don't re-bill the AI call.
