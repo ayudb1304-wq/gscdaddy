@@ -50,8 +50,13 @@ export async function generateRecommendations(siteId: string) {
     p_limit: 20,
   })
 
-  if (kwError || !keywords || keywords.length === 0) {
-    throw new Error("No striking distance keywords found for this site")
+  if (kwError) {
+    throw new Error(`Failed to fetch striking distance keywords: ${kwError.message}`)
+  }
+
+  if (!keywords || keywords.length === 0) {
+    console.log(`Site ${siteId} has no striking distance keywords yet — skipping`)
+    return []
   }
 
   const keywordData = keywords.map((k: {

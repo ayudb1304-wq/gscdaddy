@@ -4,7 +4,7 @@ on:
   schedule:
     - cron: "0 4 * * *"   # Daily 9:30 AM IST — sync GSC data
     - cron: "30 4 * * *"  # Daily 10:00 AM IST — refresh materialized views
-    - cron: "0 5 * * 0"   # Sundays 10:30 AM IST — generate AI recommendations
+    - cron: "0 5 * * *"   # Daily 10:30 AM IST — generate AI recommendations (self-healing)
     - cron: "0 9 * * *"   # Daily 2:30 PM IST — send emails
   workflow_dispatch:
     inputs:
@@ -55,7 +55,7 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
   generate-recs:
-    if: github.event.schedule == '0 5 * * 0' || github.event.inputs.job == 'generate-recs'
+    if: github.event.schedule == '0 5 * * *' || github.event.inputs.job == 'generate-recs'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:

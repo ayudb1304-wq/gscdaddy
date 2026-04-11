@@ -3,6 +3,7 @@ import { requireAuth } from "@/lib/auth"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { successResponse, errors } from "@/lib/api/response"
 import { syncSite } from "@/lib/sync/gsc-sync"
+import { generateRecommendations } from "@/lib/ai/generate-recommendations"
 
 export const maxDuration = 300 // 5 minutes max for sync
 
@@ -35,6 +36,25 @@ export async function POST(
         await syncSite(siteId)
       } catch (err) {
         console.error(`Background sync failed for site ${siteId}:`, err)
+        return
+      }
+
+      // Post-sync: auto-generate recommendations for first-time users
+      // so they land on the dashboard with something to act on immediately.
+      // Gated on "zero non-expired recs" so repeat syncs don't re-bill the AI call.
+      try {
+        const { count } = await admin
+          .from("recommendations")
+          .select("*", { count: "exact", head: true })
+          .eq("site_id", siteId)
+          .gt("expires_at", new Date().toISOString())
+
+        if (!count || count === 0) {
+          console.log(`Auto-generating first-time recommendations for site ${siteId}`)
+          await generateRecommendations(siteId)
+        }
+      } catch (err) {
+        console.error(`Auto rec-generation failed for site ${siteId}:`, err)
       }
     })
 
