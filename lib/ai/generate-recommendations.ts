@@ -1,4 +1,5 @@
-import Anthropic from "@anthropic-ai/sdk"
+import { anthropic } from "@ai-sdk/anthropic"
+import { generateObject } from "ai"
 import { z } from "zod/v4"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { SYSTEM_PROMPT, buildUserPrompt } from "./prompts"
@@ -22,10 +23,6 @@ const RecommendationSchema = z.object({
   action_items: z.array(z.string()),
   priority: z.enum(["high", "medium", "low"]),
 })
-
-const RecommendationsArraySchema = z.array(RecommendationSchema)
-
-const anthropic = new Anthropic()
 
 export async function generateRecommendations(siteId: string) {
   const admin = createAdminClient()
@@ -77,32 +74,22 @@ export async function generateRecommendations(siteId: string) {
     opportunityScore: Math.round(Number(k.opportunity_score)),
   }))
 
-  // Build prompt and call Claude. Pass `new Date()` so the model always
-  // knows the current date and doesn't fall back to years from its training
-  // data when generating titles or "updated for YYYY" phrasing.
+  // Build prompt and call Claude via @ai-sdk/anthropic. Pass `new Date()` so
+  // the model always knows the current date and doesn't fall back to years
+  // from its training data when generating titles or "updated for YYYY" phrasing.
   const userPrompt = buildUserPrompt(site.site_url, keywordData, new Date())
 
-  const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-20250514",
-    max_tokens: 2048,
+  // generateObject handles schema validation, markdown-fence stripping, and
+  // JSON parsing internally — replacing the manual parse/zod pipeline we had
+  // with the direct Anthropic SDK.
+  const { object: recommendations } = await generateObject({
+    model: anthropic("claude-sonnet-4-6"),
+    output: "array",
+    schema: RecommendationSchema,
     system: SYSTEM_PROMPT,
-    messages: [{ role: "user", content: userPrompt }],
+    prompt: userPrompt,
+    maxOutputTokens: 2048,
   })
-
-  // Extract text content
-  const textBlock = response.content.find((block) => block.type === "text")
-  if (!textBlock || textBlock.type !== "text") {
-    throw new Error("No text response from Claude")
-  }
-
-  // Parse JSON — handle potential markdown code fences
-  let jsonStr = textBlock.text.trim()
-  if (jsonStr.startsWith("```")) {
-    jsonStr = jsonStr.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "")
-  }
-
-  const parsed = JSON.parse(jsonStr)
-  const recommendations = RecommendationsArraySchema.parse(parsed)
 
   // Insert into DB
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
