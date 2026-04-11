@@ -2,8 +2,16 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
-import { RefreshCw, Sparkles, AlertCircle } from "lucide-react"
+import { RefreshCw, Sparkles, AlertCircle, Lightbulb, Clock, FileText, Target, BarChart3 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 
 interface SyncRecsBarProps {
   siteId: string
@@ -36,6 +44,7 @@ export function SyncRecsBar({
   const [syncProgress, setSyncProgress] = useState<string | null>(null)
   const [generating, setGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [noOpportunitiesOpen, setNoOpportunitiesOpen] = useState(false)
   const justFinishedSyncRef = useRef(false)
 
   const isSyncing = syncStatus === "syncing"
@@ -98,7 +107,16 @@ export function SyncRecsBar({
       if (!res.ok) {
         throw new Error(json.error?.message || json.error || "Generation failed")
       }
-      router.refresh()
+      // Success shape is { success: true, data: <recommendations[]> }.
+      // An empty array means generateRecommendations() returned [] because
+      // the site has no striking-distance keywords yet — surface that as a
+      // friendly dialog instead of silently doing nothing.
+      const data = json.data ?? json
+      if (Array.isArray(data) && data.length === 0) {
+        setNoOpportunitiesOpen(true)
+      } else {
+        router.refresh()
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Generation failed")
     } finally {
@@ -144,6 +162,92 @@ export function SyncRecsBar({
           <span>{error}</span>
         </div>
       )}
+
+      <Dialog open={noOpportunitiesOpen} onOpenChange={setNoOpportunitiesOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <div className="mx-auto mb-2 flex size-12 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30">
+              <Lightbulb className="size-6 text-amber-600 dark:text-amber-400" />
+            </div>
+            <DialogTitle className="text-center text-lg">
+              Not enough data for recommendations — yet
+            </DialogTitle>
+            <DialogDescription className="text-center">
+              Your site doesn&apos;t have any{" "}
+              <span className="font-medium text-foreground">&quot;striking distance&quot; keywords</span>{" "}
+              right now. These are queries where you rank between positions 5–15 with enough impressions
+              to be worth optimizing — the sweet spot for quick SEO wins.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-3">
+            <p className="text-sm font-medium">Here&apos;s what usually helps:</p>
+            <ul className="space-y-3 text-sm">
+              <li className="flex gap-3">
+                <Clock className="size-4 shrink-0 text-muted-foreground mt-0.5" />
+                <div>
+                  <p className="font-medium">Give it time.</p>
+                  <p className="text-muted-foreground">
+                    Brand-new sites need 2–4 weeks before Google Search Console starts reporting
+                    meaningful impression data. If you just connected this site, check back in a few days.
+                  </p>
+                </div>
+              </li>
+              <li className="flex gap-3">
+                <FileText className="size-4 shrink-0 text-muted-foreground mt-0.5" />
+                <div>
+                  <p className="font-medium">Publish more content.</p>
+                  <p className="text-muted-foreground">
+                    More indexed pages means more queries you can rank for. Aim for 10–20 well-targeted
+                    pages before expecting meaningful striking-distance keywords.
+                  </p>
+                </div>
+              </li>
+              <li className="flex gap-3">
+                <Target className="size-4 shrink-0 text-muted-foreground mt-0.5" />
+                <div>
+                  <p className="font-medium">Target mid-tail keywords.</p>
+                  <p className="text-muted-foreground">
+                    Phrases like &quot;best X for Y&quot; reach striking distance faster than short,
+                    high-competition queries.
+                  </p>
+                </div>
+              </li>
+              <li className="flex gap-3">
+                <BarChart3 className="size-4 shrink-0 text-muted-foreground mt-0.5" />
+                <div>
+                  <p className="font-medium">Check GSC directly.</p>
+                  <p className="text-muted-foreground">
+                    If Search Console is showing zero impressions for your site, that&apos;s the root
+                    issue — make sure the site is verified and indexed before expecting ranking data.
+                  </p>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <DialogFooter className="flex-col gap-2 sm:flex-row">
+            <Button
+              variant="outline"
+              onClick={() => setNoOpportunitiesOpen(false)}
+              className="w-full sm:w-auto"
+            >
+              Got it
+            </Button>
+            <Button
+              onClick={() => {
+                setNoOpportunitiesOpen(false)
+                handleSync()
+              }}
+              disabled={isSyncing}
+              className="w-full gap-1.5 sm:w-auto"
+            >
+              <RefreshCw className={`size-3.5 ${isSyncing ? "animate-spin" : ""}`} />
+              Re-sync from GSC
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
