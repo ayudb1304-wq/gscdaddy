@@ -26,7 +26,24 @@ export async function POST(
 
     if (siteError || !site) return errors.notFound("Site")
 
-    // Rate limit check: count today's generations for this site
+    // Credit-burn guard: if this site already has non-expired recommendations,
+    // return them without calling the AI. Prevents duplicate spend on repeated
+    // clicks, UI races (e.g., cron just generated in parallel), or stale props.
+    // This makes the endpoint idempotent — safe to hammer without billing.
+    const nowIso = new Date().toISOString()
+    const { data: existingFreshRecs } = await admin
+      .from("recommendations")
+      .select("*")
+      .eq("site_id", siteId)
+      .gt("expires_at", nowIso)
+      .order("created_at", { ascending: false })
+
+    if (existingFreshRecs && existingFreshRecs.length > 0) {
+      return successResponse(existingFreshRecs)
+    }
+
+    // Daily rate limit check: count today's rows for this site.
+    // Only applies when we actually need to call the AI.
     const today = new Date().toISOString().split("T")[0]
     const { count } = await admin
       .from("recommendations")

@@ -83,7 +83,7 @@ export async function generateRecommendations(siteId: string) {
   // JSON parsing internally — replacing the manual parse/zod pipeline we had
   // with the direct Anthropic SDK.
   const { object: recommendations } = await generateObject({
-    model: anthropic("claude-sonnet-4-6"),
+    model: anthropic("claude-haiku-4-5"),
     output: "array",
     schema: RecommendationSchema,
     system: SYSTEM_PROMPT,
