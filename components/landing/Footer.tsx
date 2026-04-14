@@ -33,7 +33,13 @@ export function Footer() {
 
         <div className="mt-6 flex flex-col items-center gap-4 text-xs text-muted-foreground md:flex-row md:justify-between">
           <p>&copy; 2026 GSCdaddy. Built with &#9749; in India.</p>
-          <div className="flex gap-4">
+          <div className="flex flex-wrap gap-4">
+            <a href="/seo-health-checker" className="transition-colors hover:text-foreground">
+              SEO Health Checker
+            </a>
+            <a href="/tools" className="transition-colors hover:text-foreground">
+              Free Tools
+            </a>
             <a href="/blog" className="transition-colors hover:text-foreground">
               Blog
             </a>

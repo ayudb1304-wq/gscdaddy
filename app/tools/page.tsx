@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { ArrowRight, TrendingUp, Eye, Code, Share2, Link as LinkIcon, Bot, BarChart3, BookOpen } from "lucide-react"
+import { ArrowRight, TrendingUp, Eye, Code, Share2, Link as LinkIcon, Bot, BarChart3, BookOpen, HeartPulse } from "lucide-react"
 import { Logo } from "@/components/logo"
 import { TOOLS } from "@/lib/tools"
 
@@ -20,6 +20,7 @@ export const metadata: Metadata = {
 }
 
 const ICON_MAP: Record<string, React.ReactNode> = {
+  HeartPulse: <HeartPulse className="size-5" />,
   TrendingUp: <TrendingUp className="size-5" />,
   Eye: <Eye className="size-5" />,
   Code: <Code className="size-5" />,
@@ -80,7 +81,33 @@ export default function ToolsIndexPage() {
         </p>
       </header>
 
-      <div className="mt-12 grid gap-4 sm:grid-cols-2">
+      {/* Featured: SEO Health Checker */}
+      <Link
+        href="/seo-health-checker"
+        className="group mt-12 flex flex-col gap-4 rounded-xl border-2 border-primary/30 bg-primary/5 p-6 transition-colors hover:border-primary/50 hover:bg-primary/10 sm:flex-row sm:items-center"
+      >
+        <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary/20 text-primary transition-colors group-hover:bg-primary/30">
+          <HeartPulse className="size-6" />
+        </div>
+        <div className="flex-1">
+          <div className="flex items-center gap-2">
+            <p className="font-heading text-base font-bold text-foreground">
+              SEO Health Checker
+            </p>
+            <span className="rounded-full bg-primary/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary">
+              Popular
+            </span>
+          </div>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Get a free 0-100 SEO health score for any website in 15 seconds. Checks
+            performance, mobile friendliness, on-page SEO, schema markup, security,
+            and indexability.
+          </p>
+        </div>
+        <ArrowRight className="size-5 shrink-0 text-primary opacity-0 transition-opacity group-hover:opacity-100" />
+      </Link>
+
+      <div className="mt-6 grid gap-4 sm:grid-cols-2">
         {TOOLS.map((tool) => (
           <Link
             key={tool.slug}

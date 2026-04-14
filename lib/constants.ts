@@ -1,4 +1,5 @@
 export const NAV_LINKS = [
+  { label: "SEO Checker", href: "/seo-health-checker" },
   { label: "Features", href: "#features" },
   { label: "Pricing", href: "#pricing" },
   { label: "Blog", href: "/blog" },
