@@ -2,26 +2,109 @@
 
 A prioritized rebuild of the funnel based on the competitor analysis, mapped against what is already shipped in `implementation.md`. The single thesis driving this document is the same one the research keeps returning to. The product is fine. The funnel is broken. Three users signed up and never came back because the GSC connection step gates 100% of the value. Everything below is structured to fix that, in the order it should be fixed.
 
+> **Last updated:** April 14, 2026
+
+---
+
+## Progress Checklist
+
+Track overall revamp progress at a glance. Each item maps to a priority section below.
+
+### P0. Close out Phase 1 gaps
+
+- [x] **P0.1 Email notifications** — Weekly summary, trial ending, trial expired, welcome, nudge, top opportunity alert (7 templates shipped via Resend + React Email)
+- [x] **P0.2 Settings pages** — Profile, sites management, billing, GDPR delete account, revoke Google access (all live at `/settings/*`)
+- [x] **P0.3 API response format & validation** — Standardized envelope via `lib/api/response.ts`, rate limiting via `lib/api/rate-limit.ts`, zod validation on routes
+
+### P1. Fix the cold start problem
+
+- [ ] **P1.1 Free SEO Health Score tool** — Public tool at `/seo-health-checker` with 0-100 score, email-gated PDF report, programmatic SEO per domain
+- [ ] **P1.2 Demo mode with sample data** — Populated dashboard using gscdaddy.com data for users with no synced sites
+- [ ] **P1.3 Two-track onboarding** — "How old is your website?" split: new site launchpad vs. established site flow
+- [ ] **P1.4 Reverse trial after expiry** — Downgrade to read-only free tier instead of full lockout
+
+### P2. Fix activation and retention emails
+
+- [ ] **Signup completed email** — "Your SEO score is X/100, here are your top 3 fixes"
+- [ ] **No GSC connection within 24h** — "Here is what you are missing" with sample striking distance report
+- [ ] **GSC connected, sync completed** — "We found N striking distance keywords on your site"
+- [ ] **No login for 3 days** — "Quick wins you are leaving on the table" with top 3 opportunities
+- [ ] **7 days into trial** — "You are halfway through. Here is what you have unlocked."
+- [ ] **11 days in (3 days before end)** — Personalized summary of access about to be lost
+- [ ] **13 days in** — Final reminder + annual discount offer
+- [ ] **Trial expired, no upgrade** — "What stopped you?" with Calendly link
+- [ ] **Day 30 post-trial** — Win-back with new features shipped since they left
+- [ ] **Email events tracking table** — `email_events` table for dedup and conversion tracking
+
+### P3. Programmatic SEO and content expansion
+
+- [ ] **P3.1 Comparison pages** — `/vs/seotesting`, `/vs/seo-gets`, `/vs/content-raptor`, `/vs/ahrefs`, `/vs/semrush`, `/vs/ubersuggest`
+- [ ] **P3.2 Vertical-specific GSC guides** — `/for/bloggers`, `/for/agencies`, `/for/ecommerce`, `/for/saas`, `/for/affiliates`
+- [x] **P3.3 Free tool landing pages** — 8 tools live at `/tools/*`: keyword calculator, SERP preview, keyword density checker, meta tag generator, OG generator, readability checker, robots.txt generator, slug generator
+- [x] **P3.4 Build-in-public content** — 7 blog posts published, social media strategy active (see `socialmediahustle.md`)
+
+### P4. Additional free tools (after SEO Health Score)
+
+- [x] **Keyword calculator** — Live at `/tools/keyword-calculator` (position/impression to traffic gain estimates)
+- [x] **SERP preview tool** — Live at `/tools/serp-preview`
+- [ ] **Content decay checker** — URL input, checks Google cache date and flags freshness issues
+- [ ] **Schema markup generator and validator** — URL input, detect existing schema, generate missing JSON-LD
+- [ ] **AI Overviews visibility checker** — Check whether a domain appears in Google's AI Overviews
+
+### P5. Browser extension
+
+- [ ] **MVP Chrome extension** — Overlay on GSC Performance report showing striking distance keywords with opportunity score
+
+### P6. Phase 2 features from original implementation doc
+
+- [ ] **Content decay alerts** — Daily cron comparing 28-day windows, severity thresholds, alerts UI at `/alerts`
+- [ ] **Onboarding checklist** — Persistent dashboard checklist with persona-adapted items, endowed progress
+- [ ] **Keyword cannibalization detection** — Find queries where 2+ pages rank, recommend merge/differentiate/301
+- [ ] **PDF export (Agency plan only)** — `@react-pdf/renderer` for monthly client reports
+
+### P7. Landing page revamp
+
+- [x] Hero section with CTA
+- [x] Trust bar (Trustpilot badge)
+- [x] Problem section
+- [x] How it works (3 steps)
+- [x] Features comparison
+- [x] Founder section with Twitter link
+- [x] Build-in-public social proof
+- [x] Blog highlights section
+- [x] Pricing cards with annual toggle
+- [x] FAQ with FAQPage schema
+- [x] Final CTA section
+- [x] Navigation and footer
+- [x] SoftwareApplication, Organization, WebSite, BreadcrumbList JSON-LD
+- [ ] Inline SEO Health Score input on hero (depends on P1.1)
+- [ ] Real build-in-public tweet embeds as social proof
+- [ ] Page speed optimization (target LCP < 2.5s, INP < 200ms)
+
 ---
 
 ## What is already shipped
 
-The Phase 1 MVP is essentially done. From `implementation.md`, the following steps are marked COMPLETE.
+Phase 1 MVP is **complete**. All 12 steps from `implementation.md` are marked DONE.
 
-- Database, RLS, materialized view for striking distance
+**Core product (Steps 1-8):**
+- Database, RLS, materialized view for striking distance (13 migrations)
 - Google OAuth with PKCE and encrypted token storage
 - 4-step onboarding wizard with persona selection and pre-permission priming
 - Daily GSC sync with cron and rate limiting
 - Dashboard with metrics cards, performance chart, top opportunities, recent recs
 - Striking distance report with filters, sorting, opportunity score, CSV export
 - AI recommendations via Claude with rate limiting and weekly auto-generation
-- Dodo Payments billing with checkout, webhooks, customer portal, trial logic
+- Dodo Payments billing with checkout, webhooks, customer portal, trial logic (Blogger $19, Pro $49, Agency $99)
 
-The following Phase 1 items are listed but not marked complete and should be closed out before any new work.
-
-- Settings pages (profile, sites management UI, GDPR delete account)
-- Standardized API response format and zod validation across all routes
-- Email notifications (weekly summary, trial ending, trial expired)
+**Supporting systems (Steps 9-12):**
+- Settings pages — profile, sites management, billing, GDPR delete, Google access revocation
+- Standardized API response format with zod validation and rate limiting
+- Email notifications — 7 templates (welcome, weekly summary, trial ending, trial expired, nudge recommendations, top opportunity alert, shared utilities) via Resend + React Email
+- Blog system — 7 published posts with BlogPosting/FAQPage schema, RSS feed, sticky TOC
+- 8 free SEO tools at `/tools/*` with tools landing page
+- Full landing page with 15 component sections and structured data
+- IndexNow pinging on every deploy
 
 Phase 2 and Phase 3 from the original plan (decay alerts, alert UI, cannibalization, PDF export, archival) are not built.
 
@@ -43,30 +126,36 @@ The biggest single lever, by a wide margin, is the free SEO Health Score tool. E
 
 ---
 
-## Priority 0. Close out the Phase 1 gaps
+## Priority 0. Close out the Phase 1 gaps ✅ COMPLETE
 
-Before building anything new, finish what is half-built. These are not glamorous but the conversion improvements below assume they exist.
+All Phase 1 gaps have been closed. These shipped as part of the MVP completion.
 
-### P0.1 Email notifications (Step 11 from the implementation doc)
+### P0.1 Email notifications ✅
 
-The weekly summary email is the single most important retention lever for users who are NOT logging in daily. Without it, sync runs in the background and users forget the tool exists. Build the three MVP emails first.
+Seven email templates shipped via Resend + React Email, triggered by a daily cron job at `/api/cron/send-emails`:
 
-- Weekly summary, sent Sunday 9 AM in the user's timezone, includes top 3 opportunities and week-over-week metric changes
-- Trial ending warning, sent 3 days before `trial_ends_at`
-- Trial expired notice, sent on `trial_ends_at`
+- **Welcome email** — sent on signup
+- **Weekly summary** — top opportunities, week-over-week metric changes
+- **Trial ending warning** — sent 3 days before `trial_ends_at`
+- **Trial expired notice** — sent on `trial_ends_at`
+- **Nudge recommendations** — sent once per site when user has synced data + striking distance keywords but hasn't generated recommendations (tracked via `nudge_email_sent_at` on sites table)
+- **Top opportunity alert** — highlights highest-potential keyword
+- **Shared template utilities** — common email components
 
-Files referenced in `implementation.md` Step 11. Use Resend with React Email templates. The data is already in the DB, this is purely a templating and cron job.
+### P0.2 Settings pages ✅
 
-### P0.2 Settings pages (Step 9)
-
-- `/settings/profile` with name, email (read-only), avatar
+- `/settings/profile` with name, email (read-only from Google), avatar
 - `/settings/sites` with add, remove, manual sync, last synced timestamp
-- "Delete my account" with cascading delete (GDPR requirement, also a trust signal worth surfacing on the landing page)
+- `/settings/billing` with current plan, usage, trial countdown, upgrade/downgrade, customer portal
+- "Delete my account" with cascading delete (GDPR)
 - "Revoke Google access" button
 
-### P0.3 API response format and validation (Step 10)
+### P0.3 API response format and validation ✅
 
-Every route should return the standard envelope. Every input should be zod-validated. This becomes important the moment external services consume the API (Zapier, the future browser extension, the future free tools).
+- Standardized response envelope via `lib/api/response.ts`
+- Rate limiting via `lib/api/rate-limit.ts` (50 req/min per user)
+- Zod validation on API inputs
+- Proper HTTP status codes across all routes
 
 ---
 
@@ -239,23 +328,47 @@ Almost no competitor creates industry-specific content. These are underserved an
 
 Each guide should pair with a persona-specific landing page (`gscdaddy.com/for/bloggers`, `gscdaddy.com/for/agencies`) with a tailored hero, copy, and pricing recommendation. The `users.persona` field is already in the schema for this exact purpose.
 
-### P3.3 Free tool landing pages as programmatic SEO
+### P3.3 Free tool landing pages as programmatic SEO ✅ PARTIALLY COMPLETE
 
-Every free tool from Priority 1 (and the additional ones below) gets its own landing page targeting a specific commercial keyword. This is the Ahrefs model.
+8 free tools are already live at `gscdaddy.com/tools/*` with a tools landing page. Each has its own public page targeting relevant keywords.
 
+**Already live:**
+- `gscdaddy.com/tools/keyword-calculator` → "striking distance keywords calculator"
+- `gscdaddy.com/tools/serp-preview` → "serp preview tool"
+- `gscdaddy.com/tools/keyword-density-checker` → "keyword density checker"
+- `gscdaddy.com/tools/meta-tag-generator` → "meta tag generator"
+- `gscdaddy.com/tools/open-graph-generator` → "open graph generator"
+- `gscdaddy.com/tools/readability-checker` → "readability checker"
+- `gscdaddy.com/tools/robots-txt-generator` → "robots txt generator"
+- `gscdaddy.com/tools/slug-generator` → "slug generator"
+
+**Still to build (depend on P1.1 and P4):**
 - `gscdaddy.com/seo-health-checker` → "website seo checker"
-- `gscdaddy.com/striking-distance-calculator` → "striking distance keywords tool"
-- `gscdaddy.com/serp-preview-tool` → "serp preview tool"
-- `gscdaddy.com/schema-validator` → "schema markup generator"
+- `gscdaddy.com/tools/schema-validator` → "schema markup generator"
+- `gscdaddy.com/tools/content-decay-checker` → "content decay checker"
 
-### P3.4 The build-in-public content angle
+### P3.4 The build-in-public content angle ✅ IN PROGRESS
 
-Ayush is already sharing the journey. Turn it into long-form content.
+Ayush is actively sharing the journey. 7 blog posts published, social media strategy running (see `socialmediahustle.md` and `30-day-plan.md`).
 
+**Published blog posts:**
+1. `/blog/striking-distance-keywords-guide` — Pillar page on striking distance keywords
+2. `/blog/low-hanging-fruit-keywords-gsc` — Finding low-hanging fruit in GSC
+3. `/blog/google-search-console-beginners-guide` — GSC beginner guide
+4. `/blog/improve-ctr-google-search-console` — CTR improvement with GSC data
+5. `/blog/ahrefs-vs-semrush-vs-google-search-console` — Comparison page (BOFU)
+6. `/blog/keyword-cannibalization-google-search-console` — Cannibalization detection in GSC
+7. `/blog/google-search-console-alternatives` — Alternatives listicle (BOFU)
+
+**Still to write (from 30-day plan and revamp ideas):**
 - "I analyzed 10,000 striking distance keywords from gscdaddy.com, here is what I learned"
 - "Month 1 building an SEO tool, lessons from $0 MRR"
 - "How I am competing against Ahrefs as a solo developer in Bangalore"
 - "Why I built GSCdaddy after 3 years of staring at GSC data"
+- Glossary pages (crawl budget, keyword difficulty, search intent, content decay, long-tail keywords)
+- WordPress GSC setup guide
+- Content audit guide
+- Regex in GSC tutorial
 
 These posts cross-promote on Reddit (r/indiehackers, r/SEO, r/juststart) and Twitter as the experiment threads from the 30-day plan.
 
@@ -263,13 +376,22 @@ These posts cross-promote on Reddit (r/indiehackers, r/SEO, r/juststart) and Twi
 
 ## Priority 4. Additional free tools (after the SEO Health Score)
 
-Build these in priority order, one per 1-2 weeks after the Health Score ships.
+**Already shipped (8 tools live at `/tools/*`):**
 
-1. **Striking distance keyword calculator.** Paste a CSV from GSC, get traffic gain estimates per keyword. No API connection needed. Targets the exact commercial keyword "striking distance keywords tool."
-2. **SERP preview tool.** Title and description, see how it appears in Google. Client-side, ships in a day. Targets "serp preview" cluster.
-3. **Content decay checker.** URL input, checks Google cache date and flags freshness issues. Targets the growing content decay keyword cluster.
-4. **Schema markup generator and validator.** URL input, see what schema exists, generate missing JSON-LD. Targets "schema generator."
-5. **AI Overviews visibility checker.** Check whether a domain appears in Google's AI Overviews. Connects striking distance to the hot 2026 topic. Higher build effort but high differentiation.
+1. ~~**Keyword calculator**~~ ✅ Live at `/tools/keyword-calculator` — enter position, impressions, CTR, get traffic gain estimates
+2. ~~**SERP preview tool**~~ ✅ Live at `/tools/serp-preview` — title and description preview as it appears in Google
+3. ~~**Keyword density checker**~~ ✅ Live at `/tools/keyword-density-checker`
+4. ~~**Meta tag generator**~~ ✅ Live at `/tools/meta-tag-generator`
+5. ~~**Open Graph generator**~~ ✅ Live at `/tools/open-graph-generator`
+6. ~~**Readability checker**~~ ✅ Live at `/tools/readability-checker`
+7. ~~**Robots.txt generator**~~ ✅ Live at `/tools/robots-txt-generator`
+8. ~~**Slug generator**~~ ✅ Live at `/tools/slug-generator`
+
+**Still to build (in priority order, one per 1-2 weeks after the Health Score ships):**
+
+1. **Content decay checker.** URL input, checks Google cache date and flags freshness issues. Targets the growing content decay keyword cluster.
+2. **Schema markup generator and validator.** URL input, see what schema exists, generate missing JSON-LD. Targets "schema generator."
+3. **AI Overviews visibility checker.** Check whether a domain appears in Google's AI Overviews. Connects striking distance to the hot 2026 topic. Higher build effort but high differentiation.
 
 Each tool follows the same pattern, public landing page, no signup for the free tier, email gate for advanced features or the PDF report.
 
@@ -316,37 +438,50 @@ Find queries where 2+ pages rank with >20 impressions each. Recommend merge, dif
 
 ---
 
-## Priority 7. Landing page revamp
+## Priority 7. Landing page revamp ✅ PARTIALLY COMPLETE
 
-The `landingpageplaybook.md` is a complete blueprint. Once Priority 1 (free tools) and Priority 2 (emails) ship, the landing page rebuild becomes the next highest leverage move. Key changes summarized.
+The landing page has been built with 15 component sections. Most of the structural work is done. What remains are refinements that depend on P1 (Health Score tool) and performance optimization.
 
-- Hero, swap to "Find your almost-ranking keywords. Know exactly what to do next." with a real screenshot of the striking distance dashboard
-- Add the SEO Health Score tool inline on the hero (input field right on the homepage)
-- Founder section with real photo, link to Twitter, "I built this for myself" narrative
-- Pricing with annual toggle defaulted to annual, $49 Pro plan center-stage with "Most Popular" badge
-- Triple risk reversal under every CTA, "14-day trial, no credit card, cancel anytime"
-- Build-in-public tweet embeds as social proof
-- FAQ section with FAQPage schema for AI Overviews capture
-- SoftwareApplication and Organization schema in JSON-LD
-- Page speed, target LCP under 2.5s, INP under 200ms
+**Already shipped (in `components/landing/`):**
+- ✅ Hero section with CTA (`Hero.tsx`)
+- ✅ Trust bar with Trustpilot badge (`TrustBar.tsx`)
+- ✅ Problem section (`ProblemSection.tsx`)
+- ✅ How it works — 3 steps (`HowItWorks.tsx`)
+- ✅ Features comparison (`Features.tsx`, `Comparison.tsx`)
+- ✅ Founder section with Twitter link, "I built this for myself" narrative (`FounderSection.tsx`)
+- ✅ Build-in-public social proof section (`BuildInPublic.tsx`)
+- ✅ Blog highlights section (`BlogSection.tsx`)
+- ✅ Pricing cards with annual toggle (`Pricing.tsx`)
+- ✅ FAQ section with FAQPage schema (`FAQ.tsx`)
+- ✅ Final CTA section (`FinalCTA.tsx`)
+- ✅ Navigation and footer (`Navigation.tsx`, `Footer.tsx`)
+- ✅ Fade-in animations (`FadeInSection.tsx`)
+- ✅ SoftwareApplication, Organization, WebSite, BreadcrumbList JSON-LD schemas (`app/page.tsx`)
 
-The landing page playbook has the full copy and structure. Implement it as a single sprint after the funnel fixes above.
+**Still to do (after P1.1 ships):**
+- [ ] Add SEO Health Score tool inline on the hero (input field right on the homepage)
+- [ ] Embed real build-in-public tweets as social proof (replace static section)
+- [ ] Page speed optimization — target LCP under 2.5s, INP under 200ms
+- [ ] Real product screenshots in hero and feature sections
 
 ---
 
-## Suggested execution order (12-week plan)
+## Suggested execution order (updated from original 12-week plan)
 
-| Weeks | Focus | Deliverable |
-|---|---|---|
-| 1 | P0 closeout | Settings pages, email MVP (3 emails), API response format |
-| 2-3 | P1.1 Free SEO Health Score | Public tool live at `/seo-health-checker`, email gated PDF |
-| 4 | P1.2, P1.3 | Demo mode with gscdaddy.com data, two-track onboarding |
-| 5 | P1.4, P2 | Reverse trial, full trigger-based email sequence |
-| 6-7 | P3.1, P3.2 | 6 comparison pages, 4 vertical guides shipped |
-| 8 | P4.1, P4.2 | Striking distance calculator, SERP preview tool |
-| 9-10 | P7 | Landing page rebuild per the playbook |
-| 11-12 | P6 | Decay alerts + onboarding checklist + cannibalization report |
-| Ongoing | P5 | Browser extension build (background project) |
+P0 is complete. 8 free tools and 7 blog posts already shipped. Updated timeline reflects remaining work only.
+
+| Weeks | Focus | Deliverable | Status |
+|---|---|---|---|
+| ~~1~~ | ~~P0 closeout~~ | ~~Settings pages, email MVP, API response format~~ | ✅ Done |
+| 1-2 | P1.1 Free SEO Health Score | Public tool at `/seo-health-checker`, email gated PDF, programmatic SEO | Not started |
+| 3 | P1.2, P1.3 | Demo mode with gscdaddy.com data, two-track onboarding | Not started |
+| 4 | P1.4, P2 | Reverse trial, full trigger-based email sequence (9 new emails) | Not started |
+| 5-6 | P3.1, P3.2 | 6 comparison pages, 5 vertical guides | Not started |
+| ~~7~~ | ~~P4.1, P4.2~~ | ~~Keyword calculator, SERP preview tool~~ | ✅ Done |
+| 7 | P4.3, P4.4 | Content decay checker, schema generator | Not started |
+| 8-9 | P7 | Landing page rebuild (inline Health Score, tweet embeds, perf) | Partially done |
+| 10-11 | P6 | Decay alerts + onboarding checklist + cannibalization report | Not started |
+| Ongoing | P5 | Browser extension build (background project) | Not started |
 
 ---
 
