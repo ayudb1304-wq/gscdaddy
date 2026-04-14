@@ -4,7 +4,7 @@ export const strikingDistanceKeywordsGuide: BlogPost = {
   slug: "striking-distance-keywords-guide",
   title: "Striking Distance Keywords: How to Rank Positions 5-20 in 2026",
   description:
-    "Learn how to optimize striking distance keywords ranked 5-20 and convert them into top 3 positions—with real examples and a step-by-step GSC workflow.",
+    "Learn how to optimize striking distance keywords ranked 5-20 and convert them into top 3 positions with a step-by-step GSC workflow.",
   publishedAt: "2026-04-05",
   author: {
     name: "Ayush",
