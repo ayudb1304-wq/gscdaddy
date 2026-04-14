@@ -2,9 +2,9 @@ import type { BlogPost } from "@/lib/blog"
 
 export const strikingDistanceKeywordsGuide: BlogPost = {
   slug: "striking-distance-keywords-guide",
-  title: "The Complete Guide to Striking Distance Keywords in 2026",
+  title: "Striking Distance Keywords: How to Rank Positions 5-20 in 2026",
   description:
-    "Learn how to find keywords ranking positions 5-15 in Google Search Console and turn them into page 1 rankings with proven optimization tactics.",
+    "Learn how to optimize striking distance keywords ranked 5-20 and convert them into top 3 positions—with real examples and a step-by-step GSC workflow.",
   publishedAt: "2026-04-05",
   author: {
     name: "Ayush",
@@ -46,7 +46,7 @@ export const strikingDistanceKeywordsGuide: BlogPost = {
 
 <p>This is exactly the problem I built GSCdaddy to solve. But before I talk about tools, let me walk you through everything I have learned about striking distance keywords and how to turn them into actual traffic.</p>
 
-<h2>What Are Striking Distance Keywords</h2>
+<h2>What Are Striking Distance Keywords?</h2>
 
 <p>Striking distance keywords are search queries where your pages rank between positions 5 and 15 in Google. Some people define the range as 4 to 20, but I have found that 5 to 15 is the sweet spot where optimization effort produces the most predictable returns.</p>
 
