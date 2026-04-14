@@ -182,7 +182,6 @@ function CategoryCard({
 }
 
 export function HealthCheckerForm() {
-  const router = useRouter()
   const [url, setUrl] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)

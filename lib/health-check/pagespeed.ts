@@ -32,8 +32,8 @@ export async function getPageSpeedResults(
     url,
     strategy,
     category: "performance",
-    category: "accessibility",
   })
+  params.append("category", "accessibility")
   if (apiKey) params.set("key", apiKey)
 
   const response = await fetch(`${PSI_API_URL}?${params}`, {
