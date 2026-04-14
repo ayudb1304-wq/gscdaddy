@@ -11,6 +11,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       images: [`${baseUrl}/images/dashboard-screenshot.jpg`],
     },
     { url: `${baseUrl}/blog`, lastModified: new Date() },
+    { url: `${baseUrl}/seo-health-checker`, lastModified: new Date() },
     { url: `${baseUrl}/tools`, lastModified: new Date() },
     { url: `${baseUrl}/tools/keyword-calculator`, lastModified: new Date() },
     { url: `${baseUrl}/tools/serp-preview`, lastModified: new Date() },
