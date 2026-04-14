@@ -38,13 +38,20 @@ export async function generateRecommendations(siteId: string) {
     throw new Error(`Site not found: ${siteId}`)
   }
 
-  // Fetch top 20 striking distance keywords
+  // Fetch top 20 striking distance keywords.
+  // All parameters must be passed explicitly (including the null optional ones)
+  // to match the function signature — omitting them can cause PostgREST to
+  // skip default resolution and return zero rows.
   const { data: keywords, error: kwError } = await admin.rpc("get_striking_distance", {
     p_site_id: siteId,
     p_sort_by: "opportunity_score",
     p_sort_order: "desc",
     p_page: 1,
     p_limit: 20,
+    p_search: null,
+    p_min_impressions: null,
+    p_min_position: null,
+    p_max_position: null,
   })
 
   if (kwError) {
