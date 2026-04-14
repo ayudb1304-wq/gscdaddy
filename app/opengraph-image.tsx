@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og"
 import { readFile } from "node:fs/promises"
 import { join } from "node:path"
 
-export const alt = "GSCdaddy - Find Your Almost-Ranking Keywords"
+export const alt = "GSCdaddy - You're ranking #8. Let's fix that."
 export const size = { width: 1200, height: 630 }
 export const contentType = "image/png"
 
@@ -81,6 +81,15 @@ export default async function Image() {
           >
             GSCdaddy
           </span>
+          <span
+            style={{
+              fontSize: "16px",
+              color: "#737373",
+              marginLeft: "8px",
+            }}
+          >
+            Google Search Console Intelligence
+          </span>
         </div>
 
         {/* Middle: Headline + subtext */}
@@ -96,10 +105,11 @@ export default async function Image() {
               letterSpacing: "-2px",
             }}
           >
-            <span style={{ color: "#ffffff" }}>Find your <span style={{ fontFamily: "Caveat", fontWeight: 700, letterSpacing: "0px" }}>almost-ranking</span></span>
             <span style={{ color: "#ffffff" }}>
-              keywords.{" "}
-              <span style={{ color: "#4ade80" }}>Act on them.</span>
+              You&apos;re ranking #8.
+            </span>
+            <span style={{ fontFamily: "Caveat", fontWeight: 700, letterSpacing: "0px", color: "#4ade80", fontSize: "60px" }}>
+              Let&apos;s fix that.
             </span>
           </div>
 
@@ -111,7 +121,7 @@ export default async function Image() {
               maxWidth: "600px",
             }}
           >
-            Google Search Console analytics with AI-powered action plans to push your pages to page 1.
+            Find your striking distance keywords and get AI action plans to reach page 1.
           </div>
         </div>
 
@@ -124,7 +134,7 @@ export default async function Image() {
           }}
         >
           <div style={{ display: "flex", gap: "16px" }}>
-            {["Striking Distance Keywords", "AI Recommendations", "Free 14-Day Trial"].map(
+            {["Striking Distance Keywords", "AI Action Plans", "Free 14-Day Trial"].map(
               (item) => (
                 <div
                   key={item}

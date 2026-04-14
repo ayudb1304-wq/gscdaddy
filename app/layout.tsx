@@ -53,9 +53,9 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "GSCdaddy - Find Your Almost-Ranking Keywords",
+    title: "GSCdaddy - You're Ranking #8. Let's Fix That.",
     description:
-      "Turn your Google Search Console data into actionable insights. Track rankings, discover opportunities, and grow your organic traffic.",
+      "Find your striking distance keywords in Google Search Console and get AI action plans to reach page 1.",
     url: "https://gscdaddy.com",
     siteName: "GSCdaddy",
     type: "website",
@@ -63,9 +63,9 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     creator: "@ayu_theindiedev",
-    title: "GSCdaddy - Find Your Almost-Ranking Keywords",
+    title: "GSCdaddy - You're Ranking #8. Let's Fix That.",
     description:
-      "Turn your Google Search Console data into actionable insights.",
+      "Find your striking distance keywords and get AI action plans to reach page 1.",
   },
   robots: {
     index: true,
