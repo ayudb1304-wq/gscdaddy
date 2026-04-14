@@ -181,12 +181,27 @@ function CategoryCard({
   )
 }
 
-export function HealthCheckerForm() {
-  const [url, setUrl] = useState("")
+export function HealthCheckerForm({
+  initialResult,
+}: {
+  initialResult?: HealthResult | null
+}) {
+  const [url, setUrl] = useState(initialResult?.domain ?? "")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [result, setResult] = useState<HealthResult | null>(null)
-  const [openCategories, setOpenCategories] = useState<Set<string>>(new Set())
+  const [result, setResult] = useState<HealthResult | null>(initialResult ?? null)
+
+  // Auto-open failed categories for initial result
+  const [openCategories, setOpenCategories] = useState<Set<string>>(() => {
+    if (!initialResult?.results?.score?.categories) return new Set<string>()
+    const failed = new Set<string>()
+    for (const cat of initialResult.results.score.categories) {
+      if (cat.items.some((item) => item.status === "fail")) {
+        failed.add(cat.slug)
+      }
+    }
+    return failed
+  })
   const [email, setEmail] = useState("")
   const [emailSending, setEmailSending] = useState(false)
   const [emailSent, setEmailSent] = useState(false)

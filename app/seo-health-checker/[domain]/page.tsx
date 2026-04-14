@@ -96,7 +96,21 @@ export default async function DomainHealthPage({ params }: Props) {
       </header>
 
       <div className="mt-10">
-        <HealthCheckerForm />
+        <HealthCheckerForm
+          initialResult={
+            cached?.results?.score
+              ? {
+                  id: cached.id,
+                  domain: cached.domain,
+                  url: cached.url,
+                  score: cached.score,
+                  results: { score: cached.results.score },
+                  cached: true,
+                  created_at: cached.created_at,
+                }
+              : null
+          }
+        />
       </div>
 
       {/* Programmatic SEO content */}
