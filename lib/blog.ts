@@ -3,6 +3,8 @@ import { lowHangingFruitKeywordsGsc } from "@/content/blog/low-hanging-fruit-key
 import { googleSearchConsoleBeginnersGuide } from "@/content/blog/google-search-console-beginners-guide"
 import { improveCtrGoogleSearchConsole } from "@/content/blog/improve-ctr-google-search-console"
 import { ahrefsVsSemrushVsGoogleSearchConsole } from "@/content/blog/ahrefs-vs-semrush-vs-google-search-console"
+import { keywordCannibalizationGoogleSearchConsole } from "@/content/blog/keyword-cannibalization-google-search-console"
+import { googleSearchConsoleAlternatives } from "@/content/blog/google-search-console-alternatives"
 
 export interface BlogPost {
   slug: string
@@ -26,6 +28,8 @@ const posts: BlogPost[] = [
   googleSearchConsoleBeginnersGuide,
   improveCtrGoogleSearchConsole,
   ahrefsVsSemrushVsGoogleSearchConsole,
+  keywordCannibalizationGoogleSearchConsole,
+  googleSearchConsoleAlternatives,
 ]
 
 export function getAllPosts(): BlogPost[] {
