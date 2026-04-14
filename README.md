@@ -42,7 +42,7 @@ Keyword calculator, SERP preview, keyword density checker, meta tag generator, O
 7 published posts with BlogPosting + FAQPage schema, RSS feed, sticky table of contents
 
 ### Landing page
-15 component sections with SoftwareApplication, Organization, WebSite, BreadcrumbList, FAQPage JSON-LD schemas
+13 component sections with asymmetrical left-aligned layout, dedicated AI Action Plan section, 3-column comparison table, founder dogfooding story, and SoftwareApplication, Organization, WebSite, BreadcrumbList, FAQPage JSON-LD schemas. Revamped April 14, 2026 based on competitor analysis of 15+ tools.
 
 ## Project structure
 

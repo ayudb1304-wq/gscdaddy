@@ -448,31 +448,41 @@ Find queries where 2+ pages rank with >20 impressions each. Recommend merge, dif
 
 ---
 
-## Priority 7. Landing page revamp ✅ PARTIALLY COMPLETE
+## Priority 7. Landing page revamp ✅ MAJOR REVAMP SHIPPED (April 14, 2026)
 
-The landing page has been built with 15 component sections. Most of the structural work is done. What remains are refinements that depend on P1 (Health Score tool) and performance optimization.
+Full landing page overhaul based on competitor analysis of 15+ tools and conversion research. Shifted from centered template layout to asymmetrical, left-aligned design with personality.
 
-**Already shipped (in `components/landing/`):**
-- ✅ Hero section with CTA (`Hero.tsx`)
-- ✅ Trust bar with Trustpilot badge (`TrustBar.tsx`)
-- ✅ Problem section (`ProblemSection.tsx`)
-- ✅ How it works — 3 steps (`HowItWorks.tsx`)
-- ✅ Features comparison (`Features.tsx`, `Comparison.tsx`)
-- ✅ Founder section with Twitter link, "I built this for myself" narrative (`FounderSection.tsx`)
-- ✅ Build-in-public social proof section (`BuildInPublic.tsx`)
-- ✅ Blog highlights section (`BlogSection.tsx`)
-- ✅ Pricing cards with annual toggle (`Pricing.tsx`)
-- ✅ FAQ section with FAQPage schema (`FAQ.tsx`)
-- ✅ Final CTA section (`FinalCTA.tsx`)
-- ✅ Navigation and footer (`Navigation.tsx`, `Footer.tsx`)
+**What changed in the revamp:**
+- ✅ New hero headline: "You're ranking #8. Let's fix that." with left-aligned 2-column layout (text left, screenshot right)
+- ✅ Removed TrustBar (tech stack badges were vibecoded), absorbed read-only trust message into hero
+- ✅ Removed mid-page Features section, replaced with dedicated AI Action Plan section (`AIActionPlan.tsx`)
+- ✅ Removed mid-page BlogSection, moved blog links to footer
+- ✅ New AI Action Plan section showing a real example recommendation card (the primary differentiator)
+- ✅ Expanded Comparison to 3 columns: Spreadsheets vs Plain GSC vs GSCdaddy (`Comparison.tsx`)
+- ✅ Founder section redesigned: photo left, text right, added dogfooding story in cursive
+- ✅ Section reorder for conversion: Hero > Problem > HowItWorks > AIActionPlan > Comparison > Founder > Pricing > BuildInPublic > FAQ > FinalCTA
+- ✅ Brand-colored cursive (Caveat font) emphasis on key phrases throughout page
+- ✅ Left-aligned/asymmetrical text layout across all sections (anti-vibecoded)
+- ✅ Problem section: 2-column layout with blockquote on the right
+- ✅ FinalCTA: 2-column layout with CTA button on the right
+- ✅ SEO-optimized copy with target keywords (striking distance, Google Search Console, AI action plans)
+- ✅ 3 new FAQ items: AI action plans, data safety, non-English sites (9 total)
+- ✅ Back-to-home links added on /tools and /login pages
+- ✅ All em dashes removed from page copy
 - ✅ Fade-in animations (`FadeInSection.tsx`)
-- ✅ SoftwareApplication, Organization, WebSite, BreadcrumbList JSON-LD schemas (`app/page.tsx`)
+- ✅ SoftwareApplication, Organization, WebSite, BreadcrumbList, FAQPage JSON-LD schemas (`app/page.tsx`)
 
-**Still to do (after P1.1 ships):**
+**Current components (in `components/landing/`):**
+`Navigation.tsx`, `Hero.tsx`, `ProblemSection.tsx`, `HowItWorks.tsx`, `AIActionPlan.tsx`, `Comparison.tsx`, `FounderSection.tsx`, `Pricing.tsx`, `BuildInPublic.tsx`, `FAQ.tsx`, `FinalCTA.tsx`, `Footer.tsx`, `FadeInSection.tsx`
+
+**Deleted components:** `TrustBar.tsx`, `Features.tsx`, `BlogSection.tsx`
+
+**Still to do:**
 - [ ] Add SEO Health Score tool inline on the hero (input field right on the homepage)
 - [ ] Embed real build-in-public tweets as social proof (replace static section)
-- [ ] Page speed optimization — target LCP under 2.5s, INP under 200ms
-- [ ] Real product screenshots in hero and feature sections
+- [ ] Page speed optimization, target LCP under 2.5s, INP under 200ms
+- [ ] Real product screenshots / annotated animated GIF in hero
+- [ ] A/B test headline variants (#1 "You're ranking #8", #2 "Your GSC data is hiding 47 quick wins", #5 "Other tools show data. This one tells you what to do.")
 
 ---
 
