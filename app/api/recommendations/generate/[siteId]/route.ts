@@ -26,21 +26,29 @@ export async function POST(
 
     if (siteError || !site) return errors.notFound("Site")
 
-    // Credit-burn guard: if this site already has non-expired recommendations,
-    // return them without calling the AI. Prevents duplicate spend on repeated
-    // clicks, UI races (e.g., cron just generated in parallel), or stale props.
-    // This makes the endpoint idempotent — safe to hammer without billing.
-    const nowIso = new Date().toISOString()
-    const { data: existingFreshRecs } = await admin
+    // Anti-bounce guard: prevent rapid double-clicks from burning AI credits.
+    // Only block if recs were generated in the last 2 minutes — this protects
+    // against accidental re-clicks and UI races (e.g., cron fired in parallel)
+    // while still allowing intentional regeneration.
+    const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000).toISOString()
+    const { data: recentRecs } = await admin
       .from("recommendations")
       .select("*")
       .eq("site_id", siteId)
-      .gt("expires_at", nowIso)
+      .gt("created_at", twoMinutesAgo)
       .order("created_at", { ascending: false })
 
-    if (existingFreshRecs && existingFreshRecs.length > 0) {
-      return successResponse(existingFreshRecs)
+    if (recentRecs && recentRecs.length > 0) {
+      return successResponse(recentRecs)
     }
+
+    // Clear stale non-completed recommendations so the user gets a fresh set.
+    // Completed recs are preserved so the user doesn't lose tracked progress.
+    await admin
+      .from("recommendations")
+      .delete()
+      .eq("site_id", siteId)
+      .eq("is_completed", false)
 
     // Daily rate limit check: count today's rows for this site.
     // Only applies when we actually need to call the AI.
