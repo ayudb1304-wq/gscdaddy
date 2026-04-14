@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
+import { ArrowLeft } from "lucide-react"
 import { Logo } from "@/components/logo"
 import { Button } from "@/components/ui/button"
 import { signInWithGoogle } from "./actions"
@@ -78,7 +79,7 @@ export default function LoginPage({
         <div className="text-center">
           <h2 className="font-heading text-2xl font-bold leading-tight">
             Your SEO data has<br />
-            <span className="text-primary">stories to tell.</span>
+            <span className="text-primary" style={{ fontFamily: "var(--font-cursive)" }}>stories to tell.</span>
           </h2>
           <p className="mx-auto mt-4 max-w-xs text-sm text-neutral-400 dark:text-neutral-500">
             Strategic SEO intelligence powered by AI. Not another checklist of meaningless scores.
@@ -100,7 +101,15 @@ export default function LoginPage({
       </div>
 
       {/* Right panel — sign in form */}
-      <div className="flex flex-col items-center justify-center bg-background px-6 py-12">
+      <div className="relative flex flex-col items-center justify-center bg-background px-6 py-12">
+        <Link
+          href="/"
+          className="absolute top-6 left-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <ArrowLeft className="size-3.5" />
+          Back to home
+        </Link>
+
         {/* Mobile logo (hidden on desktop) */}
         <Link href="/" className="mb-8 flex items-center gap-2 font-heading text-xl font-bold lg:hidden">
           <Logo size={24} />

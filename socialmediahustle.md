@@ -449,3 +449,45 @@ Every tool should be built by someone who uses it daily.
 - [ ] Add first reply 15-20 min after thread
 - [ ] Reply to 10 people in SEO/indie hacker space
 - [ ] Catch up on any missed directory submissions
+
+---
+
+## Day 9 (April 9, 2026)
+
+### Single Post (attach dashboard screenshot)
+
+```
+Day 9.
+
+2 clicks. 45 impressions. Average position 37.7.
+
+Still basically invisible.
+
+Here is what I shipped today anyway:
+
+- 7 free SEO tools (SERP preview, meta tag generator, OG generator, slug generator, robots.txt generator, keyword density checker, readability scorer)
+- A /tools index page linking them all together
+- Rewrote every CTA on the landing page
+- Replaced "Coming Soon" features with things that actually exist
+- Added real trust messaging instead of tech logos nobody cares about
+
+That is 8 free tools now on gscdaddy.com/tools. All client-side. No signup needed. No catch.
+
+The dashboard screenshot still looks empty because Google's Search API has a 2-3 day data delay. The pages I published today will not show up in my own dashboard until April 11 or 12. That is just how the GSC API works.
+
+So I am shipping into the void right now. Building pages Google has not even crawled yet. Writing for an audience that does not know I exist.
+
+But every page I publish starts the indexing clock. And every day that clock runs is a day closer to actual traffic.
+
+The numbers will come. Or they will not. Either way I am going to keep building.
+
+gscdaddy.com/tools
+```
+
+---
+
+### Engagement Plan
+
+- [ ] Post at 8:30am IST with dashboard screenshot attached
+- [ ] Reply to 10 people in SEO/indie hacker space
+- [ ] Share the /tools page in relevant Reddit threads (r/SEO, r/webdev)

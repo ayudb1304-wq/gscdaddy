@@ -1,14 +1,12 @@
 import { Navigation } from "@/components/landing/Navigation"
 import { Hero } from "@/components/landing/Hero"
-import { TrustBar } from "@/components/landing/TrustBar"
 import { ProblemSection } from "@/components/landing/ProblemSection"
 import { HowItWorks } from "@/components/landing/HowItWorks"
-import { Features } from "@/components/landing/Features"
+import { AIActionPlan } from "@/components/landing/AIActionPlan"
 import { Comparison } from "@/components/landing/Comparison"
 import { FounderSection } from "@/components/landing/FounderSection"
-import { BuildInPublic } from "@/components/landing/BuildInPublic"
-import { BlogSection } from "@/components/landing/BlogSection"
 import { Pricing } from "@/components/landing/Pricing"
+import { BuildInPublic } from "@/components/landing/BuildInPublic"
 import { FAQ } from "@/components/landing/FAQ"
 import { FinalCTA } from "@/components/landing/FinalCTA"
 import { Footer } from "@/components/landing/Footer"
@@ -122,15 +120,13 @@ export default function Page() {
       <Navigation />
       <main>
         <Hero />
-        <TrustBar />
         <ProblemSection />
         <HowItWorks />
-        <Features />
+        <AIActionPlan />
         <Comparison />
         <FounderSection />
-        <BuildInPublic />
-        <BlogSection />
         <Pricing />
+        <BuildInPublic />
         <FAQ />
         <FinalCTA />
       </main>

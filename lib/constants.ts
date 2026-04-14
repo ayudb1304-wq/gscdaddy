@@ -1,6 +1,6 @@
 export const NAV_LINKS = [
   { label: "SEO Checker", href: "/seo-health-checker" },
-  { label: "Features", href: "#features" },
+  { label: "How It Works", href: "#how-it-works" },
   { label: "Pricing", href: "#pricing" },
   { label: "Blog", href: "/blog" },
   { label: "Tools", href: "/tools" },
@@ -34,34 +34,15 @@ export const STEPS = [
   },
 ] as const
 
-export const FEATURES = [
-  {
-    eyebrow: "Striking Distance Finder",
-    title: "See which keywords are THIS close to page 1",
-    description:
-      "Stop guessing which pages to optimize. GSCdaddy automatically finds your keywords ranking positions 5-15 and scores them by traffic potential - not just position.",
-    bullets: [
-      "Sorted by opportunity score, not just rankings",
-      "Filter by impressions, clicks, or CTR",
-      "Export to CSV in one click",
-    ],
-    imagePosition: "right" as const,
-  },
-  {
-    eyebrow: "AI Action Plans",
-    title: '"What should I do?" - answered every week',
-    description:
-      "Other tools show you data. GSCdaddy tells you what to DO with it. Get personalized recommendations delivered to your inbox every Monday.",
-    bullets: [
-      "Specific actions, not generic advice",
-      "Estimated time to complete each task",
-      "Track which recommendations you've completed",
-    ],
-    imagePosition: "left" as const,
-  },
-] as const
-
 export const COMPARISON = {
+  spreadsheet: [
+    "Export CSV every week",
+    "Build pivot tables to find patterns",
+    "Manually check each keyword",
+    "No alerts when rankings drop",
+    "One site at a time",
+    "2+ hours every Monday morning",
+  ],
   without: [
     "Export CSVs manually",
     "Build spreadsheets to filter",
@@ -157,12 +138,29 @@ export const FAQ_ITEMS = [
     answer:
       "Yes! 14 days, full access, no credit card required. If GSCdaddy doesn't help you find opportunities worth pursuing, it costs you nothing.",
   },
+  {
+    question: "What are AI action plans?",
+    answer:
+      "For every striking distance keyword, GSCdaddy generates specific steps to improve your ranking. This includes adding internal links, updating headings, or expanding thin sections. Each plan includes estimated time and expected impact. Think of it as having an SEO consultant review every page.",
+  },
+  {
+    question: "Is my Search Console data safe?",
+    answer:
+      "Yes. GSCdaddy uses read-only access to your Google Search Console. We can never modify your site, your content, or your settings. Your data is encrypted in transit and at rest.",
+  },
+  {
+    question: "Does it work for non-English sites?",
+    answer:
+      "Yes. GSCdaddy works with any language in Google Search Console. The AI recommendations are generated in English, but the keyword analysis works regardless of language.",
+  },
 ] as const
 
 export const FOUNDER = {
   quote:
     "I built GSCdaddy because I was tired of staring at my own Search Console data and not knowing what to do with it.",
-  bio: 'I\'m a solo indie developer from Bangalore, India. I had pages ranking at positions 7, 8, 12. SO close to page 1 - but no idea which ones to focus on first. Every "SEO tool" wanted $100+/month and still didn\'t answer my actual question.\n\nSo I built the tool I wished existed. GSCdaddy is bootstrapped, independent, and built by someone who uses it every single day.',
+  bio: 'Solo indie developer from Bangalore, India. I had pages ranking at positions 7, 8, 12. SO close to page 1 but no idea which to focus on first. Every "SEO tool" wanted $100+/month and still didn\'t answer my actual question. So I built the tool I wished existed.',
+  dogfooding:
+    "I connected gscdaddy.com to GSCdaddy on day one. Everything starts at zero, and I'm fixing that publicly.",
   name: "Ayush",
   title: "Solo founder, GSCdaddy ·  India",
 } as const

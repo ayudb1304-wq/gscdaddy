@@ -16,7 +16,7 @@ export function Pricing() {
     <section id="pricing" className="py-16 md:py-24">
       <div className="mx-auto max-w-6xl px-4 md:px-6">
         <FadeInSection>
-          <div className="text-center">
+          <div>
             <p className="mb-4 text-sm font-medium tracking-wider text-primary uppercase">
               Pricing
             </p>
@@ -95,7 +95,7 @@ export function Pricing() {
                   </div>
                   {isAnnual && (
                     <p className="mt-1 text-xs text-muted-foreground">
-                      billed annually (${tier.annualPrice * 12}/yr) — you save ${(tier.monthlyPrice - tier.annualPrice) * 12}/yr
+                      billed annually (${tier.annualPrice * 12}/yr), you save ${(tier.monthlyPrice - tier.annualPrice) * 12}/yr
                     </p>
                   )}
                 </div>

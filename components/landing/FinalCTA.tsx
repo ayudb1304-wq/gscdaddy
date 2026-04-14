@@ -10,28 +10,33 @@ export function FinalCTA() {
 
       <div className="relative mx-auto max-w-6xl px-4 md:px-6">
         <FadeInSection>
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 className="font-heading text-3xl font-semibold tracking-tight md:text-[40px] md:leading-[1.2]">
-              Ready to stop guessing and start ranking?
-            </h2>
+          <div className="grid items-center gap-10 md:grid-cols-2">
+            {/* Left — text */}
+            <div>
+              <h2 className="font-heading text-3xl font-semibold tracking-tight md:text-[40px] md:leading-[1.2]">
+                Ready to stop guessing and{" "}
+                <span className="text-primary" style={{ fontFamily: "var(--font-cursive)" }}>start ranking</span>?
+              </h2>
 
-            <p className="mt-4 text-lg text-muted-foreground">
-              Join 200+ bloggers and SEO pros who finally know what to do with their
-              Search Console data.
-            </p>
+              <p className="mt-4 text-lg text-muted-foreground">
+                14-day free trial. No credit card. Your first AI action plan in
+                under 5 minutes.
+              </p>
 
-            <div className="mt-8">
-              <Button size="lg" className="h-12 px-8 text-sm font-semibold" asChild>
+            </div>
+
+            {/* Right — CTA button */}
+            <div className="flex flex-col items-center">
+              <Button size="lg" className="h-12 w-full px-8 text-sm font-semibold" asChild>
                 <a href="/login">
                   Show me what I&apos;m missing
                   <ArrowRight className="ml-1 size-4" />
                 </a>
               </Button>
+              <p className="mt-3 text-center text-sm text-muted-foreground">
+                No credit card required · 14 days free · Cancel anytime
+              </p>
             </div>
-
-            <p className="mt-4 text-sm text-muted-foreground">
-              No credit card required · 14 days free · Cancel anytime
-            </p>
           </div>
         </FadeInSection>
       </div>

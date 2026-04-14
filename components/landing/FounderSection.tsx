@@ -21,39 +21,16 @@ export function FounderSection() {
     <section className="bg-card py-16 md:py-24">
       <div className="mx-auto max-w-6xl px-4 md:px-6">
         <FadeInSection>
-          <div className="mx-auto max-w-xl text-center">
-            <Image
-              src="/images/founder-portrait.jpg"
-              alt={FOUNDER.name}
-              width={160}
-              height={160}
-              className="mx-auto mb-6 size-40 rounded-full border border-border object-cover"
-            />
-
-            <blockquote className="text-xl font-medium leading-relaxed md:text-2xl">
-              &ldquo;{FOUNDER.quote}&rdquo;
-            </blockquote>
-
-            <div className="mt-8 space-y-4 text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
-              {FOUNDER.bio}
-            </div>
-
-            <div className="mt-6">
-              <p className="font-medium">{FOUNDER.name}</p>
-              <p className="text-sm text-muted-foreground">{FOUNDER.title}</p>
-              <a
-                href="https://x.com/ayu_theindiedev?s=21"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-2 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
-                aria-label="X (Twitter)"
-              >
-                <XIcon className="size-3.5" />
-                <span>@ayu_theindiedev</span>
-              </a>
-            </div>
-
-            <div className="mt-6 flex justify-center">
+          <div className="grid items-center gap-10 md:grid-cols-[auto_1fr]">
+            {/* Photo + badge column */}
+            <div className="flex flex-col items-center gap-6">
+              <Image
+                src="/images/founder-portrait.jpg"
+                alt={FOUNDER.name}
+                width={160}
+                height={160}
+                className="size-40 rounded-full border border-border object-cover"
+              />
               <a
                 href="https://trustmrr.com/startup/gscdaddy"
                 target="_blank"
@@ -76,6 +53,39 @@ export function FounderSection() {
                   className="absolute left-[15px] top-[21px] size-[48px] rounded-[8px] object-cover"
                 />
               </a>
+            </div>
+
+            {/* Text column */}
+            <div>
+              <blockquote className="text-xl font-medium leading-relaxed md:text-2xl">
+                &ldquo;{FOUNDER.quote}&rdquo;
+              </blockquote>
+
+              <div className="mt-6 text-sm text-muted-foreground leading-relaxed">
+                {FOUNDER.bio}
+              </div>
+
+              <p
+                className="mt-6 text-xl italic text-primary md:text-2xl"
+                style={{ fontFamily: "var(--font-cursive)" }}
+              >
+                &ldquo;{FOUNDER.dogfooding}&rdquo;
+              </p>
+
+              <div className="mt-6">
+                <p className="font-medium">{FOUNDER.name}</p>
+                <p className="text-sm text-muted-foreground">{FOUNDER.title}</p>
+                <a
+                  href="https://x.com/ayu_theindiedev?s=21"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-2 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                  aria-label="X (Twitter)"
+                >
+                  <XIcon className="size-3.5" />
+                  <span>@ayu_theindiedev</span>
+                </a>
+              </div>
             </div>
           </div>
         </FadeInSection>

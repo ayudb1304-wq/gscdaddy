@@ -1,4 +1,5 @@
 import { Logo } from "@/components/logo"
+import { getAllPosts } from "@/lib/blog"
 
 function XIcon({ className }: { className?: string }) {
   return (
@@ -9,6 +10,8 @@ function XIcon({ className }: { className?: string }) {
 }
 
 export function Footer() {
+  const latestPosts = getAllPosts().slice(0, 3)
+
   return (
     <footer className="border-t border-border py-8">
       <div className="mx-auto max-w-6xl px-4 md:px-6">
@@ -31,27 +34,48 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-6 flex flex-col items-center gap-4 text-xs text-muted-foreground md:flex-row md:justify-between">
-          <p>&copy; 2026 GSCdaddy. Built with &#9749; in India.</p>
-          <div className="flex flex-wrap gap-4">
-            <a href="/seo-health-checker" className="transition-colors hover:text-foreground">
-              SEO Health Checker
-            </a>
-            <a href="/tools" className="transition-colors hover:text-foreground">
-              Free Tools
-            </a>
-            <a href="/blog" className="transition-colors hover:text-foreground">
-              Blog
-            </a>
-            <a href="/privacy" className="transition-colors hover:text-foreground">
-              Privacy Policy
-            </a>
-            <a href="/terms" className="transition-colors hover:text-foreground">
-              Terms of Service
-            </a>
-            <a href="mailto:sushi@gscdaddy.com" className="transition-colors hover:text-foreground">
-              Contact
-            </a>
+        <div className="mt-6 grid gap-6 text-xs text-muted-foreground md:grid-cols-2">
+          <div>
+            <p className="mb-2 text-xs font-medium uppercase tracking-wider text-foreground">
+              From the Blog
+            </p>
+            <ul className="space-y-3">
+              {latestPosts.map((post) => (
+                <li key={post.slug}>
+                  <a
+                    href={`/blog/${post.slug}`}
+                    className="inline-flex items-center gap-1.5 underline underline-offset-2 decoration-border transition-colors hover:text-foreground hover:decoration-foreground"
+                  >
+                    <span className="text-primary">→</span>
+                    {post.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="flex flex-col justify-between gap-4">
+            <div className="flex flex-wrap gap-4">
+              <a href="/seo-health-checker" className="transition-colors hover:text-foreground">
+                SEO Health Checker
+              </a>
+              <a href="/tools" className="transition-colors hover:text-foreground">
+                Free Tools
+              </a>
+              <a href="/blog" className="transition-colors hover:text-foreground">
+                Blog
+              </a>
+              <a href="/privacy" className="transition-colors hover:text-foreground">
+                Privacy Policy
+              </a>
+              <a href="/terms" className="transition-colors hover:text-foreground">
+                Terms of Service
+              </a>
+              <a href="mailto:sushi@gscdaddy.com" className="transition-colors hover:text-foreground">
+                Contact
+              </a>
+            </div>
+            <p>&copy; 2026 GSCdaddy. Built with &#9749; in India.</p>
           </div>
         </div>
       </div>

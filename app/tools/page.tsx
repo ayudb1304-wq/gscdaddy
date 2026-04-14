@@ -68,10 +68,19 @@ export default function ToolsIndexPage() {
       <ToolsJsonLd />
 
       <header className="text-center">
-        <Link href="/" className="inline-flex items-center gap-2">
-          <Logo size={28} />
-          <span className="font-heading text-sm font-bold">GSCdaddy</span>
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <ArrowRight className="size-3.5 rotate-180" />
+          Back to home
         </Link>
+        <div className="mt-4">
+          <Link href="/" className="inline-flex items-center gap-2">
+            <Logo size={28} />
+            <span className="font-heading text-sm font-bold">GSCdaddy</span>
+          </Link>
+        </div>
         <h1 className="mt-6 font-heading text-3xl font-bold leading-tight md:text-4xl">
           Free SEO Tools
         </h1>
