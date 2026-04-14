@@ -2,7 +2,7 @@
 
 A prioritized rebuild of the funnel based on the competitor analysis, mapped against what is already shipped in `implementation.md`. The single thesis driving this document is the same one the research keeps returning to. The product is fine. The funnel is broken. Three users signed up and never came back because the GSC connection step gates 100% of the value. Everything below is structured to fix that, in the order it should be fixed.
 
-> **Last updated:** April 14, 2026
+> **Last updated:** April 14, 2026 (P1.1 SEO Health Score tool shipped)
 
 ---
 
@@ -18,7 +18,7 @@ Track overall revamp progress at a glance. Each item maps to a priority section 
 
 ### P1. Fix the cold start problem
 
-- [ ] **P1.1 Free SEO Health Score tool** — Public tool at `/seo-health-checker` with 0-100 score, email-gated PDF report, programmatic SEO per domain
+- [x] **P1.1 Free SEO Health Score tool** — Public tool at `/seo-health-checker` with 0-100 score, email-gated PDF report, programmatic SEO per domain
 - [ ] **P1.2 Demo mode with sample data** — Populated dashboard using gscdaddy.com data for users with no synced sites
 - [ ] **P1.3 Two-track onboarding** — "How old is your website?" split: new site launchpad vs. established site flow
 - [ ] **P1.4 Reverse trial after expiry** — Downgrade to read-only free tier instead of full lockout
@@ -106,6 +106,16 @@ Phase 1 MVP is **complete**. All 12 steps from `implementation.md` are marked DO
 - Full landing page with 15 component sections and structured data
 - IndexNow pinging on every deploy
 
+**P1.1 SEO Health Score tool (shipped):**
+- Free SEO Health Checker at `/seo-health-checker` with 0-100 score across 6 categories
+- HTML crawler (meta tags, headings, images, links, schema detection, robots.txt, sitemap)
+- PageSpeed Insights API integration for Lighthouse scores and Core Web Vitals
+- Weighted scoring engine: Performance (20%), On-Page SEO (25%), Indexability (20%), Mobile (15%), Schema (10%), Security (10%)
+- Email-gated report via Resend (lead capture)
+- Programmatic SEO pages at `/seo-health-checker/[domain]` with cached results
+- 1-hour result caching per domain, rate limiting by IP
+- Featured in main navigation, tools page, footer, and sitemap
+
 Phase 2 and Phase 3 from the original plan (decay alerts, alert UI, cannibalization, PDF export, archival) are not built.
 
 ---
@@ -163,9 +173,9 @@ Seven email templates shipped via Resend + React Email, triggered by a daily cro
 
 This is the biggest single revenue lever in the entire document. The research is unambiguous. Until there is a way to deliver value without GSC connection, every other improvement is downstream of broken activation.
 
-### P1.1 Build the free SEO Health Score tool
+### P1.1 Build the free SEO Health Score tool ✅
 
-This is the HubSpot Website Grader playbook applied to the GSCdaddy niche. Estimated build time, 1 to 2 weeks for a solo dev.
+This is the HubSpot Website Grader playbook applied to the GSCdaddy niche. Shipped April 14, 2026.
 
 **Mechanics**
 
@@ -473,7 +483,7 @@ P0 is complete. 8 free tools and 7 blog posts already shipped. Updated timeline 
 | Weeks | Focus | Deliverable | Status |
 |---|---|---|---|
 | ~~1~~ | ~~P0 closeout~~ | ~~Settings pages, email MVP, API response format~~ | ✅ Done |
-| 1-2 | P1.1 Free SEO Health Score | Public tool at `/seo-health-checker`, email gated PDF, programmatic SEO | Not started |
+| ~~1-2~~ | ~~P1.1 Free SEO Health Score~~ | ~~Public tool at `/seo-health-checker`, email gated PDF, programmatic SEO~~ | ✅ Done |
 | 3 | P1.2, P1.3 | Demo mode with gscdaddy.com data, two-track onboarding | Not started |
 | 4 | P1.4, P2 | Reverse trial, full trigger-based email sequence (9 new emails) | Not started |
 | 5-6 | P3.1, P3.2 | 6 comparison pages, 5 vertical guides | Not started |
@@ -503,6 +513,4 @@ The current funnel is, roughly, "100 visitors → 3 signups → 0 retained." The
 
 ## The one thing that matters most
 
-If only one item from this document gets built, build the **free SEO Health Score tool**. It solves the cold start problem, generates organic traffic on its own, captures emails, and creates a natural bridge to the GSC product. Every successful competitor (Ahrefs, HubSpot, Mangools, Surfer) has proven this model. GSCdaddy without it is a tool that requires users to do work before getting value. With it, the tool delivers value in 15 seconds from any URL.
-
-That is the gap between a SaaS that gets to $1k MRR and one that does not.
+~~If only one item from this document gets built, build the **free SEO Health Score tool**.~~ **Done.** The SEO Health Score tool shipped April 14, 2026 at `/seo-health-checker`. It delivers a 0-100 score in ~15 seconds from any URL, captures emails via gated reports, and creates programmatic SEO pages per domain. Next priority: P1.2 demo mode and P1.3 two-track onboarding to complete the cold start fix.
