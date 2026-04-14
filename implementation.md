@@ -714,13 +714,13 @@ lib/billing/access.ts                        -- checkAccess(), requirePlan() hel
 
 **Key Implementation Details:**
 
-`lib/billing/plans.ts`:
+`lib/billing/plans.ts` (updated — "starter" renamed to "blogger" per migration 011):
 ```typescript
 export const PLANS = {
-  free: { sites: 1, aiRecsPerDay: 2, features: ['striking_distance', 'weekly_email'] },
-  starter: { sites: 1, aiRecsPerDay: 3, price: { monthly: 19, annual: 15 }, features: ['striking_distance', 'weekly_email'] },
-  pro: { sites: 5, aiRecsPerDay: 5, price: { monthly: 49, annual: 39 }, features: ['striking_distance', 'ai_recs', 'decay_alerts', 'weekly_email', 'priority_support'] },
-  agency: { sites: 15, aiRecsPerDay: 10, price: { monthly: 99, annual: 79 }, features: ['striking_distance', 'ai_recs', 'decay_alerts', 'pdf_exports', 'team_access', 'white_label', 'weekly_email', 'priority_support'] },
+  free: { sites: 1, aiRecsPerDay: 3, features: ['striking_distance', 'weekly_email'] },
+  blogger: { sites: 1, aiRecsPerDay: 5, price: { monthly: 19, annual: 15 }, features: ['striking_distance', 'weekly_email', 'decay_alerts'] },
+  pro: { sites: 5, aiRecsPerDay: 25, price: { monthly: 49, annual: 39 }, features: ['striking_distance', 'ai_recs', 'decay_alerts', 'csv_exports', 'weekly_email', 'priority_support'] },
+  agency: { sites: 25, aiRecsPerDay: 50, price: { monthly: 99, annual: 79 }, features: ['striking_distance', 'ai_recs', 'decay_alerts', 'pdf_exports', 'team_access', 'white_label', 'weekly_email', 'priority_support'] },
 };
 ```
 
@@ -775,7 +775,7 @@ function checkAccess(user): AccessLevel {
 
 ### Step 9: Settings Pages ✅
 
-**Files to create:**
+**Files:**
 ```
 app/(dashboard)/settings/layout.tsx            -- Settings layout with tabs
 app/(dashboard)/settings/profile/page.tsx      -- User profile (name, email, avatar)
@@ -804,7 +804,7 @@ app/(dashboard)/settings/billing/page.tsx      -- (covered in Step 8)
 
 ### Step 10: API Response Format & Validation ✅
 
-**Files to create:**
+**Files:**
 ```
 lib/api/response.ts          -- Standardized success/error response helpers
 lib/api/errors.ts            -- Error codes and classes
@@ -828,22 +828,30 @@ lib/api/rate-limit.ts        -- Rate limiting (in-memory or Supabase-based)
 
 ---
 
-### Step 11: Email Notifications (MVP subset) ✅
+### Step 11: Email Notifications ✅
 
-**Files to create:**
+**Files:**
 ```
-lib/email/resend.ts                    -- Resend client wrapper
-lib/email/templates/weekly-summary.tsx -- React Email template for weekly summary
-lib/email/templates/trial-ending.tsx   -- Trial ending warning email
-lib/email/templates/trial-expired.tsx  -- Trial expired email
-app/api/cron/send-emails/route.ts      -- Cron: weekly summaries, trial reminders
+lib/email/resend.ts                              -- Resend client wrapper
+lib/email/templates/welcome.tsx                  -- Welcome email on signup
+lib/email/templates/weekly-summary.tsx           -- React Email template for weekly summary
+lib/email/templates/trial-ending.tsx             -- Trial ending warning email
+lib/email/templates/trial-expired.tsx            -- Trial expired email
+lib/email/templates/nudge-recommendations.tsx    -- Nudge for users who haven't generated recs
+lib/email/templates/top-opportunity-alert.tsx    -- Top keyword opportunity highlight
+lib/email/templates/shared.tsx                   -- Shared email components and utilities
+app/api/cron/send-emails/route.ts                -- Cron: weekly summaries, trial reminders
+app/api/test-emails/route.ts                     -- Email testing endpoint
 ```
 
-**MVP Emails:**
-1. **Weekly Summary** (Sunday 9 AM) - top opportunities, metrics overview, CTA
-2. **Trial Ending** (3 days before) - progress made, upgrade CTA
-3. **Trial Expired** (day of) - limited access notice, upgrade CTA
-4. **Nudge: Recommendations** (daily check) - sent once per site when user has synced GSC data + striking distance keywords but hasn't generated recommendations yet. Highlights their top keyword by opportunity score with real data. Uses `nudge_email_sent_at` column on sites table to prevent repeat sends.
+**Shipped emails (7 templates):**
+1. **Welcome** - sent on signup
+2. **Weekly Summary** (Sunday 9 AM) - top opportunities, metrics overview, CTA
+3. **Trial Ending** (3 days before) - progress made, upgrade CTA
+4. **Trial Expired** (day of) - limited access notice, upgrade CTA
+5. **Nudge: Recommendations** (daily check) - sent once per site when user has synced GSC data + striking distance keywords but hasn't generated recommendations yet. Highlights their top keyword by opportunity score with real data. Uses `nudge_email_sent_at` column on sites table to prevent repeat sends.
+6. **Top Opportunity Alert** - highlights highest-potential striking distance keyword
+7. **Shared utilities** - common email layout components
 
 **Additional files:**
 ```
@@ -866,7 +874,7 @@ supabase/migrations/012_add_nudge_email_sent_at.sql  -- Adds nudge_email_sent_at
 
 **12.1 Blog System**
 
-Static blog using TypeScript content files rendered as HTML. No MDX or CMS needed.
+Static blog using TypeScript content files rendered as HTML. No MDX or CMS needed. 7 posts published.
 
 **Files:**
 ```
@@ -878,6 +886,9 @@ content/blog/striking-distance-keywords-guide.ts         -- Post #1
 content/blog/low-hanging-fruit-keywords-gsc.ts           -- Post #2
 content/blog/google-search-console-beginners-guide.ts    -- Post #3
 content/blog/improve-ctr-google-search-console.ts        -- Post #4
+content/blog/ahrefs-vs-semrush-vs-google-search-console.ts  -- Post #5 (comparison)
+content/blog/keyword-cannibalization-google-search-console.ts -- Post #6
+content/blog/google-search-console-alternatives.ts       -- Post #7 (alternatives listicle)
 app/feed.xml/route.ts                                    -- RSS feed (auto-generates from getAllPosts)
 ```
 
@@ -986,6 +997,9 @@ content/
     low-hanging-fruit-keywords-gsc.ts
     google-search-console-beginners-guide.ts
     improve-ctr-google-search-console.ts
+    ahrefs-vs-semrush-vs-google-search-console.ts
+    keyword-cannibalization-google-search-console.ts
+    google-search-console-alternatives.ts
 
 scripts/
   cron-sync-gsc.ts
@@ -1126,17 +1140,16 @@ Build in this order within Phase 1. Each step depends on the previous:
 
 ## Security Checklist
 
-- [ ] Google OAuth 2.0 with PKCE
-- [ ] Encrypted token storage
-- [ ] Row Level Security on all tables
-- [ ] All API routes check authentication
-- [ ] Rate limiting: 100 req/min per user
-- [ ] Input validation with zod on all endpoints
-- [ ] Webhook signature verification (Dodo)
-- [ ] Cron endpoints protected by CRON_SECRET header
-- [ ] CORS configured for production domain
-- [ ] No GSC data shared between users
-- [ ] GDPR: users can export/delete their data
+- [x] Google OAuth 2.0 with PKCE (`lib/google/oauth.ts`)
+- [x] Encrypted token storage — AES-256-GCM (`lib/google/tokens.ts`)
+- [x] Row Level Security on all tables (6 tables with RLS policies)
+- [x] All API routes check authentication (`lib/auth.ts` — `requireAuth()`)
+- [x] Rate limiting: 50 req/min per user (`lib/api/rate-limit.ts`)
+- [x] Input validation with zod on all endpoints
+- [x] Webhook signature verification (Dodo) (`app/api/billing/webhook/route.ts`)
+- [x] Cron endpoints protected by CRON_SECRET header
+- [x] No GSC data shared between users (RLS policies + `user_id` scoping)
+- [x] GDPR: users can delete their data (`/settings/profile` — cascading delete)
 
 ---
 
@@ -1157,21 +1170,17 @@ These are NOT generic utility tools (mortgage calculators, BMI, etc.). Every too
 
 ### The 8 Tools
 
-#### Already Built
-| # | Tool | Slug | Status |
-|---|------|------|--------|
-| 1 | Keyword Opportunity Calculator | `/tools/keyword-calculator` | Done |
-
-#### To Build
-| # | Tool | Slug | Primary Keyword | US/Mo | KD | CPC | Why It Fits GSCDaddy |
-|---|------|------|-----------------|-------|----|----|----------------------|
-| 2 | Meta Tag Generator | `/tools/meta-tag-generator` | meta tag generator | 56,000 | 20 | $2.20 | Users optimizing pages from GSCDaddy recommendations need meta tags |
-| 3 | Open Graph Generator | `/tools/open-graph-generator` | open graph meta tag generator | 29,250 | 14 | $2.40 | Direct follow-up after fixing title tags — improves social CTR |
-| 4 | Robots.txt Generator | `/tools/robots-txt-generator` | robots txt generator | 38,000 | 16 | $2.50 | Technical SEO — complements GSCDaddy's indexing insights |
-| 5 | Keyword Density Checker | `/tools/keyword-density-checker` | keyword density checker | 42,000 | 25 | $2.10 | Content optimization — users paste their page content, check keyword usage |
-| 6 | Readability Score Checker | `/tools/readability-checker` | readability score checker | 18,000 | 16 | $2.20 | Content quality — pairs with GSCDaddy's "improve this page" recommendations |
-| 7 | SERP Snippet Preview | `/tools/serp-preview` | google serp preview tool | ~12,000 | 12 | $1.80 | Users preview how their title/description looks in Google before publishing |
-| 8 | Slug Generator | `/tools/slug-generator` | slug generator | 22,000 | 12 | $1.60 | URL optimization — referenced in GSCDaddy blog posts |
+#### All 8 Tools — COMPLETE ✅
+| # | Tool | Slug | Primary Keyword | US/Mo | KD | Status |
+|---|------|------|-----------------|-------|----|----|
+| 1 | Keyword Opportunity Calculator | `/tools/keyword-calculator` | striking distance keywords calculator | — | — | ✅ Done |
+| 2 | Meta Tag Generator | `/tools/meta-tag-generator` | meta tag generator | 56,000 | 20 | ✅ Done |
+| 3 | Open Graph Generator | `/tools/open-graph-generator` | open graph meta tag generator | 29,250 | 14 | ✅ Done |
+| 4 | Robots.txt Generator | `/tools/robots-txt-generator` | robots txt generator | 38,000 | 16 | ✅ Done |
+| 5 | Keyword Density Checker | `/tools/keyword-density-checker` | keyword density checker | 42,000 | 25 | ✅ Done |
+| 6 | Readability Score Checker | `/tools/readability-checker` | readability score checker | 18,000 | 16 | ✅ Done |
+| 7 | SERP Snippet Preview | `/tools/serp-preview` | google serp preview tool | ~12,000 | 12 | ✅ Done |
+| 8 | Slug Generator | `/tools/slug-generator` | slug generator | 22,000 | 12 | ✅ Done |
 
 **Combined estimated US search volume: ~217,250/mo**
 **Average KD: 16.4** (all rankable within 2-3 months)
