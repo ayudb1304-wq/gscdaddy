@@ -5,6 +5,9 @@ import { improveCtrGoogleSearchConsole } from "@/content/blog/improve-ctr-google
 import { ahrefsVsSemrushVsGoogleSearchConsole } from "@/content/blog/ahrefs-vs-semrush-vs-google-search-console"
 import { keywordCannibalizationGoogleSearchConsole } from "@/content/blog/keyword-cannibalization-google-search-console"
 import { googleSearchConsoleAlternatives } from "@/content/blog/google-search-console-alternatives"
+import { whatIsCtrSeo } from "@/content/blog/what-is-ctr-seo"
+import { googleSearchConsoleWordpressSetup } from "@/content/blog/google-search-console-wordpress-setup"
+import { contentAuditGoogleSearchConsole } from "@/content/blog/content-audit-google-search-console"
 
 export interface BlogPost {
   slug: string
@@ -30,6 +33,9 @@ const posts: BlogPost[] = [
   ahrefsVsSemrushVsGoogleSearchConsole,
   keywordCannibalizationGoogleSearchConsole,
   googleSearchConsoleAlternatives,
+  whatIsCtrSeo,
+  googleSearchConsoleWordpressSetup,
+  contentAuditGoogleSearchConsole,
 ]
 
 export function getAllPosts(): BlogPost[] {
