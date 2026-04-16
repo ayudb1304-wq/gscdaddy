@@ -8,6 +8,12 @@ import { googleSearchConsoleAlternatives } from "@/content/blog/google-search-co
 import { whatIsCtrSeo } from "@/content/blog/what-is-ctr-seo"
 import { googleSearchConsoleWordpressSetup } from "@/content/blog/google-search-console-wordpress-setup"
 import { contentAuditGoogleSearchConsole } from "@/content/blog/content-audit-google-search-console"
+import { whatIsCrawlBudget } from "@/content/blog/what-is-crawl-budget"
+import { whatIsKeywordDifficulty } from "@/content/blog/what-is-keyword-difficulty"
+import { whatIsSearchIntent } from "@/content/blog/what-is-search-intent"
+import { whatIsContentDecay } from "@/content/blog/what-is-content-decay"
+import { whatIsLongTailKeywords } from "@/content/blog/what-is-long-tail-keywords"
+import { moveKeywordsPage2ToPage1 } from "@/content/blog/move-keywords-page-2-to-page-1"
 
 export interface BlogPost {
   slug: string
@@ -36,6 +42,12 @@ const posts: BlogPost[] = [
   whatIsCtrSeo,
   googleSearchConsoleWordpressSetup,
   contentAuditGoogleSearchConsole,
+  whatIsCrawlBudget,
+  whatIsKeywordDifficulty,
+  whatIsSearchIntent,
+  whatIsContentDecay,
+  whatIsLongTailKeywords,
+  moveKeywordsPage2ToPage1,
 ]
 
 export function getAllPosts(): BlogPost[] {
