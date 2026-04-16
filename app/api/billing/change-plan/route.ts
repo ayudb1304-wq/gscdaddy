@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
     await client.subscriptions.changePlan(sub.dodo_subscription_id, {
       product_id: newProductId,
       quantity: 1,
-      proration_billing_mode: isUpgrade ? "prorated_immediately" : "do_not_bill",
+      proration_billing_mode: isUpgrade ? "prorated_immediately" : "full_immediately",
       effective_at: isUpgrade ? "immediately" : "next_billing_date",
       metadata: {
         user_id: user.id,
