@@ -14,6 +14,9 @@ import { whatIsSearchIntent } from "@/content/blog/what-is-search-intent"
 import { whatIsContentDecay } from "@/content/blog/what-is-content-decay"
 import { whatIsLongTailKeywords } from "@/content/blog/what-is-long-tail-keywords"
 import { moveKeywordsPage2ToPage1 } from "@/content/blog/move-keywords-page-2-to-page-1"
+import { ahrefsAlternatives } from "@/content/blog/ahrefs-alternatives"
+import { semrushAlternatives } from "@/content/blog/semrush-alternatives"
+import { mozAlternatives } from "@/content/blog/moz-alternatives"
 
 export interface BlogPost {
   slug: string
@@ -48,6 +51,9 @@ const posts: BlogPost[] = [
   whatIsContentDecay,
   whatIsLongTailKeywords,
   moveKeywordsPage2ToPage1,
+  ahrefsAlternatives,
+  semrushAlternatives,
+  mozAlternatives,
 ]
 
 export function getAllPosts(): BlogPost[] {
