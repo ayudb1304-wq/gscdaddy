@@ -19,7 +19,12 @@ export function FoundingMemberEmail({ name }: { name?: string }) {
       </Text>
 
       <Text style={paragraph}>
-        Quick note from Ayush, the founder (and still only employee) of GSCdaddy.
+        It's Ayush from X (you probably know me as{" "}
+        <Link href="https://x.com/ayu_theindiedev" style={{ color: brand.green, textDecoration: "none" }}>
+          @ayu_theindiedev
+        </Link>
+        ). I'm the founder (and still only employee) of GSCdaddy, and I wanted to drop
+        you a personal note.
       </Text>
 
       <Text style={paragraph}>
