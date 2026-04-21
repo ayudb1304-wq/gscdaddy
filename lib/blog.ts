@@ -17,6 +17,7 @@ import { moveKeywordsPage2ToPage1 } from "@/content/blog/move-keywords-page-2-to
 import { ahrefsAlternatives } from "@/content/blog/ahrefs-alternatives"
 import { semrushAlternatives } from "@/content/blog/semrush-alternatives"
 import { mozAlternatives } from "@/content/blog/moz-alternatives"
+import { gscdaddyDogfoodingWeek3 } from "@/content/blog/gscdaddy-dogfooding-week-3"
 
 export interface BlogPost {
   slug: string
@@ -54,6 +55,7 @@ const posts: BlogPost[] = [
   ahrefsAlternatives,
   semrushAlternatives,
   mozAlternatives,
+  gscdaddyDogfoodingWeek3,
 ]
 
 export function getAllPosts(): BlogPost[] {
