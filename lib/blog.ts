@@ -18,6 +18,10 @@ import { ahrefsAlternatives } from "@/content/blog/ahrefs-alternatives"
 import { semrushAlternatives } from "@/content/blog/semrush-alternatives"
 import { mozAlternatives } from "@/content/blog/moz-alternatives"
 import { gscdaddyDogfoodingWeek3 } from "@/content/blog/gscdaddy-dogfooding-week-3"
+import { freeSeoAuditChecklist } from "@/content/blog/free-seo-audit-checklist"
+import { whatIsDomainAuthority } from "@/content/blog/what-is-domain-authority"
+import { whatIsABacklink } from "@/content/blog/what-is-a-backlink"
+import { whatIsIndexingInSeo } from "@/content/blog/what-is-indexing-in-seo"
 
 export interface BlogPost {
   slug: string
@@ -56,6 +60,10 @@ const posts: BlogPost[] = [
   semrushAlternatives,
   mozAlternatives,
   gscdaddyDogfoodingWeek3,
+  freeSeoAuditChecklist,
+  whatIsDomainAuthority,
+  whatIsABacklink,
+  whatIsIndexingInSeo,
 ]
 
 export function getAllPosts(): BlogPost[] {
