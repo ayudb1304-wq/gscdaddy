@@ -183,8 +183,10 @@ function CategoryCard({
 
 export function HealthCheckerForm({
   initialResult,
+  inApp = false,
 }: {
   initialResult?: HealthResult | null
+  inApp?: boolean
 }) {
   const [url, setUrl] = useState(initialResult?.domain ?? "")
   const [loading, setLoading] = useState(false)
@@ -249,9 +251,14 @@ export function HealthCheckerForm({
       }
       setOpenCategories(failedCategories)
 
-      // Update URL for shareability (without full navigation)
-      const domain = data.data.domain
-      window.history.replaceState(null, "", `/seo-health-checker/${domain}`)
+      // Update URL for shareability (without full navigation). Skipped
+      // in-app because /app/tools/seo-health-checker has no [domain] sub-
+      // segment; rewriting here would send the user to the public route
+      // on refresh and pop them out of the authenticated session.
+      if (!inApp) {
+        const domain = data.data.domain
+        window.history.replaceState(null, "", `/seo-health-checker/${domain}`)
+      }
     } catch {
       setError("Failed to connect. Please check the URL and try again.")
     } finally {
@@ -378,8 +385,8 @@ export function HealthCheckerForm({
             </div>
           </div>
 
-          {/* Email report capture */}
-          {result.id && (
+          {/* Email report capture (public only — logged-in users already have email on file) */}
+          {!inApp && result.id && (
             <section className="rounded-lg border bg-muted/30 p-6">
               {emailSent ? (
                 <div className="flex items-center gap-3 text-sm">
@@ -429,24 +436,26 @@ export function HealthCheckerForm({
             </section>
           )}
 
-          {/* CTA to GSCdaddy */}
-          <section className="rounded-xl border-2 border-primary/20 bg-primary/5 p-6 text-center md:p-8">
-            <h3 className="font-heading text-lg font-bold md:text-xl">
-              Want to see your striking distance keywords?
-            </h3>
-            <p className="mx-auto mt-2 max-w-lg text-sm text-muted-foreground">
-              You have seen the surface-level SEO. Now see the keywords where you
-              are almost ranking on page 1. Connect Google Search Console and
-              GSCdaddy will find them automatically.
-            </p>
-            <a
-              href="/login"
-              className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-            >
-              Try GSCdaddy Free
-              <ArrowRight className="size-4" />
-            </a>
-          </section>
+          {/* CTA to GSCdaddy — public only; logged-in users are already here */}
+          {!inApp && (
+            <section className="rounded-xl border-2 border-primary/20 bg-primary/5 p-6 text-center md:p-8">
+              <h3 className="font-heading text-lg font-bold md:text-xl">
+                Want to see your striking distance keywords?
+              </h3>
+              <p className="mx-auto mt-2 max-w-lg text-sm text-muted-foreground">
+                You have seen the surface-level SEO. Now see the keywords where you
+                are almost ranking on page 1. Connect Google Search Console and
+                GSCdaddy will find them automatically.
+              </p>
+              <a
+                href="/login"
+                className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+              >
+                Try GSCdaddy Free
+                <ArrowRight className="size-4" />
+              </a>
+            </section>
+          )}
         </div>
       )}
     </div>

@@ -38,7 +38,7 @@ const TOOL_COMPONENTS: Record<ToolKey, () => React.ReactElement> = {
   "robots-txt-generator": () => <RobotsForm />,
   "keyword-density-checker": () => <DensityForm />,
   "readability-checker": () => <ReadabilityForm />,
-  "seo-health-checker": () => <HealthCheckerForm />,
+  "seo-health-checker": () => <HealthCheckerForm inApp />,
 }
 
 const HEALTH_CHECKER_META = {
