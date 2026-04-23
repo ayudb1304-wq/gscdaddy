@@ -10,7 +10,7 @@ import { WelcomeEmail } from "@/lib/email/templates/welcome"
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get("code")
-  const next = searchParams.get("next") ?? "/dashboard"
+  const next = searchParams.get("next") ?? "/today"
 
   if (!code) {
     return NextResponse.redirect(`${origin}/login?error=missing_code`)
