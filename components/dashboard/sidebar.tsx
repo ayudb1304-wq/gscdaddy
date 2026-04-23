@@ -32,12 +32,11 @@ const TOOL_SIDEBAR_LABELS: Record<string, string> = {
 }
 
 const toolsChildren: NavChild[] = [
-  { label: "SEO Health Checker", href: "/seo-health-checker", icon: HeartPulse, external: true },
+  { label: "SEO Health Checker", href: "/app/tools/seo-health-checker", icon: HeartPulse },
   ...TOOLS.map((t) => ({
     label: TOOL_SIDEBAR_LABELS[t.slug] ?? t.name,
-    href: `/tools/${t.slug}`,
+    href: `/app/tools/${t.slug}`,
     icon: TOOL_ICONS[t.icon],
-    external: true,
   })),
 ]
 
