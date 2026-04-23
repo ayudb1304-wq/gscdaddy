@@ -1,8 +1,9 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { ArrowRight, TrendingUp, Eye, Code, Share2, Link as LinkIcon, Bot, BarChart3, BookOpen, HeartPulse } from "lucide-react"
+import { ArrowRight, HeartPulse } from "lucide-react"
 import { Logo } from "@/components/logo"
 import { TOOLS } from "@/lib/tools"
+import { TOOL_ICONS } from "@/lib/tool-icons"
 
 export const metadata: Metadata = {
   title: "Free SEO Tools - Online SEO Toolkit | GSCdaddy",
@@ -17,18 +18,6 @@ export const metadata: Metadata = {
     siteName: "GSCdaddy",
     type: "website",
   },
-}
-
-const ICON_MAP: Record<string, React.ReactNode> = {
-  HeartPulse: <HeartPulse className="size-5" />,
-  TrendingUp: <TrendingUp className="size-5" />,
-  Eye: <Eye className="size-5" />,
-  Code: <Code className="size-5" />,
-  Share2: <Share2 className="size-5" />,
-  Link: <LinkIcon className="size-5" />,
-  Bot: <Bot className="size-5" />,
-  BarChart3: <BarChart3 className="size-5" />,
-  BookOpen: <BookOpen className="size-5" />,
 }
 
 function ToolsJsonLd() {
@@ -117,25 +106,28 @@ export default function ToolsIndexPage() {
       </Link>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
-        {TOOLS.map((tool) => (
-          <Link
-            key={tool.slug}
-            href={`/tools/${tool.slug}`}
-            className="group flex gap-4 rounded-xl border p-5 transition-colors hover:border-primary/40 hover:bg-muted/50"
-          >
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary/20">
-              {ICON_MAP[tool.icon]}
-            </div>
-            <div>
-              <p className="font-heading text-sm font-semibold text-foreground">
-                {tool.name}
-              </p>
-              <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
-                {tool.description}
-              </p>
-            </div>
-          </Link>
-        ))}
+        {TOOLS.map((tool) => {
+          const Icon = TOOL_ICONS[tool.icon]
+          return (
+            <Link
+              key={tool.slug}
+              href={`/tools/${tool.slug}`}
+              className="group flex gap-4 rounded-xl border p-5 transition-colors hover:border-primary/40 hover:bg-muted/50"
+            >
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary/20">
+                {Icon ? <Icon className="size-5" /> : null}
+              </div>
+              <div>
+                <p className="font-heading text-sm font-semibold text-foreground">
+                  {tool.name}
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
+                  {tool.description}
+                </p>
+              </div>
+            </Link>
+          )
+        })}
       </div>
 
       <section className="mt-16 rounded-xl border-2 border-primary/20 bg-primary/5 p-6 text-center md:p-8">

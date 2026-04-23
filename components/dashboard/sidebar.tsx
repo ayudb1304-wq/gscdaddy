@@ -3,11 +3,45 @@
 import Link from "next/link"
 import { usePathname, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
-import { LayoutDashboard, Target, Lightbulb, Settings, Crosshair, ChevronDown, CreditCard, Globe, Sparkles, User, Sunrise } from "lucide-react"
+import { LayoutDashboard, Target, Lightbulb, Settings, Crosshair, ChevronDown, CreditCard, Globe, Sparkles, User, Sunrise, Wrench, HeartPulse } from "lucide-react"
 import { Logo } from "@/components/logo"
 import { cn } from "@/lib/utils"
+import { TOOLS } from "@/lib/tools"
+import { TOOL_ICONS } from "@/lib/tool-icons"
 
-const navItems = [
+type NavIcon = React.ComponentType<{ className?: string }>
+type NavChild = { label: string; href: string; icon: NavIcon; external?: boolean }
+type NavItem = {
+  label: string
+  href?: string
+  icon: NavIcon
+  children?: NavChild[]
+}
+
+// Shorter labels so the sidebar row doesn't wrap. Public /tools cards keep
+// the longer marketing names from lib/tools.ts.
+const TOOL_SIDEBAR_LABELS: Record<string, string> = {
+  "keyword-calculator": "Keyword Calculator",
+  "serp-preview": "SERP Preview",
+  "meta-tag-generator": "Meta Tags",
+  "open-graph-generator": "Open Graph",
+  "slug-generator": "Slug Generator",
+  "robots-txt-generator": "Robots.txt",
+  "keyword-density-checker": "Keyword Density",
+  "readability-checker": "Readability",
+}
+
+const toolsChildren: NavChild[] = [
+  { label: "SEO Health Checker", href: "/seo-health-checker", icon: HeartPulse, external: true },
+  ...TOOLS.map((t) => ({
+    label: TOOL_SIDEBAR_LABELS[t.slug] ?? t.name,
+    href: `/tools/${t.slug}`,
+    icon: TOOL_ICONS[t.icon],
+    external: true,
+  })),
+]
+
+const navItems: NavItem[] = [
   {
     label: "Today",
     href: "/today",
@@ -25,6 +59,11 @@ const navItems = [
       { label: "Striking Distance", href: "/reports/striking-distance", icon: Crosshair },
       { label: "Recommendations", href: "/reports/recommendations", icon: Lightbulb },
     ],
+  },
+  {
+    label: "Tools",
+    icon: Wrench,
+    children: toolsChildren,
   },
   {
     label: "Settings",
@@ -106,11 +145,14 @@ export function Sidebar({ className }: { className?: string }) {
                     {item.children.map((child) => (
                       <Link
                         key={child.href}
-                        href={withSiteId(child.href)}
+                        href={child.external ? child.href : withSiteId(child.href)}
+                        {...(child.external
+                          ? { target: "_blank", rel: "noopener noreferrer" }
+                          : {})}
                         className={cn(
                           "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
                           "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                          pathname.startsWith(child.href)
+                          !child.external && pathname.startsWith(child.href)
                             ? "bg-sidebar-accent text-sidebar-primary font-medium"
                             : "text-sidebar-foreground/70"
                         )}
