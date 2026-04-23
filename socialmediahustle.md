@@ -491,3 +491,63 @@ gscdaddy.com/tools
 - [ ] Post at 8:30am IST with dashboard screenshot attached
 - [ ] Reply to 10 people in SEO/indie hacker space
 - [ ] Share the /tools page in relevant Reddit threads (r/SEO, r/webdev)
+
+---
+
+## Day 22 (April 23, 2026)
+
+### Single X Post
+
+```
+20 days of building gscdaddy in public.
+
+GSC impressions went from 1 a day to 307.
+
+One post does all the work (striking distance keywords, 5.4% CTR, position 8).
+
+Meanwhile my beginners guide has 456 impressions and 0 clicks, stuck at position 54.
+
+Shipped free SEO tools inside the app sidebar today.
+```
+
+---
+
+### Reddit Post (r/SEO, r/juststart, r/indiehackers)
+
+**Title**
+
+```
+20 days of building gscdaddy, here is what the Search Console data actually looks like
+```
+
+**Body**
+
+```
+Posting the raw numbers instead of vibes.
+
+Apr 2 to Apr 21 (Google Search Console)
+- 1864 impressions total
+- 19 clicks total
+- Daily impressions went from 1 to 307
+
+What is working
+The striking distance keywords guide is carrying the whole site. 11 clicks, 204 impressions, 5.39% CTR, position 8.5. It is the only page out of page 5.
+
+What is not working
+The beginners guide to GSC has 456 impressions and zero clicks, sitting at position 54. Classic no-mans-land. Going to rewrite the intro and push internal links at it this week.
+
+The weird one
+India converts at 43% CTR on 30 impressions. The US is 0.16% CTR on 1230 impressions. Same site, wildly different behavior. Still figuring out why.
+
+Shipped today
+Free SEO tools now render inside the authenticated app shell, including the SEO Health Checker. Before today they lived on separate pages and logged-in users had to leave the app to use them. Now they sit in the sidebar next to the paid stuff so the free tools can actually drive retention.
+```
+
+---
+
+### Engagement Plan
+
+- [ ] Schedule X post in Typefully for 8:30am IST
+- [ ] Post Reddit thread on r/SEO first, then r/juststart the next day
+- [ ] Reply to any comments within the first hour
+- [ ] Quote tweet the X post with a screenshot of the impressions chart
