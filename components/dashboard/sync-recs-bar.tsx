@@ -70,6 +70,12 @@ export function SyncRecsBar({
           // Refresh the server component so metrics/charts/recs repaint
           // with the freshly-synced data (and, if Layer 2 ran, new recs).
           router.refresh()
+          // Notify client-side pages (Striking Distance, Recommendations) that
+          // fetch via useEffect — router.refresh() alone doesn't re-run their
+          // effects, so they'd otherwise keep showing stale data.
+          window.dispatchEvent(
+            new CustomEvent("gsc:sync-completed", { detail: { siteId } })
+          )
         }
       } catch {
         // ignore polling errors — we'll try again next tick

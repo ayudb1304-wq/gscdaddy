@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { LayoutDashboard, Target, Lightbulb, Settings, Crosshair, ChevronDown, CreditCard, Globe, Sparkles, User } from "lucide-react"
 import { Logo } from "@/components/logo"
@@ -41,6 +41,9 @@ interface Usage {
 
 export function Sidebar({ className }: { className?: string }) {
   const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const siteId = searchParams.get("siteId")
+  const withSiteId = (href: string) => (siteId ? `${href}?siteId=${siteId}` : href)
   const [expandedSections, setExpandedSections] = useState<string[]>(["Reports"])
   const [usage, setUsage] = useState<Usage | null>(null)
 
@@ -98,7 +101,7 @@ export function Sidebar({ className }: { className?: string }) {
                     {item.children.map((child) => (
                       <Link
                         key={child.href}
-                        href={child.href}
+                        href={withSiteId(child.href)}
                         className={cn(
                           "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
                           "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
@@ -120,7 +123,7 @@ export function Sidebar({ className }: { className?: string }) {
           return (
             <Link
               key={item.href}
-              href={item.href!}
+              href={withSiteId(item.href!)}
               className={cn(
                 "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                 "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
@@ -153,7 +156,7 @@ export function Sidebar({ className }: { className?: string }) {
           />
           {(usage.sitesUsed >= usage.sitesLimit || usage.recsToday >= usage.recsLimit) && (
             <Link
-              href="/settings/billing"
+              href={withSiteId("/settings/billing")}
               className="block text-center text-[11px] text-sidebar-foreground/50 hover:text-sidebar-foreground/70 transition-colors"
             >
               Upgrade for more

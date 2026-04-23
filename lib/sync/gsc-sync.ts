@@ -122,6 +122,18 @@ export async function syncSite(siteId: string): Promise<{ rowCount: number }> {
       await batchUpsert(admin, siteId, rows)
     }
 
+    // Refresh the striking-distance materialized view before flipping status
+    // to "completed". The dashboard/recommendations/striking-distance UIs
+    // refetch as soon as they see status != "syncing"; if the view isn't
+    // refreshed first, the user sees empty/stale opportunities for a beat.
+    // Non-fatal on failure — the nightly refresh-views cron is a safety net.
+    await updateSyncProgress(admin, siteId, "Refreshing opportunities view...")
+    try {
+      await admin.rpc("refresh_striking_distance")
+    } catch (err) {
+      console.error(`Post-sync view refresh failed for site ${siteId}:`, err)
+    }
+
     // Mark as completed
     await admin
       .from("sites")

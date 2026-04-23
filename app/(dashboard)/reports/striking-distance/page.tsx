@@ -64,6 +64,15 @@ export default function StrikingDistancePage() {
     fetchData()
   }, [fetchData])
 
+  useEffect(() => {
+    const onSyncCompleted = (e: Event) => {
+      const ce = e as CustomEvent<{ siteId: string }>
+      if (ce.detail?.siteId === siteId) fetchData()
+    }
+    window.addEventListener("gsc:sync-completed", onSyncCompleted)
+    return () => window.removeEventListener("gsc:sync-completed", onSyncCompleted)
+  }, [siteId, fetchData])
+
   const handleSort = (column: string) => {
     if (sortBy === column) {
       setSortOrder((prev) => (prev === "desc" ? "asc" : "desc"))
