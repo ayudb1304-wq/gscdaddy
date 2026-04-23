@@ -51,6 +51,15 @@ export default function RecommendationsPage() {
     fetchRecs()
   }, [fetchRecs])
 
+  useEffect(() => {
+    const onSyncCompleted = (e: Event) => {
+      const ce = e as CustomEvent<{ siteId: string }>
+      if (ce.detail?.siteId === siteId) fetchRecs()
+    }
+    window.addEventListener("gsc:sync-completed", onSyncCompleted)
+    return () => window.removeEventListener("gsc:sync-completed", onSyncCompleted)
+  }, [siteId, fetchRecs])
+
   const handleGenerate = async () => {
     if (!siteId) return
     setGenerating(true)
