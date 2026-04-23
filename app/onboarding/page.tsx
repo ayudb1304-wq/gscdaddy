@@ -133,11 +133,11 @@ export default function OnboardingPage() {
   }, [step, syncStatus])
 
   function handleSkip() {
-    router.push("/dashboard")
+    router.push("/today")
   }
 
   function handleGoToDashboard() {
-    router.push("/dashboard")
+    router.push("/today")
   }
 
   return (

@@ -3,11 +3,16 @@
 import Link from "next/link"
 import { usePathname, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
-import { LayoutDashboard, Target, Lightbulb, Settings, Crosshair, ChevronDown, CreditCard, Globe, Sparkles, User } from "lucide-react"
+import { LayoutDashboard, Target, Lightbulb, Settings, Crosshair, ChevronDown, CreditCard, Globe, Sparkles, User, Sunrise } from "lucide-react"
 import { Logo } from "@/components/logo"
 import { cn } from "@/lib/utils"
 
 const navItems = [
+  {
+    label: "Today",
+    href: "/today",
+    icon: Sunrise,
+  },
   {
     label: "Dashboard",
     href: "/dashboard",

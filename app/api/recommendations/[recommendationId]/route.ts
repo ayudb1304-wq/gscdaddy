@@ -1,6 +1,7 @@
 import { requireAuth } from "@/lib/auth"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { successResponse, errors } from "@/lib/api/response"
+import { captureBaseline, clearBaseline } from "@/lib/recommendations/baseline"
 
 export async function PATCH(
   request: Request,
@@ -36,6 +37,15 @@ export async function PATCH(
       .single()
 
     if (error) return errors.internal("Failed to update recommendation")
+
+    // Snapshot baseline metrics so the /today rec-impact band can show
+    // before/after deltas. On un-complete, drop the baseline so a future
+    // re-complete captures a fresh window.
+    if (newCompleted) {
+      await captureBaseline(admin, recommendationId)
+    } else {
+      await clearBaseline(admin, recommendationId)
+    }
 
     return successResponse(data)
   } catch (e) {
