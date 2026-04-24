@@ -66,7 +66,7 @@ export const strikingDistanceKeywordsGuide: BlogPost = {
 
 <h2>How to Find Them Manually in Google Search Console</h2>
 
-<p>Here is the exact process I use. Open <a href="/blog/google-search-console-beginners-guide">Google Search Console</a> and follow these steps.</p>
+<p>Here is the exact process I use. Open Google Search Console (if you have never used it before, start with this <a href="/blog/google-search-console-beginners-guide">step by step guide on how to use Google Search Console</a>) and follow these steps.</p>
 
 <ol>
 <li><strong>Go to Performance and click Search Results</strong>. Make sure you have Clicks, Impressions, CTR, and Average Position all enabled at the top.</li>
