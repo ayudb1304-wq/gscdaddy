@@ -2,9 +2,9 @@ import type { BlogPost } from "@/lib/blog"
 
 export const ahrefsVsSemrushVsGoogleSearchConsole: BlogPost = {
   slug: "ahrefs-vs-semrush-vs-google-search-console",
-  title: "Ahrefs vs Semrush vs Google Search Console: Which Do You Actually Need?",
+  title: "Ahrefs vs Semrush vs GSC: Which to Pick",
   description:
-    "Honest comparison of Ahrefs, Semrush, and Google Search Console for solo bloggers. When you actually need a $129/mo tool, and when free GSC is all you need.",
+    "Honest comparison of Ahrefs, Semrush, and Google Search Console for solo bloggers. When to pay $129/mo and when free GSC covers it.",
   publishedAt: "2026-04-11",
   author: {
     name: "Ayush",

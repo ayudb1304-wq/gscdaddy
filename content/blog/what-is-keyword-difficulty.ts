@@ -2,9 +2,9 @@ import type { BlogPost } from "@/lib/blog"
 
 export const whatIsKeywordDifficulty: BlogPost = {
   slug: "what-is-keyword-difficulty",
-  title: "What is Keyword Difficulty? How to Assess It and Pick Winnable Keywords",
+  title: "What is Keyword Difficulty? How to Use It",
   description:
-    "Keyword difficulty estimates how hard it will be to rank on page one for a given search term. Learn how it is calculated, why scores vary between tools, and how to find keywords you can actually win.",
+    "Keyword difficulty estimates how hard it is to rank on page one. Learn how it is calculated, why scores vary by tool, and how to pick winnable keywords.",
   publishedAt: "2026-04-16",
   author: {
     name: "Ayush",

@@ -2,10 +2,9 @@ import type { BlogPost } from "@/lib/blog"
 
 export const googleSearchConsoleWordpressSetup: BlogPost = {
   slug: "google-search-console-wordpress-setup",
-  title:
-    "How to Use Google Search Console with WordPress (Complete Setup Guide)",
+  title: "Google Search Console WordPress Setup",
   description:
-    "Step-by-step guide to connecting Google Search Console to your WordPress site. Covers verification methods, sitemap submission, weekly checks, and common WordPress-specific GSC issues.",
+    "Step by step guide to connect Google Search Console to WordPress. Verification, sitemap submission, weekly checks, and common WordPress GSC fixes.",
   publishedAt: "2026-04-12",
   author: {
     name: "Ayush",

@@ -2,9 +2,9 @@ import type { BlogPost } from "@/lib/blog"
 
 export const whatIsCtrSeo: BlogPost = {
   slug: "what-is-ctr-seo",
-  title: "What is CTR in SEO? How to Calculate and Improve Your Click-Through Rate",
+  title: "What is CTR in SEO? How to Improve It",
   description:
-    "CTR in SEO is the percentage of people who click your result after seeing it in search. Learn how to calculate it, what benchmarks to aim for, and 5 ways to improve it.",
+    "CTR in SEO is the percent of searchers who click your result. Learn how to calculate it, what benchmarks to hit, and 5 ways to improve it.",
   publishedAt: "2026-04-13",
   author: {
     name: "Ayush",

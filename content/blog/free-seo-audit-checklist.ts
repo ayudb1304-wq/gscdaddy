@@ -2,9 +2,9 @@ import type { BlogPost } from "@/lib/blog"
 
 export const freeSeoAuditChecklist: BlogPost = {
   slug: "free-seo-audit-checklist",
-  title: "Free SEO Audit Checklist for New Websites in 2026",
+  title: "Free SEO Audit Checklist for 2026",
   description:
-    "A practical 29-point SEO audit checklist for new websites in 2026. Technical, on-page, content, and off-page fundamentals you can work through in an afternoon, no paid tools required.",
+    "29-point SEO audit checklist for new websites in 2026. Technical, on-page, content, and off-page fixes you can ship in an afternoon. No paid tools.",
   publishedAt: "2026-04-20",
   author: {
     name: "Ayush",

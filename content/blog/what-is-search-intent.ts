@@ -2,9 +2,9 @@ import type { BlogPost } from "@/lib/blog"
 
 export const whatIsSearchIntent: BlogPost = {
   slug: "what-is-search-intent",
-  title: "What is Search Intent? The 4 Types and How to Optimize for Each",
+  title: "What is Search Intent? The 4 Types Explained",
   description:
-    "Search intent is the reason behind a search query. Learn the four types of search intent, how to identify them, and how to create content that matches what searchers actually want.",
+    "Search intent is the reason behind a search query. Learn the 4 types of search intent, how to identify them, and how to write content that matches.",
   publishedAt: "2026-04-16",
   author: {
     name: "Ayush",

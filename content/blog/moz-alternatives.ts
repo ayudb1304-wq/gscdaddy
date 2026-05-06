@@ -2,9 +2,9 @@ import type { BlogPost } from "@/lib/blog"
 
 export const mozAlternatives: BlogPost = {
   slug: "moz-alternatives",
-  title: "7 Best Moz Alternatives in 2026 (Free and Paid)",
+  title: "7 Best Moz Alternatives 2026 (Free + Paid)",
   description:
-    "Looking for Moz alternatives? Here are 7 SEO tools that match or beat Moz for keyword research, site audits, and rank tracking. Includes free options and honest pricing comparisons.",
+    "Compare 7 SEO tools that match or beat Moz for keyword research, site audits, and rank tracking. Free options included with honest pricing.",
   publishedAt: "2026-04-18",
   author: {
     name: "Ayush",

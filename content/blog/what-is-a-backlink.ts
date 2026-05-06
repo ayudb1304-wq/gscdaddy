@@ -2,9 +2,9 @@ import type { BlogPost } from "@/lib/blog"
 
 export const whatIsABacklink: BlogPost = {
   slug: "what-is-a-backlink",
-  title: "What is a Backlink? Types, Quality Signals, and How to Earn Them",
+  title: "What is a Backlink? Types and How to Earn",
   description:
-    "A backlink is a link from one website to another. Learn the different types of backlinks, what makes one valuable, and how to earn them ethically in 2026.",
+    "A backlink is a link from one website to another. Learn the types of backlinks, what makes one valuable, and how to earn them ethically in 2026.",
   publishedAt: "2026-04-20",
   author: {
     name: "Ayush",

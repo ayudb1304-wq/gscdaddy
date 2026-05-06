@@ -2,9 +2,9 @@ import type { BlogPost } from "@/lib/blog"
 
 export const moveKeywordsPage2ToPage1: BlogPost = {
   slug: "move-keywords-page-2-to-page-1",
-  title: "How to Move Keywords from Page 2 to Page 1 of Google: A Proven Process",
+  title: "Move Keywords from Page 2 to Page 1",
   description:
-    "Page 2 of Google gets less than 4% of all clicks. Learn the exact 7-step process to identify your page 2 keywords and push them to page 1 where the traffic actually is.",
+    "Page 2 of Google gets under 4% of clicks. Use this 7 step process to find your page 2 keywords and push them to page 1 where the traffic is.",
   publishedAt: "2026-04-17",
   author: {
     name: "Ayush",

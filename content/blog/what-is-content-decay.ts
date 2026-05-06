@@ -2,9 +2,9 @@ import type { BlogPost } from "@/lib/blog"
 
 export const whatIsContentDecay: BlogPost = {
   slug: "what-is-content-decay",
-  title: "What is Content Decay? How to Find and Fix Declining Pages",
+  title: "What is Content Decay? Find and Fix It",
   description:
-    "Content decay is when a page gradually loses organic traffic and rankings over time. Learn why it happens, how to detect it in Google Search Console, and how to reverse the decline.",
+    "Content decay is when a page gradually loses organic traffic and rankings. Learn why it happens, how to spot it in GSC, and how to reverse it.",
   publishedAt: "2026-04-16",
   author: {
     name: "Ayush",

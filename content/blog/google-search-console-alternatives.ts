@@ -2,10 +2,9 @@ import type { BlogPost } from "@/lib/blog"
 
 export const googleSearchConsoleAlternatives: BlogPost = {
   slug: "google-search-console-alternatives",
-  title:
-    "7 Best Google Search Console Alternatives and Companion Tools in 2026",
+  title: "Best Google Search Console Alternatives 2026",
   description:
-    "Honest reviews of the best Google Search Console alternatives and companion tools for bloggers and indie devs. Covers free and paid options with pricing, pros, and cons.",
+    "Honest reviews of the best Google Search Console alternatives and companion tools for bloggers and indie devs. Free and paid picks, real pricing.",
   publishedAt: "2026-04-13",
   author: {
     name: "Ayush",
