@@ -2,10 +2,9 @@ import type { BlogPost } from "@/lib/blog"
 
 export const contentAuditGoogleSearchConsole: BlogPost = {
   slug: "content-audit-google-search-console",
-  title:
-    "How to Do a Content Audit Using Google Search Console Data (Free Method)",
+  title: "Content Audit with Google Search Console",
   description:
-    "A practical step-by-step guide to auditing your content using Google Search Console. Sort pages into 4 buckets, identify dead weight, and find striking distance opportunities.",
+    "Free step-by-step content audit using Google Search Console. Sort pages into 4 buckets, cut dead weight, and find striking distance wins.",
   publishedAt: "2026-04-14",
   author: {
     name: "Ayush",

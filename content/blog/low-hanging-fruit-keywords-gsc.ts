@@ -2,9 +2,9 @@ import type { BlogPost } from "@/lib/blog"
 
 export const lowHangingFruitKeywordsGsc: BlogPost = {
   slug: "low-hanging-fruit-keywords-gsc",
-  title: "Find Low-Hanging Fruit Keywords in Google Search Console",
+  title: "Find Low-Hanging Fruit Keywords in GSC",
   description:
-    "A step-by-step tutorial to find keywords you are already ranking for that need small improvements to drive significantly more traffic from Google.",
+    "Step by step tutorial to find keywords you already rank for that need small fixes to drive a lot more organic traffic from Google.",
   publishedAt: "2026-04-05",
   author: {
     name: "Ayush",

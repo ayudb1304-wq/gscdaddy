@@ -2,9 +2,9 @@ import type { BlogPost } from "@/lib/blog"
 
 export const googleSearchConsoleBeginnersGuide: BlogPost = {
   slug: "google-search-console-beginners-guide",
-  title: "How to Use Google Search Console (Step by Step Guide for Beginners)",
+  title: "How to Use Google Search Console (2026)",
   description:
-    "A step by step Google Search Console tutorial for beginners. Learn how to use GSC, set up your account, read the 5 reports that matter, and build a 10 minute weekly routine.",
+    "Step by step Google Search Console tutorial for beginners. Set up your account, read the 5 reports that matter, and build a 10 minute weekly routine.",
   publishedAt: "2026-04-06",
   updatedAt: "2026-04-24",
   author: {

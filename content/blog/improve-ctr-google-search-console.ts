@@ -2,9 +2,9 @@ import type { BlogPost } from "@/lib/blog"
 
 export const improveCtrGoogleSearchConsole: BlogPost = {
   slug: "improve-ctr-google-search-console",
-  title: "How to Improve CTR Using Google Search Console Data",
+  title: "Improve CTR with Google Search Console",
   description:
-    "Find pages with low CTR in Google Search Console and fix them with better title tags, meta descriptions, and structured data.",
+    "Find low CTR pages in Google Search Console and fix them with sharper title tags, meta descriptions, and structured data.",
   publishedAt: "2026-04-07",
   author: {
     name: "Ayush",

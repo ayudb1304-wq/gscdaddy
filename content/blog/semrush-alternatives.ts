@@ -2,9 +2,9 @@ import type { BlogPost } from "@/lib/blog"
 
 export const semrushAlternatives: BlogPost = {
   slug: "semrush-alternatives",
-  title: "7 Best Semrush Alternatives in 2026 (Free and Paid)",
+  title: "7 Best Semrush Alternatives 2026 (Free + Paid)",
   description:
-    "Looking for Semrush alternatives? Here are 7 tools from free to affordable that cover keyword research, site audits, and rank tracking without the Semrush price tag.",
+    "Compare 7 Semrush alternatives from free to affordable. Keyword research, site audits, and rank tracking without the Semrush price tag.",
   publishedAt: "2026-04-18",
   author: {
     name: "Ayush",

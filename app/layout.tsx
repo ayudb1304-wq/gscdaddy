@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://gscdaddy.com"),
   title: "GSCdaddy - Find Your Almost-Ranking Keywords",
   description:
-    "Stop guessing which SEO fixes matter. GSCdaddy finds your almost-ranking keywords and builds AI action plans to push them to page 1. Free 14-day trial.",
+    "GSCdaddy finds your almost-ranking keywords in Google Search Console and builds AI action plans to push them to page 1. Free 14-day trial.",
   keywords: [
     "Google Search Console",
     "SEO analytics",
@@ -58,7 +58,9 @@ export const metadata: Metadata = {
       "Find your striking distance keywords in Google Search Console and get AI action plans to reach page 1.",
     url: "https://gscdaddy.com",
     siteName: "GSCdaddy",
+    locale: "en_US",
     type: "website",
+    images: ["/opengraph-image"],
   },
   twitter: {
     card: "summary_large_image",
@@ -66,6 +68,7 @@ export const metadata: Metadata = {
     title: "GSCdaddy - You're Ranking #8. Let's Fix That.",
     description:
       "Find your striking distance keywords and get AI action plans to reach page 1.",
+    images: ["/opengraph-image"],
   },
   robots: {
     index: true,

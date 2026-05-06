@@ -15,7 +15,9 @@ export const metadata: Metadata = {
       "SEO guides, Google Search Console tutorials, and striking distance keyword strategies.",
     url: "https://gscdaddy.com/blog",
     siteName: "GSCdaddy",
+    locale: "en_US",
     type: "website",
+    images: ["/opengraph-image"],
   },
 }
 

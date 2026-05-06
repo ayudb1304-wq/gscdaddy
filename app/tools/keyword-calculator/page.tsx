@@ -24,7 +24,9 @@ export const metadata: Metadata = {
       "Free SEO calculator. See how many clicks you are leaving on the table based on your current Google position.",
     url: "https://gscdaddy.com/tools/keyword-calculator",
     siteName: "GSCdaddy",
+    locale: "en_US",
     type: "website",
+    images: ["/opengraph-image"],
   },
 }
 

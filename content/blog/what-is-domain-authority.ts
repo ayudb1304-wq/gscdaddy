@@ -2,9 +2,9 @@ import type { BlogPost } from "@/lib/blog"
 
 export const whatIsDomainAuthority: BlogPost = {
   slug: "what-is-domain-authority",
-  title: "What is Domain Authority? How It's Calculated and Why It Matters",
+  title: "What is Domain Authority? How It Works",
   description:
-    "Domain Authority is a third-party score from 1 to 100 that predicts how well a website will rank in search. Learn how it's calculated, why Google does not use it directly, and how to improve yours.",
+    "Domain Authority is a third-party score from 1 to 100 that predicts ranking. Learn how it is calculated, why Google ignores it, and how to grow it.",
   publishedAt: "2026-04-20",
   author: {
     name: "Ayush",

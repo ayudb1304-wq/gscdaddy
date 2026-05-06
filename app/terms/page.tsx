@@ -12,7 +12,9 @@ export const metadata = {
       "Terms of Service for GSCdaddy. Rules and conditions for using our SEO tool.",
     url: "https://gscdaddy.com/terms",
     siteName: "GSCdaddy",
+    locale: "en_US",
     type: "website",
+    images: ["/opengraph-image"],
   },
 }
 

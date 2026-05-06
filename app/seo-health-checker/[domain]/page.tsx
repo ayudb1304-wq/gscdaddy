@@ -13,18 +13,35 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { domain } = await params
   const decoded = decodeURIComponent(domain)
 
+  const MAX_TITLE = 60
+  const fullTitle = `${decoded} SEO Health Score | GSCdaddy`
+  const title =
+    fullTitle.length <= MAX_TITLE
+      ? fullTitle
+      : `${decoded} SEO Score | GSCdaddy`.length <= MAX_TITLE
+        ? `${decoded} SEO Score | GSCdaddy`
+        : `${decoded.slice(0, MAX_TITLE - 1).trimEnd()}…`
+
+  const fullDesc = `Free SEO audit and health score for ${decoded}. Performance, mobile, on-page SEO, schema, security, and indexability checks.`
+  const description =
+    fullDesc.length <= 155
+      ? fullDesc
+      : `Free SEO audit and 0-100 health score for ${decoded}.`
+
   return {
-    title: `SEO Health Score for ${decoded} | GSCdaddy`,
-    description: `Free SEO audit and health score for ${decoded}. Check performance, mobile friendliness, on-page SEO, schema markup, security, and indexability.`,
+    title,
+    description,
     alternates: {
       canonical: `https://gscdaddy.com/seo-health-checker/${decoded}`,
     },
     openGraph: {
-      title: `SEO Health Score for ${decoded} | GSCdaddy`,
-      description: `Free SEO audit for ${decoded}. See the 0-100 health score across 6 categories.`,
+      title,
+      description,
       url: `https://gscdaddy.com/seo-health-checker/${decoded}`,
       siteName: "GSCdaddy",
+      locale: "en_US",
       type: "website",
+      images: ["/opengraph-image"],
     },
     robots: {
       index: true,

@@ -24,7 +24,9 @@ export const metadata: Metadata = {
       "Free robots.txt generator. Control how Googlebot and other crawlers access your site.",
     url: "https://gscdaddy.com/tools/robots-txt-generator",
     siteName: "GSCdaddy",
+    locale: "en_US",
     type: "website",
+    images: ["/opengraph-image"],
   },
 }
 

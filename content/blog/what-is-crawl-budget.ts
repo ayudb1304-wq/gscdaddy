@@ -2,9 +2,9 @@ import type { BlogPost } from "@/lib/blog"
 
 export const whatIsCrawlBudget: BlogPost = {
   slug: "what-is-crawl-budget",
-  title: "What is Crawl Budget? Why It Matters and How to Optimize It",
+  title: "What is Crawl Budget? How to Optimize It",
   description:
-    "Crawl budget is the number of pages Google will crawl on your site within a given timeframe. Learn why it matters, how to check it, and how to make sure Google spends its time on your most important pages.",
+    "Crawl budget is how many pages Google crawls on your site in a given timeframe. Learn why it matters, how to check it, and how to optimize it.",
   publishedAt: "2026-04-16",
   author: {
     name: "Ayush",

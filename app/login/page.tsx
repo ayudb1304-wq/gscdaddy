@@ -17,7 +17,9 @@ export const metadata: Metadata = {
       "Sign in to access your SEO dashboard and AI-powered recommendations.",
     url: "https://gscdaddy.com/login",
     siteName: "GSCdaddy",
+    locale: "en_US",
     type: "website",
+    images: ["/opengraph-image"],
   },
 }
 

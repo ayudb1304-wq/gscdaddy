@@ -2,9 +2,9 @@ import type { BlogPost } from "@/lib/blog"
 
 export const whatIsLongTailKeywords: BlogPost = {
   slug: "what-is-long-tail-keywords",
-  title: "What are Long-Tail Keywords? How to Find and Use Them for SEO",
+  title: "What Are Long-Tail Keywords? Find and Use",
   description:
-    "Long-tail keywords are specific, multi-word search phrases with lower volume but higher conversion rates. Learn how to find them, why they matter, and how to build a content strategy around them.",
+    "Long-tail keywords are specific multi-word search phrases with lower volume but higher conversion. Learn how to find them and build a strategy around them.",
   publishedAt: "2026-04-16",
   author: {
     name: "Ayush",

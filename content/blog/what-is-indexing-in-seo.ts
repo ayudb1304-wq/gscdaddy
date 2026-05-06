@@ -2,9 +2,9 @@ import type { BlogPost } from "@/lib/blog"
 
 export const whatIsIndexingInSeo: BlogPost = {
   slug: "what-is-indexing-in-seo",
-  title: "What is Indexing in SEO? How Google Discovers, Crawls, and Indexes Pages",
+  title: "What is Indexing in SEO? Full Guide",
   description:
-    "Indexing is the process of search engines storing your pages so they can appear in search results. Learn how Google discovers, crawls, and indexes pages, why pages fail to get indexed, and how to fix indexing problems.",
+    "Indexing is how search engines store your pages so they can appear in results. Learn how Google indexes pages and how to fix indexing issues.",
   publishedAt: "2026-04-20",
   author: {
     name: "Ayush",

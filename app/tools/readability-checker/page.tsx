@@ -14,17 +14,19 @@ import {
 } from "@/components/tool-page-sections"
 
 export const metadata: Metadata = {
-  title: "Readability Score Checker - Free Online Tool | GSCdaddy",
+  title: "Readability Checker - Free SEO Tool | GSCdaddy",
   description:
-    "Check the readability of your content with Flesch Reading Ease, Flesch-Kincaid Grade Level, and Gunning Fog Index. Get actionable recommendations to improve your writing.",
+    "Check content readability with Flesch Reading Ease, Flesch-Kincaid Grade Level, and Gunning Fog Index. Get tips to improve your writing.",
   alternates: { canonical: "https://gscdaddy.com/tools/readability-checker" },
   openGraph: {
-    title: "Readability Score Checker - Free Online Tool | GSCdaddy",
+    title: "Readability Checker - Free SEO Tool | GSCdaddy",
     description:
       "Free readability checker. Get Flesch-Kincaid, Gunning Fog, and more scores for your content.",
     url: "https://gscdaddy.com/tools/readability-checker",
     siteName: "GSCdaddy",
+    locale: "en_US",
     type: "website",
+    images: ["/opengraph-image"],
   },
 }
 

@@ -2,10 +2,9 @@ import type { BlogPost } from "@/lib/blog"
 
 export const keywordCannibalizationGoogleSearchConsole: BlogPost = {
   slug: "keyword-cannibalization-google-search-console",
-  title:
-    "How to Find Keyword Cannibalization in Google Search Console",
+  title: "Find Keyword Cannibalization with GSC",
   description:
-    "A step-by-step tutorial to find and fix keyword cannibalization using Google Search Console. Stop your own pages from competing against each other in search results.",
+    "Step by step tutorial to find and fix keyword cannibalization with Google Search Console. Stop your own pages from competing in search results.",
   publishedAt: "2026-04-12",
   author: {
     name: "Ayush",

@@ -2,9 +2,9 @@ import type { BlogPost } from "@/lib/blog"
 
 export const gscdaddyDogfoodingWeek3: BlogPost = {
   slug: "gscdaddy-dogfooding-week-3",
-  title: "I'm Using My Own SEO Tool on My Own Site. Here's What the Data Shows After 3 Weeks",
+  title: "Dogfooding GSCdaddy: Week 3 Data Drop",
   description:
-    "Three weeks of using GSCdaddy on gscdaddy.com. Real numbers, what the tool recommended, what I followed, what I ignored, and the irony of building an SEO product with no SEO traffic yet.",
+    "Three weeks of running GSCdaddy on gscdaddy.com. Real numbers, what the tool flagged, what I shipped, what I ignored, and the SEO traffic so far.",
   publishedAt: "2026-04-19",
   author: {
     name: "Ayush",

@@ -12,23 +12,26 @@ import {
 } from "@/components/tool-page-sections"
 
 export const metadata: Metadata = {
-  title: "Free SEO Health Checker - Website SEO Audit Tool | GSCdaddy",
+  title: "Free SEO Health Checker - Website Audit | GSCdaddy",
   description:
-    "Get a free 0-100 SEO health score for any website in 15 seconds. Check performance, mobile friendliness, on-page SEO, schema markup, security, and indexability.",
+    "Get a free 0-100 SEO health score for any website in 15 seconds. Check performance, mobile, on-page SEO, schema, security, and indexability.",
   alternates: { canonical: "https://gscdaddy.com/seo-health-checker" },
   openGraph: {
-    title: "Free SEO Health Checker - Website SEO Audit Tool | GSCdaddy",
+    title: "Free SEO Health Checker - Website Audit | GSCdaddy",
     description:
       "Get a free 0-100 SEO health score for any website in 15 seconds. Check 6 critical SEO categories instantly.",
     url: "https://gscdaddy.com/seo-health-checker",
     siteName: "GSCdaddy",
+    locale: "en_US",
     type: "website",
+    images: ["/opengraph-image"],
   },
   twitter: {
     card: "summary_large_image",
     title: "Free SEO Health Checker | GSCdaddy",
     description:
       "Get a free 0-100 SEO health score for any website in 15 seconds.",
+    images: ["/opengraph-image"],
   },
 }
 

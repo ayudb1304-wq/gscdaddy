@@ -2,9 +2,9 @@ import type { BlogPost } from "@/lib/blog"
 
 export const ahrefsAlternatives: BlogPost = {
   slug: "ahrefs-alternatives",
-  title: "7 Best Ahrefs Alternatives in 2026 (Free and Paid)",
+  title: "7 Best Ahrefs Alternatives 2026 (Free + Paid)",
   description:
-    "Looking for Ahrefs alternatives? Here are 7 tools that can replace parts or all of what Ahrefs does, from free options to affordable paid tools. Honest comparison with pricing, pros, and cons.",
+    "Compare 7 Ahrefs alternatives that match its features for less. Free picks, paid tools under $50/mo, with pricing, pros, and cons for each.",
   publishedAt: "2026-04-18",
   author: {
     name: "Ayush",
