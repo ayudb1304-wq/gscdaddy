@@ -24,7 +24,9 @@ export const metadata: Metadata = {
       "Free meta tag generator. Create optimized HTML meta tags for better search engine visibility and click-through rates.",
     url: "https://gscdaddy.com/tools/meta-tag-generator",
     siteName: "GSCdaddy",
+    locale: "en_US",
     type: "website",
+    images: ["/opengraph-image"],
   },
 }
 

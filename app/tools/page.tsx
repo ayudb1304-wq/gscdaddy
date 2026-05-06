@@ -8,7 +8,7 @@ import { TOOL_ICONS } from "@/lib/tool-icons"
 export const metadata: Metadata = {
   title: "Free SEO Tools - Online SEO Toolkit | GSCdaddy",
   description:
-    "Free online SEO tools to optimize your website. SERP preview, meta tag generator, keyword density checker, readability scorer, robots.txt generator, and more.",
+    "Free online SEO tools to optimize your website. SERP preview, meta tag generator, keyword density, readability scorer, robots.txt and more.",
   alternates: { canonical: "https://gscdaddy.com/tools" },
   openGraph: {
     title: "Free SEO Tools - Online SEO Toolkit | GSCdaddy",
@@ -16,7 +16,9 @@ export const metadata: Metadata = {
       "Free online SEO tools to optimize your website. SERP preview, meta tag generator, keyword density checker, and more.",
     url: "https://gscdaddy.com/tools",
     siteName: "GSCdaddy",
+    locale: "en_US",
     type: "website",
+    images: ["/opengraph-image"],
   },
 }
 

@@ -35,12 +35,13 @@ function JsonLd() {
     description:
       "Google Search Console analytics tool that finds striking-distance keywords and provides AI-powered action plans.",
     image: "https://gscdaddy.com/images/dashboard-screenshot.png",
+    url: "https://gscdaddy.com",
     offers: {
       "@type": "AggregateOffer",
-      lowPrice: "19",
-      highPrice: "99",
+      lowPrice: 19,
+      highPrice: 99,
       priceCurrency: "USD",
-      offerCount: PRICING_TIERS.length.toString(),
+      offerCount: PRICING_TIERS.length,
     },
   }
 
@@ -54,7 +55,10 @@ function JsonLd() {
       "Find your striking distance keywords in Google Search Console and get AI-powered action plans to reach page 1.",
     potentialAction: {
       "@type": "SearchAction",
-      target: "https://gscdaddy.com/blog?q={search_term_string}",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: "https://gscdaddy.com/blog?q={search_term_string}",
+      },
       "query-input": "required name=search_term_string",
     },
   }

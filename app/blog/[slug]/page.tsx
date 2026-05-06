@@ -18,20 +18,36 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const post = getPostBySlug(slug)
   if (!post) return {}
 
+  const SUFFIX = " - GSCdaddy"
+  const MAX_TITLE = 60
+  const fullTitle = `${post.title}${SUFFIX}`
+  const title =
+    fullTitle.length <= MAX_TITLE
+      ? fullTitle
+      : post.title.length <= MAX_TITLE
+        ? post.title
+        : `${post.title.slice(0, MAX_TITLE - 1).trimEnd()}…`
+
+  const description =
+    post.description.length <= 155
+      ? post.description
+      : `${post.description.slice(0, 154).trimEnd()}…`
+
   return {
-    title: `${post.title} - GSCdaddy`,
-    description: post.description,
+    title,
+    description,
     authors: [{ name: post.author.name, url: post.author.url }],
     alternates: { canonical: `https://gscdaddy.com/blog/${post.slug}` },
     openGraph: {
-      title: post.title,
-      description: post.description,
+      title,
+      description,
       type: "article",
       publishedTime: post.publishedAt,
       modifiedTime: post.updatedAt ?? post.publishedAt,
       authors: [post.author.name],
       url: `https://gscdaddy.com/blog/${post.slug}`,
       siteName: "GSCdaddy",
+      locale: "en_US",
       images: [
         {
           url: "https://gscdaddy.com/images/dashboard-screenshot.png",
@@ -44,8 +60,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     twitter: {
       card: "summary_large_image",
       creator: "@ayu_theindiedev",
-      title: post.title,
-      description: post.description,
+      title,
+      description,
+      images: ["https://gscdaddy.com/images/dashboard-screenshot.png"],
     },
   }
 }

@@ -24,7 +24,7 @@ export function ToolJsonLd({ name, slug, description, faqs }: ToolJsonLdProps) {
     applicationCategory: "SEO Tool",
     operatingSystem: "Web",
     description,
-    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+    offers: { "@type": "Offer", price: 0, priceCurrency: "USD" },
     author: {
       "@type": "Organization",
       name: "GSCdaddy",

@@ -24,7 +24,9 @@ export const metadata: Metadata = {
       "Free slug generator. Convert titles into SEO-friendly URL slugs instantly.",
     url: "https://gscdaddy.com/tools/slug-generator",
     siteName: "GSCdaddy",
+    locale: "en_US",
     type: "website",
+    images: ["/opengraph-image"],
   },
 }
 

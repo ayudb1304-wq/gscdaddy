@@ -24,7 +24,9 @@ export const metadata: Metadata = {
       "Free keyword density checker. Analyze word frequency and avoid over-optimization.",
     url: "https://gscdaddy.com/tools/keyword-density-checker",
     siteName: "GSCdaddy",
+    locale: "en_US",
     type: "website",
+    images: ["/opengraph-image"],
   },
 }
 

@@ -14,17 +14,19 @@ import {
 } from "@/components/tool-page-sections"
 
 export const metadata: Metadata = {
-  title: "Open Graph Generator - Free Online Tool | GSCdaddy",
+  title: "Open Graph Generator - Free Tool | GSCdaddy",
   description:
-    "Free open graph meta tag generator. Create OG and Twitter Card meta tags to control how your pages appear when shared on Facebook, Twitter, LinkedIn, and other social platforms.",
+    "Free Open Graph meta tag generator. Create OG and Twitter Card tags to control how pages appear when shared on Facebook, Twitter, and LinkedIn.",
   alternates: { canonical: "https://gscdaddy.com/tools/open-graph-generator" },
   openGraph: {
-    title: "Open Graph Generator - Free Online Tool | GSCdaddy",
+    title: "Open Graph Generator - Free Tool | GSCdaddy",
     description:
       "Generate OG and Twitter Card meta tags in seconds. Preview your social share card and copy the code.",
     url: "https://gscdaddy.com/tools/open-graph-generator",
     siteName: "GSCdaddy",
+    locale: "en_US",
     type: "website",
+    images: ["/opengraph-image"],
   },
 }
 

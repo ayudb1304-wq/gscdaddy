@@ -14,17 +14,19 @@ import {
 } from "@/components/tool-page-sections"
 
 export const metadata: Metadata = {
-  title: "SERP Snippet Preview - Free Online Tool | GSCdaddy",
+  title: "SERP Snippet Preview - Free SEO Tool | GSCdaddy",
   description:
-    "Preview how your page looks in Google search results. Optimize your title tag and meta description length to maximize click-through rates with this free google serp preview tool.",
+    "Preview how your page looks in Google search results. Optimize title and meta description length to maximize click-through rates.",
   alternates: { canonical: "https://gscdaddy.com/tools/serp-preview" },
   openGraph: {
-    title: "SERP Snippet Preview - Free Online Tool | GSCdaddy",
+    title: "SERP Snippet Preview - Free SEO Tool | GSCdaddy",
     description:
-      "Free SERP snippet preview tool. See exactly how your page will appear in Google search results before you publish.",
+      "Free SERP snippet preview tool. See how your page will appear in Google search before you publish.",
     url: "https://gscdaddy.com/tools/serp-preview",
     siteName: "GSCdaddy",
+    locale: "en_US",
     type: "website",
+    images: ["/opengraph-image"],
   },
 }
 

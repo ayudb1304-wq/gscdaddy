@@ -12,7 +12,9 @@ export const metadata = {
       "Learn how GSCdaddy collects, uses, and protects your data.",
     url: "https://gscdaddy.com/privacy",
     siteName: "GSCdaddy",
+    locale: "en_US",
     type: "website",
+    images: ["/opengraph-image"],
   },
 }
 
