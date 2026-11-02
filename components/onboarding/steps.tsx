@@ -219,11 +219,16 @@ export function SitePickerStep({
   onSelect,
   onSkip,
   loading,
+  selectingUrl = null,
+  error = null,
 }: {
   sites: AvailableSite[]
   onSelect: (siteUrl: string, permissionLevel: string) => void
   onSkip: () => void
   loading: boolean
+  /** The site currently being added (shows "Adding…" on it). */
+  selectingUrl?: string | null
+  error?: string | null
 }) {
   if (sites.length === 0) {
     return (
@@ -257,6 +262,12 @@ export function SitePickerStep({
         Start with your main site - you can add more later.
       </p>
 
+      {error && (
+        <p role="alert" className="mt-6 rounded-lg border border-critical/30 bg-critical-soft px-4 py-3 text-sm text-critical">
+          {error}
+        </p>
+      )}
+
       <div className="mt-8 grid gap-3">
         {sites.map((site) => {
           const displayUrl = site.siteUrl
@@ -285,9 +296,13 @@ export function SitePickerStep({
                   </p>
                 </div>
               </div>
-              {site.isAdded && (
+              {site.isAdded ? (
                 <span className="text-xs text-muted-foreground">Already added</span>
-              )}
+              ) : selectingUrl === site.siteUrl ? (
+                <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <Loader2 className="size-3.5 animate-spin" /> Adding…
+                </span>
+              ) : null}
             </button>
           )
         })}

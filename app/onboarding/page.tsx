@@ -24,6 +24,8 @@ export default function OnboardingPage() {
   const [loading, setLoading] = useState(false)
   const [availableSites, setAvailableSites] = useState<AvailableSite[]>([])
   const [showSitePicker, setShowSitePicker] = useState(false)
+  const [selectingUrl, setSelectingUrl] = useState<string | null>(null)
+  const [siteError, setSiteError] = useState<string | null>(null)
   const [syncStatus, setSyncStatus] = useState<"syncing" | "completed" | "timeout">("syncing")
   const [syncStage, setSyncStage] = useState(0)
 
@@ -62,24 +64,32 @@ export default function OnboardingPage() {
   }
 
   async function handleSiteSelect(siteUrl: string, permissionLevel: string) {
+    if (loading) return
     setLoading(true)
+    setSelectingUrl(siteUrl)
+    setSiteError(null)
     try {
       const res = await fetch("/api/sites", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ siteUrl, permissionLevel }),
       })
-      const json = await res.json()
-      if (json.success) {
+      const json = await res.json().catch(() => null)
+      if (json?.success) {
         // Trigger sync
         await fetch(`/api/sites/${json.data.id}/sync`, { method: "POST" })
         setStep(4)
         startSyncProgress()
+      } else {
+        // Used to fail silently: the button just re-enabled.
+        setSiteError(json?.error?.message || "Couldn't add that site. Try again.")
       }
     } catch (e) {
       console.error("Failed to add site:", e)
+      setSiteError("Couldn't reach the server. Check your connection and try again.")
     } finally {
       setLoading(false)
+      setSelectingUrl(null)
     }
   }
 
@@ -191,6 +201,8 @@ export default function OnboardingPage() {
               onSelect={handleSiteSelect}
               onSkip={handleSkip}
               loading={loading}
+              selectingUrl={selectingUrl}
+              error={siteError}
             />
           )}
 
