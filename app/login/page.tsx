@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, Check, Lock } from "lucide-react"
 import { Logo } from "@/components/logo"
 import { Button } from "@/components/ui/button"
 import { signInWithGoogle } from "./actions"
@@ -53,100 +53,78 @@ export default function LoginPage({
   searchParams: Promise<{ error?: string }>
 }) {
   return (
-    <div className="grid min-h-screen lg:grid-cols-2">
-      {/* Left panel — inverted: dark in light mode, light in dark mode */}
-      <div className="relative hidden flex-col justify-between bg-[#0a0a0a] p-10 text-white dark:bg-white dark:text-[#0a0a0a] lg:flex">
-        {/* Logo — links to home */}
-        <Link href="/" className="flex items-center gap-2 font-heading text-lg font-bold">
-          <Image
-            src="/images/GSCDaddyLogo_LightMode.png"
-            alt="GSCdaddy"
-            width={28}
-            height={28}
-            priority
-            className="shrink-0 dark:hidden"
-          />
-          <Image
-            src="/images/GSCDaddyLogo.png"
-            alt="GSCdaddy"
-            width={28}
-            height={28}
-            priority
-            className="hidden shrink-0 dark:block"
-          />
-          GSCdaddy
-        </Link>
-
-        {/* Tagline */}
-        <div className="text-center">
-          <h2 className="font-heading text-2xl font-bold leading-tight">
-            Your SEO data has<br />
-            <span className="text-primary" style={{ fontFamily: "var(--font-cursive)" }}>stories to tell.</span>
-          </h2>
-          <p className="mx-auto mt-4 max-w-xs text-sm text-neutral-400 dark:text-neutral-500">
-            Strategic SEO intelligence powered by AI. Not another checklist of meaningless scores.
-          </p>
-        </div>
-
-        {/* Footer */}
-        <div className="flex items-center justify-between text-xs text-neutral-500">
-          <span>&copy; {new Date().getFullYear()} GSCdaddy</span>
-          <div className="flex gap-4">
-            <Link href="/terms" className="transition-colors hover:text-neutral-300 dark:hover:text-neutral-700">
-              Terms
-            </Link>
-            <Link href="/privacy" className="transition-colors hover:text-neutral-300 dark:hover:text-neutral-700">
-              Privacy
-            </Link>
+    <div className="grid min-h-screen gap-3 bg-background p-3 lg:grid-cols-[1.1fr_1fr]">
+      {/* Left: the same sky and hills as the homepage, with the promise on top */}
+      <div className="relative hidden overflow-hidden rounded-tile lg:block">
+        <Image
+          src="/marketing/hero-sky.jpg"
+          alt=""
+          fill
+          priority
+          sizes="55vw"
+          className="object-cover object-bottom dark:brightness-[0.45] dark:saturate-[0.8]"
+        />
+        <div className="relative flex h-full flex-col justify-between p-10">
+          <Link href="/" className="flex w-fit items-center gap-2 rounded-xl bg-white/80 px-3 py-2 backdrop-blur">
+            <Image src="/images/GSCDaddyLogo.png" alt="" width={24} height={24} priority />
+            <span className="font-heading text-base font-bold text-[oklch(0.2_0.008_230)]">GSCdaddy</span>
+          </Link>
+          <div className="max-w-md pb-[18%]">
+            <h2 className="font-heading text-5xl leading-[1.02] font-semibold tracking-[-0.03em] text-[oklch(0.27_0.09_245)] dark:text-white">
+              Your next page-one keyword is already in Search Console.
+            </h2>
+            <ul className="mt-6 space-y-2 text-[15px] text-[oklch(0.28_0.05_245)] dark:text-white/85">
+              {["Read-only Google access", "Your first opportunities in minutes", "14 days free, no card"].map((t) => (
+                <li key={t} className="flex items-center gap-2">
+                  <Check className="size-4" /> {t}
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>
 
-      {/* Right panel — sign in form */}
-      <div className="relative flex flex-col items-center justify-center bg-background px-6 py-12">
+      {/* Right: sign in */}
+      <div className="relative flex flex-col items-center justify-center px-6 py-12">
         <Link
           href="/"
-          className="absolute top-6 left-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          className="absolute top-4 left-4 inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
-          <ArrowLeft className="size-3.5" />
-          Back to home
+          <ArrowLeft className="size-4" />
+          Home
         </Link>
 
-        {/* Mobile logo (hidden on desktop) */}
-        <Link href="/" className="mb-8 flex items-center gap-2 font-heading text-xl font-bold lg:hidden">
-          <Logo size={24} />
-          GSCdaddy
+        <Link href="/" className="mb-10 flex items-center gap-2 lg:hidden">
+          <Logo size={28} />
+          <span className="font-heading text-xl font-bold">GSCdaddy</span>
         </Link>
 
-        <div className="w-full max-w-sm space-y-6">
-          <div>
-            <h1 className="font-heading text-2xl font-bold text-foreground">Welcome back</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Sign in to continue to your dashboard
-            </p>
-          </div>
+        <div className="w-full max-w-sm">
+          <h1 className="font-heading text-4xl font-semibold tracking-[-0.02em]">Welcome back</h1>
+          <p className="mt-2 text-[15px] text-muted-foreground">
+            Sign in with the Google account that owns your Search Console properties.
+          </p>
 
-          {/* Google sign in */}
-          <form action={signInWithGoogle}>
-            <Button
-              type="submit"
-              variant="outline"
-              className="h-11 w-full gap-2.5 text-sm font-medium"
-            >
+          <form action={signInWithGoogle} className="mt-8">
+            <Button type="submit" variant="outline" size="lg" className="w-full gap-3 bg-card">
               <GoogleIcon className="size-5" />
               Continue with Google
             </Button>
           </form>
 
-          <p className="text-center text-xs text-muted-foreground">
-            We only request read-only access to your Search Console data.
-          </p>
+          <div className="mt-4">
+            <ErrorMessage searchParams={searchParams} />
+          </div>
 
-          {/* Error message */}
-          <ErrorMessage searchParams={searchParams} />
+          <div className="mt-6 flex items-start gap-3 rounded-2xl bg-tile-sage p-4 text-sm">
+            <Lock className="mt-0.5 size-4 shrink-0" />
+            <p className="text-foreground/80">
+              We ask for read-only access to Search Console. GSCdaddy can never change your site,
+              your content or your Google settings.
+            </p>
+          </div>
 
-          {/* Terms footer (mobile only — desktop has it in left panel) */}
-          <p className="text-center text-xs text-muted-foreground lg:hidden">
+          <p className="mt-8 text-center text-xs text-muted-foreground">
             By signing in, you agree to our{" "}
             <Link href="/terms" className="underline hover:text-foreground">
               Terms of Service
@@ -177,7 +155,7 @@ async function ErrorMessage({
   }
 
   return (
-    <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-center text-sm text-destructive">
+    <div role="alert" className="rounded-xl bg-critical-soft p-3 text-center text-sm text-critical">
       {messages[error] || "An error occurred during sign-in."}
     </div>
   )

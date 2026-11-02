@@ -1,4 +1,4 @@
-import { Inter, JetBrains_Mono, Oxanium, Caveat } from "next/font/google"
+import { Archivo, Gabarito, JetBrains_Mono } from "next/font/google"
 import type { Metadata } from "next"
 
 import "./globals.css"
@@ -6,27 +6,21 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { Analytics } from "@vercel/analytics/next"
 import { cn } from "@/lib/utils"
 
-const oxanium = Oxanium({
+const archivo = Archivo({
   subsets: ["latin"],
-  variable: "--font-heading",
+  variable: "--font-archivo",
   display: "swap",
 })
 
-const inter = Inter({
+const gabarito = Gabarito({
   subsets: ["latin"],
-  variable: "--font-sans",
+  variable: "--font-gabarito",
   display: "swap",
 })
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
-  variable: "--font-mono",
-  display: "swap",
-})
-
-const caveat = Caveat({
-  subsets: ["latin"],
-  variable: "--font-cursive",
+  variable: "--font-jetbrains",
   display: "swap",
 })
 
@@ -90,10 +84,9 @@ export default function RootLayout({
       suppressHydrationWarning
       className={cn(
         "antialiased",
-        inter.variable,
-        oxanium.variable,
-        jetbrainsMono.variable,
-        caveat.variable
+        archivo.variable,
+        gabarito.variable,
+        jetbrainsMono.variable
       )}
     >
       <body>

@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation"
 import { getCurrentUser } from "@/lib/auth"
+import { fetchAllRows } from "@/lib/supabase/fetch-all"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { MetricsCards } from "@/components/dashboard/metrics-cards"
 import { PerformanceChart } from "@/components/dashboard/performance-chart"
@@ -80,26 +81,30 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
   // Fetch all data in parallel
   const nowIso = new Date().toISOString()
-  const [currentResult, priorResult, chartResult, opportunitiesResult, recsResult, freshRecsCountResult] = await Promise.all([
-    admin
-      .from("gsc_data")
-      .select("clicks, impressions, position")
-      .eq("site_id", siteId)
-      .gte("date", fmt(currentStart))
-      .lte("date", fmt(endDate)),
-    admin
-      .from("gsc_data")
-      .select("clicks, impressions, position")
-      .eq("site_id", siteId)
-      .gte("date", fmt(priorStart))
-      .lte("date", fmt(priorEnd)),
-    admin
-      .from("gsc_data")
-      .select("date, clicks, impressions, position")
-      .eq("site_id", siteId)
-      .gte("date", fmt(currentStart))
-      .lte("date", fmt(endDate))
-      .order("date", { ascending: true }),
+  const [currentResult, priorResult, , opportunitiesResult, recsResult, freshRecsCountResult] = await Promise.all([
+    // Paged: a single request is capped at 1,000 rows, which undercounted busy sites.
+    fetchAllRows<{ date: string; clicks: number; impressions: number; position: number }>((from, to) =>
+      admin
+        .from("gsc_data")
+        .select("date, clicks, impressions, position")
+        .eq("site_id", siteId)
+        .gte("date", fmt(currentStart))
+        .lte("date", fmt(endDate))
+        .order("date", { ascending: true })
+        .order("id")
+        .range(from, to)
+    ).then((data) => ({ data })),
+    fetchAllRows<{ clicks: number; impressions: number; position: number }>((from, to) =>
+      admin
+        .from("gsc_data")
+        .select("clicks, impressions, position")
+        .eq("site_id", siteId)
+        .gte("date", fmt(priorStart))
+        .lte("date", fmt(priorEnd))
+        .order("id")
+        .range(from, to)
+    ).then((data) => ({ data })),
+    Promise.resolve(null),
     admin.rpc("get_striking_distance", {
       p_site_id: siteId,
       p_sort_by: "opportunity_score",
@@ -150,7 +155,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const current = currentResult.data || []
   const prior = priorResult.data || []
 
-  const aggregate = (rows: typeof current) => {
+  const aggregate = (rows: { clicks: number; impressions: number; position: number }[]) => {
     if (rows.length === 0) return { clicks: 0, impressions: 0, avgPosition: 0 }
     const clicks = rows.reduce((sum, r) => sum + (r.clicks || 0), 0)
     const impressions = rows.reduce((sum, r) => sum + (r.impressions || 0), 0)
@@ -180,7 +185,8 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   }
 
   // Aggregate chart data by date
-  const chartRaw = chartResult.data || []
+  // The chart uses the same paged rows as the totals (already ordered by date).
+  const chartRaw = currentResult.data || []
   const byDate = new Map<string, { clicks: number; impressions: number; positions: number[] }>()
   for (const row of chartRaw) {
     const existing = byDate.get(row.date) || { clicks: 0, impressions: 0, positions: [] }
@@ -203,8 +209,8 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Dashboard</h1>
-          <p className="text-sm text-muted-foreground">Last 28 days performance overview</p>
+          <h1 className="font-heading text-3xl leading-tight font-semibold tracking-[-0.02em] md:text-[2.25rem]">Dashboard</h1>
+          <p className="mt-1.5 max-w-2xl text-[15px] text-muted-foreground">How your site did in Google over the last 28 days.</p>
         </div>
         <SyncRecsBar
           siteId={site.id}

@@ -101,9 +101,9 @@ export function PersonaStep({
 }) {
   return (
     <div className="mx-auto max-w-lg text-center">
-      <h1 className="font-heading text-2xl font-bold md:text-3xl">What best describes you?</h1>
-      <p className="mt-2 text-sm text-muted-foreground">
-        We'll tailor your experience based on your role.
+      <h1 className="font-heading text-3xl font-semibold tracking-[-0.02em] md:text-4xl">What best describes you?</h1>
+      <p className="mt-2 text-[15px] text-muted-foreground">
+        We&apos;ll tailor your experience based on your role.
       </p>
 
       <div className="mt-8 grid gap-4">
@@ -112,10 +112,10 @@ export function PersonaStep({
             key={persona.id}
             onClick={() => onSelect(persona.id)}
             disabled={loading}
-            className="flex items-center gap-4 rounded-xl border border-border bg-card p-5 text-left transition-all hover:border-primary/40 hover:ring-1 hover:ring-primary/20 disabled:opacity-50"
+            className="flex items-center gap-4 rounded-2xl bg-card p-5 text-left shadow-[0_1px_2px_rgb(0_0_0/0.04)] ring-1 ring-black/[0.07] transition-all hover:-translate-y-0.5 hover:shadow-[0_14px_30px_-18px_rgb(0_0_0/0.35)] hover:ring-brand/50 disabled:opacity-50 dark:ring-white/10"
           >
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-              <persona.icon className="size-5 text-primary" />
+            <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand-soft">
+              <persona.icon className="size-5 text-brand-strong" />
             </div>
             <div>
               <p className="font-medium">{persona.title}</p>
@@ -142,10 +142,10 @@ const TRIAL_FEATURES = [
 export function PrimingStep({ onConnect, onSkip, loading }: { onConnect: () => void; onSkip: () => void; loading: boolean }) {
   return (
     <div className="mx-auto max-w-lg text-center">
-      <h1 className="font-heading text-2xl font-bold md:text-3xl">
+      <h1 className="font-heading text-3xl font-semibold tracking-[-0.02em] md:text-4xl">
         Your 14-day trial includes everything
       </h1>
-      <p className="mt-2 text-sm text-muted-foreground">
+      <p className="mt-2 text-[15px] text-muted-foreground">
         Connect your Google Search Console to get started. You immediately get:
       </p>
 
@@ -153,7 +153,7 @@ export function PrimingStep({ onConnect, onSkip, loading }: { onConnect: () => v
         {TRIAL_FEATURES.map((feature) => (
           <div
             key={feature.label}
-            className="flex items-center gap-2.5 rounded-lg border p-3 text-left text-sm"
+            className="flex items-center gap-2.5 rounded-xl bg-card p-3 text-left text-sm ring-1 ring-black/[0.07] dark:ring-white/10"
           >
             <feature.icon className="size-4 shrink-0 text-primary" />
             <span className="leading-tight">{feature.label}</span>
@@ -161,7 +161,7 @@ export function PrimingStep({ onConnect, onSkip, loading }: { onConnect: () => v
         ))}
       </div>
 
-      <div className="mt-8 space-y-2 rounded-lg border border-border bg-muted/30 p-4 text-xs text-muted-foreground">
+      <div className="mt-8 space-y-2 rounded-2xl bg-tile-sage p-4 text-left text-xs text-foreground/75">
         <div className="flex items-center gap-2">
           <Shield className="size-3.5 shrink-0 text-primary" />
           <span><strong className="text-foreground">Read-only access</strong> — we never modify your data or settings</span>
@@ -228,8 +228,8 @@ export function SitePickerStep({
   if (sites.length === 0) {
     return (
       <div className="mx-auto max-w-md text-center">
-        <h1 className="font-heading text-2xl font-bold">No sites found</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <h1 className="font-heading text-3xl font-semibold tracking-[-0.02em]">No sites found</h1>
+        <p className="mt-2 text-[15px] text-muted-foreground">
           We couldn&apos;t find any Google Search Console properties linked to your account.
           Make sure you&apos;ve verified at least one site in Google Search Console.
         </p>
@@ -252,8 +252,8 @@ export function SitePickerStep({
 
   return (
     <div className="mx-auto max-w-lg text-center">
-      <h1 className="font-heading text-2xl font-bold md:text-3xl">Choose your site</h1>
-      <p className="mt-2 text-sm text-muted-foreground">
+      <h1 className="font-heading text-3xl font-semibold tracking-[-0.02em] md:text-4xl">Choose your site</h1>
+      <p className="mt-2 text-[15px] text-muted-foreground">
         Start with your main site - you can add more later.
       </p>
 
@@ -318,8 +318,8 @@ export function CelebrationStep({
     return (
       <div className="mx-auto max-w-md text-center">
         <Loader2 className="mx-auto size-10 animate-spin text-primary" />
-        <h1 className="mt-4 font-heading text-2xl font-bold">Setting up your dashboard</h1>
-        <p className="mt-2 text-sm text-muted-foreground">This usually takes 2-5 minutes.</p>
+        <h1 className="mt-4 font-heading text-3xl font-semibold tracking-[-0.02em]">Setting up your dashboard</h1>
+        <p className="mt-2 text-[15px] text-muted-foreground">This usually takes 2-5 minutes.</p>
 
         <div className="mt-8 space-y-3">
           {SYNC_STAGES.map((stage, i) => (
@@ -348,8 +348,8 @@ export function CelebrationStep({
   return (
     <div className="mx-auto max-w-md text-center">
       <div className="mx-auto mb-4 text-5xl">🎉</div>
-      <h1 className="font-heading text-2xl font-bold md:text-3xl">You're all set!</h1>
-      <p className="mt-2 text-sm text-muted-foreground">
+      <h1 className="font-heading text-3xl font-semibold tracking-[-0.02em] md:text-4xl">You&apos;re all set</h1>
+      <p className="mt-2 text-[15px] text-muted-foreground">
         {syncStatus === "completed"
           ? "Your dashboard is ready with your keyword data."
           : "Your data is still syncing. We'll have it ready for you shortly."}

@@ -31,8 +31,8 @@ function DeltaChip({ delta, inverse = false }: { delta: number; inverse?: boolea
   const cls = isZero
     ? "text-muted-foreground"
     : isPositive
-    ? "text-emerald-600 dark:text-emerald-400"
-    : "text-rose-600 dark:text-rose-400"
+    ? "text-ok"
+    : "text-critical"
   const sign = delta > 0 ? "+" : ""
   return (
     <span className={cn("inline-flex items-center gap-0.5 text-xs font-medium", cls)}>

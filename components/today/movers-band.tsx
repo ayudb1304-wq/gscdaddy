@@ -18,8 +18,8 @@ function MoverRow({ item, kind }: { item: Mover; kind: "gain" | "drop" }) {
   const Icon = kind === "gain" ? ArrowUp : ArrowDown
   const color =
     kind === "gain"
-      ? "text-emerald-600 dark:text-emerald-400"
-      : "text-rose-600 dark:text-rose-400"
+      ? "text-ok"
+      : "text-critical"
   const sign = item.clickDelta > 0 ? "+" : ""
   return (
     <div className="flex items-center justify-between gap-3">

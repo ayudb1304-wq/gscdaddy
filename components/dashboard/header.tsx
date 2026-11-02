@@ -23,9 +23,9 @@ interface Site {
 const PLAN_BADGE_STYLES: Record<string, string> = {
   free: "bg-muted text-muted-foreground",
   trial: "bg-muted text-muted-foreground",
-  blogger: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-  pro: "bg-primary/10 text-primary",
-  agency: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
+  blogger: "bg-tile-sky text-foreground",
+  pro: "bg-brand-soft text-brand-strong",
+  agency: "bg-tile-lilac text-foreground",
 }
 
 const PLAN_LABELS: Record<string, string> = {
@@ -56,7 +56,7 @@ export function Header({ user, sites, plan, daysRemaining, onToggleSidebar }: He
     .join("")
 
   return (
-    <header className="flex h-14 items-center justify-between border-b bg-background px-4">
+    <header className="flex h-16 shrink-0 items-center justify-between gap-3 border-b px-4 md:px-6">
       <div className="flex items-center gap-3">
         <Button
           variant="ghost"
@@ -70,17 +70,21 @@ export function Header({ user, sites, plan, daysRemaining, onToggleSidebar }: He
       </div>
 
       <div className="flex items-center gap-2">
-        <ThemeToggle className="size-8" />
+        <ThemeToggle className="size-9 rounded-lg" />
         {daysRemaining !== undefined && daysRemaining > 0 && (
-          <Badge variant="secondary" className="text-xs">
-            {daysRemaining} day{daysRemaining !== 1 ? "s" : ""} left in trial
-          </Badge>
+          <a
+            href="/settings/billing"
+            className="hidden h-8 items-center gap-1.5 rounded-full bg-tile-cream px-3 text-xs font-medium transition-colors hover:bg-tile-peach sm:inline-flex"
+          >
+            <span className="size-1.5 rounded-full bg-warning" />
+            {daysRemaining} day{daysRemaining !== 1 ? "s" : ""} left in your trial
+          </a>
         )}
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-auto gap-2 rounded-full px-2 py-1">
-              <Avatar className="h-8 w-8">
+              <Avatar className="size-8 ring-2 ring-background">
                 <AvatarImage src={user.avatar_url || undefined} alt={user.name || "User"} />
                 <AvatarFallback className="text-xs">{initials}</AvatarFallback>
               </Avatar>

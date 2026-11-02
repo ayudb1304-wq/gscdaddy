@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation"
 import { getCurrentUser } from "@/lib/auth"
+import { fetchAllRows } from "@/lib/supabase/fetch-all"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { ShippedRecsBand, type ShippedRec } from "@/components/today/shipped-recs-band"
 import { MoversBand, type Mover } from "@/components/today/movers-band"
@@ -85,13 +86,20 @@ export default async function TodayPage() {
       .order("estimated_traffic_gain", { ascending: false, nullsFirst: false })
       .order("created_at", { ascending: true })
       .limit(25),
-    // Band 2 source: 9 days of gsc_data to compute 2-day vs 7-day deltas
-    admin
-      .from("gsc_data")
-      .select("site_id, query, page, date, clicks, impressions")
-      .in("site_id", siteIds)
-      .gte("date", fmt(windowStart))
-      .lte("date", fmt(now)),
+    // Band 2 source: 9 days of gsc_data to compute 2-day vs 7-day deltas.
+    // Paged: a real site easily has more than PostgREST's 1,000-row cap in 9 days.
+    fetchAllRows<{ site_id: string; query: string; page: string; date: string; clicks: number; impressions: number }>(
+      (from, to) =>
+        admin
+          .from("gsc_data")
+          .select("site_id, query, page, date, clicks, impressions")
+          .in("site_id", siteIds)
+          .gte("date", fmt(windowStart))
+          .lte("date", fmt(now))
+          .order("date", { ascending: true })
+          .order("id")
+          .range(from, to)
+    ).then((data) => ({ data })),
   ])
 
   // --- Band 1: shipped recs impact ---
@@ -100,20 +108,26 @@ export default async function TodayPage() {
 
   if (baselines.length > 0) {
     // Fetch post-completion gsc_data for all baselines in one query
-    const earliestCompleted = baselines.reduce((min, b) => {
-      const d = new Date(b.completed_at)
-      return !min || d < min ? d : min
-    }, null as Date | null)
-
-    const { data: postData } = earliestCompleted
-      ? await admin
-          .from("gsc_data")
-          .select("site_id, query, page, date, clicks, position")
-          .in("site_id", siteIds)
-          .gte("date", fmt(earliestCompleted))
-      : { data: [] as Array<{ site_id: string; query: string; page: string; date: string; clicks: number; position: number }> }
-
-    const postList = postData || []
+    // One narrow query per shipped rec (site + query + page + date). A single query across all
+    // sites since the oldest completion hit the 1,000-row cap, so most recs never got results.
+    const perRec = await Promise.all(
+      baselines.map((b) =>
+        fetchAllRows<{ site_id: string; query: string; page: string; date: string; clicks: number; position: number }>(
+          (from, to) =>
+            admin
+              .from("gsc_data")
+              .select("site_id, query, page, date, clicks, position")
+              .eq("site_id", b.site_id)
+              .eq("query", b.query)
+              .eq("page", b.page)
+              .gte("date", fmt(new Date(b.completed_at)))
+              .order("date", { ascending: true })
+              .order("id")
+              .range(from, to)
+        )
+      )
+    )
+    const postList = perRec.flat()
 
     for (const b of baselines) {
       const site = siteById.get(b.site_id)
@@ -172,8 +186,20 @@ export default async function TodayPage() {
 
   // --- Band 2: movers (last 2 days vs prior 7) ---
   const moversRaw = moversRawResult.data || []
-  const recentCutoff = new Date(now)
-  recentCutoff.setUTCDate(recentCutoff.getUTCDate() - 2)
+  // Search Console data lags 2–3 days, so "the last 2 days" means the 2 newest days each site
+  // actually has data for. Counting back from now left the recent window empty and showed
+  // every keyword as a drop.
+  const latestBySite = new Map<string, string>()
+  for (const row of moversRaw) {
+    const cur = latestBySite.get(row.site_id)
+    if (!cur || row.date > cur) latestBySite.set(row.site_id, row.date)
+  }
+  const recentCutoffBySite = new Map<string, string>()
+  for (const [siteId, latest] of latestBySite) {
+    const d = new Date(`${latest}T00:00:00Z`)
+    d.setUTCDate(d.getUTCDate() - 1)
+    recentCutoffBySite.set(siteId, fmt(d))
+  }
 
   type Bucket = {
     key: string
@@ -203,8 +229,7 @@ export default async function TodayPage() {
       }
       buckets.set(k, b)
     }
-    const rowDate = new Date(row.date)
-    if (rowDate >= recentCutoff) {
+    if (row.date >= (recentCutoffBySite.get(row.site_id) ?? row.date)) {
       b.recentClicks += row.clicks || 0
     } else {
       b.priorClicks += row.clicks || 0
@@ -298,8 +323,10 @@ export default async function TodayPage() {
     <div className="space-y-6">
       <Header name={user.name} />
       <TodaysFocusBand rec={focus} />
-      <ShippedRecsBand items={shippedItems} />
-      <MoversBand gainers={gainers} droppers={droppers} />
+      <div className="grid items-start gap-6 xl:grid-cols-[1.45fr_1fr]">
+        <ShippedRecsBand items={shippedItems} />
+        <MoversBand gainers={gainers} droppers={droppers} />
+      </div>
     </div>
   )
 }
@@ -308,12 +335,13 @@ function Header({ name }: { name: string | null }) {
   const firstName = name?.split(" ")[0]
   return (
     <div>
-      <h1 className="text-2xl font-bold">
+      <h1 className="font-heading text-3xl leading-tight font-semibold tracking-[-0.02em] md:text-[2.25rem]">
         {firstName ? `Good to see you, ${firstName}` : "Today"}
       </h1>
-      <p className="text-sm text-muted-foreground">
-        Your daily SEO briefing — what shipped, what moved, what&apos;s next.
+      <p className="mt-1.5 max-w-2xl text-[15px] text-muted-foreground">
+        Your daily briefing: what you shipped, what moved, and the one page to work on next.
       </p>
     </div>
   )
 }
+

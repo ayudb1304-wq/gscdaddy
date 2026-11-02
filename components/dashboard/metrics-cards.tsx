@@ -25,7 +25,7 @@ function formatNumber(n: number): string {
 function ChangeIndicator({ value, inverted = false }: { value: number; inverted?: boolean }) {
   const isPositive = inverted ? value < 0 : value > 0
   const Icon = isPositive ? TrendingUp : TrendingDown
-  const color = isPositive ? "text-emerald-500" : "text-red-500"
+  const color = isPositive ? "text-ok" : "text-critical"
 
   return (
     <span className={cn("flex items-center gap-1 text-xs font-medium", color)}>
@@ -77,7 +77,7 @@ export function MetricsCards({ data }: { data: MetricsData }) {
               <card.icon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{card.getValue(data)}</div>
+              <div className="font-heading text-[2rem] leading-none font-semibold tracking-[-0.02em] tabular-nums">{card.getValue(data)}</div>
               {change !== null && (
                 <div className="mt-1">
                   <ChangeIndicator value={change} inverted={card.inverted} />

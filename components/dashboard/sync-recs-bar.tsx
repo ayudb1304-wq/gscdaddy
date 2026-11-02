@@ -172,8 +172,8 @@ export function SyncRecsBar({
       <Dialog open={noOpportunitiesOpen} onOpenChange={setNoOpportunitiesOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <div className="mx-auto mb-2 flex size-12 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30">
-              <Lightbulb className="size-6 text-amber-600 dark:text-amber-400" />
+            <div className="mx-auto mb-2 flex size-12 items-center justify-center rounded-full bg-warning-soft">
+              <Lightbulb className="size-6 text-warning" />
             </div>
             <DialogTitle className="text-center text-lg">
               Not enough data for recommendations — yet

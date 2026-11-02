@@ -116,17 +116,17 @@ export const FAQ_ITEMS = [
   {
     question: 'What are "striking distance" keywords?',
     answer:
-      "Keywords where your pages rank positions 5-15 on Google. These are your biggest opportunities - you're already close to page 1, so small improvements can dramatically increase your traffic.",
+      "Keywords where your pages rank in positions 5 to 15 on Google. You're already close to page one, so a better title, a few internal links or a fuller section often moves them up faster than writing a new post.",
   },
   {
     question: "How is this different from Google Search Console?",
     answer:
-      "GSC shows you raw data. GSCdaddy analyzes that data to find opportunities and tells you exactly what to do. Think of it as having an SEO consultant look at your data every week.",
+      "Search Console shows you raw rows: queries, pages, clicks and positions. GSCdaddy sorts those rows into keyword opportunities, ranks them by how much traffic they could bring, and writes the steps to improve each page.",
   },
   {
     question: "What if I have multiple websites?",
     answer:
-      "The Pro plan supports up to 5 sites, and Agency supports 15. All your sites appear in one dashboard - no more logging in and out.",
+      "Blogger covers 1 site, Pro covers 5 and Agency covers 25. Every site shows up in one dashboard, so you switch with one click instead of logging in and out.",
   },
   {
     question: "Can I cancel anytime?",
