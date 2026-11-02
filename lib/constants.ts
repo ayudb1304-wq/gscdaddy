@@ -154,37 +154,3 @@ export const FAQ_ITEMS = [
       "Yes. GSCdaddy works with any language in Google Search Console. The AI recommendations are generated in English, but the keyword analysis works regardless of language.",
   },
 ] as const
-
-export const FOUNDER = {
-  quote:
-    "I built GSCdaddy because I was tired of staring at my own Search Console data and not knowing what to do with it.",
-  bio: 'Solo indie developer from Bangalore, India. I had pages ranking at positions 7, 8, 12. SO close to page 1 but no idea which to focus on first. Every "SEO tool" wanted $100+/month and still didn\'t answer my actual question. So I built the tool I wished existed.',
-  dogfooding:
-    "I connected gscdaddy.com to GSCdaddy on day one. Everything starts at zero, and I'm fixing that publicly.",
-  name: "Ayush",
-  title: "Solo founder, GSCdaddy ·  India",
-} as const
-
-export const BUILD_IN_PUBLIC_TWEETS = [
-  {
-    text: "Just added a verified MRR badge to my landing page.\n\nIt says $0.\n\nMost founders wait until they hit $1K or $5K MRR before showing revenue publicly. I'm doing the opposite. Putting $0 on my homepage on purpose.\n\nThe number will change. The transparency won't.",
-    date: "Apr 8, 2026",
-    likes: 12,
-    replies: 3,
-    url: "https://x.com/ayu_theindiedev/status/2040054722279940237?s=46",
-  },
-  {
-    text: "I just launched GSCdaddy, a tool that finds your \n 'Striking Distance' keywords in Google Search Console and tells you what exactly to do with them.\n\nSo I did the only logical think, I connected my own\n site to it. \n\n Everything is at zero. Imgoing to fix that publicly.",
-    date: "Apr 03, 2026",
-    likes: 5,
-    replies: 11,
-    url: "https://x.com/ayu_theindiedev/status/2039920395583934657?s=12",
-  },
-  {
-    text: "Week 1 starts now. I'll post the first real data drop next week.\n\nIf you want to follow along, or run the same experiment on your own site, gscdaddy.com has a 14-day free trial, no credit card needed.\n\nEither way, I'm sharing everything publicly.\n\nThe wins AND the failures.",
-    date: "Apr 3, 2026",
-    likes: 4,
-    replies: 2,
-    url: "https://x.com/ayu_theindiedev/status/2039921294821749089?s=46",
-  },
-] as const
