@@ -135,7 +135,7 @@ export default function StrikingDistancePage() {
         <div>
           <h1 className="font-heading text-3xl leading-tight font-semibold tracking-[-0.02em] md:text-[2.25rem]">Striking distance</h1>
           <p className="mt-1.5 max-w-2xl text-[15px] text-muted-foreground">
-            Keywords on positions 5–15, sorted by how much traffic page one would bring.
+            Keywords averaging positions 5–20 over your last 28 days of data, sorted by opportunity.
           </p>
         </div>
         <ExportCsv siteId={siteId} filters={filters} />

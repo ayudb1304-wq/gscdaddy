@@ -77,7 +77,7 @@ export function TodaysFocusBand({ rec }: { rec: FocusRec | null }) {
               <span className="text-foreground/65">{stripProtocol(rec.siteUrl)}</span>
               {rec.estimatedTrafficGain ? (
                 <span className="font-medium text-brand-strong">
-                  +{rec.estimatedTrafficGain} clicks/mo if it reaches page one
+                  +{rec.estimatedTrafficGain} clicks/mo if it hits its target position
                 </span>
               ) : null}
             </div>

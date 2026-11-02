@@ -1,6 +1,7 @@
 import { requireAuth } from "@/lib/auth"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { successResponse, errors } from "@/lib/api/response"
+import { isUuid } from "@/lib/api/validate"
 import { captureBaseline, clearBaseline } from "@/lib/recommendations/baseline"
 
 export async function PATCH(
@@ -10,6 +11,7 @@ export async function PATCH(
   try {
     const user = await requireAuth()
     const { recommendationId } = await params
+    if (!isUuid(recommendationId)) return errors.notFound("Recommendation")
     const admin = createAdminClient()
 
     // Verify ownership through sites join
@@ -62,6 +64,7 @@ export async function DELETE(
   try {
     const user = await requireAuth()
     const { recommendationId } = await params
+    if (!isUuid(recommendationId)) return errors.notFound("Recommendation")
     const admin = createAdminClient()
 
     // Verify ownership through sites join

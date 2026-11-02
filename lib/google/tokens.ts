@@ -1,5 +1,6 @@
 import crypto from "crypto"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { GoogleAuthError } from "@/lib/google/search-console"
 
 const ALGORITHM = "aes-256-gcm"
 const IV_LENGTH = 12
@@ -71,9 +72,28 @@ export async function getDecryptedTokens(userId: string) {
   }
 }
 
+/**
+ * Record whether the user's Google connection works, so the app can show a
+ * "Reconnect Google" banner instead of silently failing every sync.
+ * (users.google_auth_status, migration 018; ignored if not applied yet.)
+ */
+export async function setGoogleAuthStatus(userId: string, ok: boolean): Promise<void> {
+  const admin = createAdminClient()
+  const { error } = await admin
+    .from("users")
+    .update({ google_auth_status: ok ? "ok" : "reauth_required" })
+    .eq("id", userId)
+  if (error && !/google_auth_status/.test(error.message)) {
+    console.error("Failed to record Google auth status:", error.message)
+  }
+}
+
 export async function refreshGoogleToken(userId: string): Promise<string | null> {
   const tokens = await getDecryptedTokens(userId)
-  if (!tokens) return null
+  if (!tokens) {
+    await setGoogleAuthStatus(userId, false)
+    throw new GoogleAuthError("No Google tokens stored for this user")
+  }
 
   // If token is still valid (more than 5 min remaining), return it
   const fiveMinFromNow = new Date(Date.now() + 5 * 60 * 1000)
@@ -94,7 +114,14 @@ export async function refreshGoogleToken(userId: string): Promise<string | null>
   })
 
   if (!response.ok) {
-    console.error("Failed to refresh Google token:", await response.text())
+    const text = await response.text()
+    console.error("Failed to refresh Google token:", text)
+    // invalid_grant = revoked access or expired refresh token: only the user can
+    // fix it. Anything else (5xx, network) is treated as temporary.
+    if (/invalid_grant|unauthorized_client|invalid_client/.test(text)) {
+      await setGoogleAuthStatus(userId, false)
+      throw new GoogleAuthError(`Google refresh token rejected: ${text.slice(0, 200)}`)
+    }
     return null
   }
 

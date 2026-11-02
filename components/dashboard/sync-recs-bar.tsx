@@ -55,7 +55,10 @@ export function SyncRecsBar({
   useEffect(() => {
     if (!isSyncing) return
 
+    // Every 5s, and not while the tab is hidden (each poll costs several
+    // database calls; a long sync in a background tab used to poll every 3s).
     const id = setInterval(async () => {
+      if (document.hidden) return
       try {
         const res = await fetch(`/api/sites/${siteId}/sync/status`)
         if (!res.ok) return
@@ -80,7 +83,7 @@ export function SyncRecsBar({
       } catch {
         // ignore polling errors — we'll try again next tick
       }
-    }, 3000)
+    }, 5000)
 
     return () => clearInterval(id)
   }, [isSyncing, siteId, router])
@@ -181,7 +184,7 @@ export function SyncRecsBar({
             <DialogDescription className="text-center">
               Your site doesn&apos;t have any{" "}
               <span className="font-medium text-foreground">&quot;striking distance&quot; keywords</span>{" "}
-              right now. These are queries where you rank between positions 5–15 with enough impressions
+              right now. These are queries where you rank between positions 5–20 with enough impressions
               to be worth optimizing — the sweet spot for quick SEO wins.
             </DialogDescription>
           </DialogHeader>

@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server"
-import { checkAccess } from "@/lib/billing/access"
-import { getPlanLimits } from "@/lib/billing/plans"
+import { checkAccess, getUserLimits } from "@/lib/billing/access"
 import { requireAuth } from "@/lib/auth"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { manualRecsUsedToday } from "@/lib/recommendations/quota"
 
 export async function GET() {
   try {
@@ -10,39 +10,27 @@ export async function GET() {
     const admin = createAdminClient()
     const access = checkAccess(user)
 
-    // For trial/free users, use free limits. For paid users, use their plan limits.
-    const isPaid = ["blogger", "pro", "agency"].includes(access.plan)
-    const limits = isPaid ? getPlanLimits(access.plan) : getPlanLimits("free")
+    // Same limits and counting as the routes that enforce them (trial = Pro;
+    // AI recs per user per UTC day from the generation log).
+    const limits = getUserLimits(user)
 
-    // Count current sites
-    const { count: sitesUsed } = await admin
-      .from("sites")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", user.id)
+    const { data: userSites } = await admin.from("sites").select("id").eq("user_id", user.id)
+    const siteIds = (userSites ?? []).map((s) => s.id)
+    const recsToday = await manualRecsUsedToday(admin, user.id, siteIds)
 
-    // Count today's AI recommendations generated
-    const todayStart = new Date()
-    todayStart.setHours(0, 0, 0, 0)
-    const { data: userSites } = await admin
-      .from("sites")
-      .select("id")
-      .eq("user_id", user.id)
-    const siteIds = userSites?.map((s) => s.id) ?? []
-
-    let recsToday = 0
-    if (siteIds.length > 0) {
-      const { count } = await admin
-        .from("recommendations")
-        .select("id", { count: "exact", head: true })
-        .in("site_id", siteIds)
-        .gte("created_at", todayStart.toISOString())
-      recsToday = count ?? 0
-    }
+    // The subscription the billing page manages: active, or payment failed.
+    const sub = (user.subscriptions ?? []).find(
+      (x: { status: string }) => x.status === "active" || x.status === "past_due"
+    ) as { status: string; plan: string; billing_interval?: string | null } | undefined
 
     return NextResponse.json({
       plan: access.plan,
       daysRemaining: access.daysRemaining,
-      sitesUsed: sitesUsed ?? 0,
+      pastDue: sub?.status === "past_due",
+      hasSubscription: !!sub,
+      subscriptionPlan: sub?.plan ?? null,
+      billingInterval: sub?.billing_interval ?? null,
+      sitesUsed: siteIds.length,
       sitesLimit: limits.sites,
       recsToday,
       recsLimit: limits.aiRecsPerDay,

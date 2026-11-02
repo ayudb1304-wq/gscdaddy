@@ -7,12 +7,17 @@ import { applyUnsubscribe } from "../lib/email/unsubscribe"
 const fillUnsubscribe = (html: string) => applyUnsubscribe(html).html
 
 const resend = new Resend(process.env.RESEND_API_KEY)
-const TO = "sorixx222@gmail.com"
+// Usage: npx tsx scripts/send-founding-member.ts <email> "<full name>"
+// (Recipient details are passed in, not kept in the repo.)
+const [TO, NAME] = process.argv.slice(2)
 const FROM = "Sushi from GSCdaddy <sushi@gscdaddy.com>"
 const SUBJECT = "You're officially a GSCdaddy Founding Member"
-const NAME = "Soraia Barroso"
 
 async function main() {
+  if (!TO || !NAME || !TO.includes("@")) {
+    console.error('Usage: npx tsx scripts/send-founding-member.ts <email> "<full name>"')
+    process.exit(1)
+  }
   if (!process.env.RESEND_API_KEY) {
     console.error("Missing RESEND_API_KEY in .env.local")
     process.exit(1)

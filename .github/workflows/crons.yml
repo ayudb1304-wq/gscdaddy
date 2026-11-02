@@ -2,8 +2,7 @@ name: Scheduled Crons
 
 on:
   schedule:
-    - cron: "0 4 * * *"   # Daily 9:30 AM IST — sync GSC data
-    - cron: "30 4 * * *"  # Daily 10:00 AM IST — refresh materialized views
+    - cron: "0 4 * * *"   # Daily 9:30 AM IST — sync GSC data (also refreshes the striking-distance view)
     - cron: "0 5 * * *"   # Daily 10:30 AM IST — generate AI recommendations (self-healing)
     - cron: "0 9 * * *"   # Daily 2:30 PM IST — send emails
   workflow_dispatch:
@@ -20,6 +19,10 @@ on:
 
 jobs:
   sync-gsc:
+    # Never run two copies of the same job (e.g. a manual run during the scheduled one).
+    concurrency:
+      group: cron-sync-gsc
+      cancel-in-progress: false
     if: github.event.schedule == '0 4 * * *' || github.event.inputs.job == 'sync-gsc'
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -39,7 +42,12 @@ jobs:
           ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
 
   refresh-views:
-    if: github.event.schedule == '30 4 * * *' || github.event.inputs.job == 'refresh-views'
+    # Never run two copies of the same job (e.g. a manual run during the scheduled one).
+    concurrency:
+      group: cron-refresh-views
+      cancel-in-progress: false
+    # Manual only: the sync job refreshes the view once after syncing.
+    if: github.event.inputs.job == 'refresh-views'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -55,6 +63,10 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
   generate-recs:
+    # Never run two copies of the same job (e.g. a manual run during the scheduled one).
+    concurrency:
+      group: cron-generate-recs
+      cancel-in-progress: false
     if: github.event.schedule == '0 5 * * *' || github.event.inputs.job == 'generate-recs'
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -72,6 +84,10 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
   send-emails:
+    # Never run two copies of the same job (e.g. a manual run during the scheduled one).
+    concurrency:
+      group: cron-send-emails
+      cancel-in-progress: false
     if: github.event.schedule == '0 9 * * *' || github.event.inputs.job == 'send-emails'
     runs-on: ubuntu-latest
     timeout-minutes: 10

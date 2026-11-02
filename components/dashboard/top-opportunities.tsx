@@ -25,7 +25,7 @@ export function TopOpportunities({ data }: { data: Opportunity[] }) {
       <CardContent>
         {data.length === 0 ? (
           <p className="text-sm text-muted-foreground">
-            No striking distance keywords found yet. These appear when you have pages ranking at positions 5-15 with sufficient impressions.
+            No striking distance keywords found yet. These appear when you have pages averaging positions 5-20 with enough impressions.
           </p>
         ) : (
           <div className="space-y-3">

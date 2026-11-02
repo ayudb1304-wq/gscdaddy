@@ -10,6 +10,7 @@ import { TrialExpiredEmail, getTrialExpiredSubject } from "../lib/email/template
 import { NudgeRecommendationsEmail, getNudgeRecommendationsSubject } from "../lib/email/templates/nudge-recommendations"
 import { applyUnsubscribe } from "../lib/email/unsubscribe"
 import { fetchAllRows } from "../lib/supabase/fetch-all"
+import { checkAccess, type AccessUser } from "../lib/billing/access"
 
 const admin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -20,11 +21,44 @@ const admin = createClient(
 const resend = new Resend(process.env.RESEND_API_KEY)
 const FROM = "Sushi from GSCdaddy <sushi@gscdaddy.com>"
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
+
 async function send(to: string, subject: string, element: React.ReactElement, userId: string) {
   // Signed one-click unsubscribe link in the footer + List-Unsubscribe headers.
   const { html, headers } = applyUnsubscribe(await render(element), userId)
-  const { error } = await resend.emails.send({ from: FROM, to, subject, html, headers })
-  if (error) throw new Error(error.message)
+  // Resend allows ~2 requests/second: pace sends and retry a rate-limit once.
+  for (let attempt = 1; ; attempt++) {
+    const { error } = await resend.emails.send({ from: FROM, to, subject, html, headers })
+    await sleep(600)
+    if (!error) return
+    if (attempt < 3 && /rate|429|too many/i.test(error.message)) {
+      await sleep(1500 * attempt)
+      continue
+    }
+    throw new Error(error.message)
+  }
+}
+
+type EmailUser = AccessUser & { id: string; email: string; name: string | null }
+
+/**
+ * Subscribed (not unsubscribed) users with access, paged, with their
+ * subscriptions embedded: one query instead of one per user, and no silent
+ * cut-off at 1,000 users.
+ */
+async function emailableUsers(filter?: (q: ReturnType<typeof usersQuery>) => ReturnType<typeof usersQuery>): Promise<EmailUser[]> {
+  const users = await fetchAllRows<EmailUser>((from, to) => {
+    const q = usersQuery()
+    return (filter ? filter(q) : q).order("id").range(from, to)
+  })
+  return users.filter((u) => checkAccess(u).hasAccess)
+}
+
+function usersQuery() {
+  return admin
+    .from("users")
+    .select("id, email, name, trial_ends_at, created_at, subscriptions(status, plan, updated_at)")
+    .or("email_unsubscribed.is.null,email_unsubscribed.eq.false")
 }
 
 const siteDisplayName = (site: { display_name: string | null; site_url: string }) =>
@@ -87,29 +121,8 @@ async function main() {
 async function sendWeeklySummaries(now: Date) {
   let sent = 0
 
-  const { data: users } = await admin
-    .from("users")
-    .select("id, email, name, trial_ends_at")
-    .or("email_unsubscribed.is.null,email_unsubscribed.eq.false")
-
-  if (!users?.length) return 0
-
-  // Filter to users with active access
-  const activeUsers = []
-  for (const user of users) {
-    const { data: sub } = await admin
-      .from("subscriptions")
-      .select("status")
-      .eq("user_id", user.id)
-      .eq("status", "active")
-      .limit(1)
-      .maybeSingle()
-
-    const hasActiveSub = !!sub
-    const hasActiveTrial = user.trial_ends_at && new Date(user.trial_ends_at) > now
-
-    if (hasActiveSub || hasActiveTrial) activeUsers.push(user)
-  }
+  const activeUsers = await emailableUsers()
+  if (!activeUsers.length) return 0
 
   for (const user of activeUsers) {
     const { data: sites } = await admin
@@ -161,7 +174,9 @@ async function sendWeeklySummaries(now: Date) {
 async function sendTrialEndingEmails(now: Date) {
   let sent = 0
 
-  const twoDays = new Date(now.getTime() + 2 * 86400000).toISOString()
+  // Anyone whose trial ends within 3 days and hasn't had this email yet (a
+  // 24-hour window meant one missed run skipped people for good).
+  const twoDays = now.toISOString()
   const threeDays = new Date(now.getTime() + 3 * 86400000).toISOString()
 
   const { data: users } = await admin
@@ -284,28 +299,10 @@ async function sendNudgeRecommendationsEmails(now: Date) {
   // Users who signed up more than 24 hours ago
   const oneDayAgo = new Date(now.getTime() - 86400000).toISOString()
 
-  const { data: users } = await admin
-    .from("users")
-    .select("id, email, name, trial_ends_at")
-    .lte("created_at", oneDayAgo)
-    .or("email_unsubscribed.is.null,email_unsubscribed.eq.false")
-
-  if (!users?.length) { console.log("  No users to nudge"); return 0 }
+  const users = await emailableUsers((q) => q.lte("created_at", oneDayAgo))
+  if (!users.length) { console.log("  No users to nudge"); return 0 }
 
   for (const user of users) {
-    // Must have active access
-    const { data: sub } = await admin
-      .from("subscriptions")
-      .select("status")
-      .eq("user_id", user.id)
-      .eq("status", "active")
-      .limit(1)
-      .maybeSingle()
-
-    const hasActiveSub = !!sub
-    const hasActiveTrial = user.trial_ends_at && new Date(user.trial_ends_at) > now
-    if (!hasActiveSub && !hasActiveTrial) continue
-
     // Get completed sites that haven't been nudged yet
     const { data: sites } = await admin
       .from("sites")
@@ -395,7 +392,7 @@ async function getPositionMovers(siteId: string) {
   const lastWeekStart = isoDay(daysBefore(latest, 13))
   const data = await fetchAllRows<{ query: string; date: string; position: number; impressions: number }>((from, to) =>
     admin.from("gsc_data").select("query, date, position, impressions").eq("site_id", siteId)
-      .gte("date", lastWeekStart).lte("date", isoDay(latest)).gte("impressions", 10)
+      .gte("date", lastWeekStart).lte("date", isoDay(latest))
       .order("id").range(from, to)
   )
   if (!data.length) return []
@@ -411,9 +408,11 @@ async function getPositionMovers(siteId: string) {
     bucket.set(row.query, acc)
   }
   const movers: { query: string; direction: "up" | "down"; change: number; currentPosition: number }[] = []
+  // Volume threshold on the week's total, after aggregating (filtering daily
+  // rows under 10 impressions first skewed the averages toward busy days).
   for (const [query, acc] of thisWeek) {
     const before = lastWeek.get(query)
-    if (!before) continue
+    if (!before || acc.impressions < 10 || before.impressions < 10) continue
     const avgNow = acc.weighted / acc.impressions
     const avgBefore = before.weighted / before.impressions
     const change = avgBefore - avgNow
@@ -434,11 +433,15 @@ async function getUserSitesCount(userId: string) {
   return count || 0
 }
 
+/** Distinct keywords (queries) with data in the last ~28 days. It counted query x page x day rows (~300 keywords showed as ~23,000). */
 async function getUserKeywordsCount(userId: string) {
+  const { data, error } = await admin.rpc("count_user_keywords", { p_user_id: userId })
+  if (!error && data !== null) return Number(data)
+  // Before migration 018: distinct queries from the striking-distance view's sites, best effort.
   const { data: sites } = await admin.from("sites").select("id").eq("user_id", userId)
-  if (!sites?.length) return 0
-  const { count } = await admin.from("gsc_data").select("query", { count: "exact", head: true }).in("site_id", sites.map((s) => s.id))
-  return count || 0
+  let total = 0
+  for (const s of sites ?? []) total += (await getStrikingDistance(s.id, 1)).total
+  return total
 }
 
 async function getUserRecsCount(userId: string) {

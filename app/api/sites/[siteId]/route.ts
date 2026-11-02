@@ -1,6 +1,7 @@
 import { requireAuth } from "@/lib/auth"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { successResponse, errors } from "@/lib/api/response"
+import { isUuid } from "@/lib/api/validate"
 
 export async function GET(
   _request: Request,
@@ -9,6 +10,7 @@ export async function GET(
   try {
     const user = await requireAuth()
     const { siteId } = await params
+    if (!isUuid(siteId)) return errors.notFound("Site")
     const admin = createAdminClient()
 
     const { data: site, error } = await admin
@@ -35,6 +37,7 @@ export async function DELETE(
   try {
     const user = await requireAuth()
     const { siteId } = await params
+    if (!isUuid(siteId)) return errors.notFound("Site")
     const admin = createAdminClient()
 
     const { error } = await admin

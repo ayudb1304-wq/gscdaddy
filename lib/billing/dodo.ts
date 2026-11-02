@@ -7,7 +7,15 @@ export function getDodoClient() {
     client = new DodoPayments({
       bearerToken: process.env.DODO_API_KEY!,
       webhookKey: process.env.DODO_WEBHOOK_SECRET!,
-      environment: process.env.NODE_ENV === "production" ? "live_mode" : "test_mode",
+      // Live only on the production deployment. NODE_ENV is "production" on
+      // every Vercel build, so preview deployments used to hit live payments.
+      // DODO_ENVIRONMENT (live_mode | test_mode) overrides.
+      environment:
+        process.env.DODO_ENVIRONMENT === "live_mode" || process.env.DODO_ENVIRONMENT === "test_mode"
+          ? process.env.DODO_ENVIRONMENT
+          : process.env.VERCEL_ENV
+            ? process.env.VERCEL_ENV === "production" ? "live_mode" : "test_mode"
+            : process.env.NODE_ENV === "production" ? "live_mode" : "test_mode",
     })
   }
   return client

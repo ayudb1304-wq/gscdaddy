@@ -2,7 +2,18 @@ import { createServerClient } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
 import { rateLimit } from "@/lib/api/rate-limit"
 
+const PROTECTED_PREFIXES = ["/today", "/dashboard", "/reports", "/settings", "/onboarding", "/alerts", "/app/"]
+
 export async function updateSession(request: NextRequest) {
+  const path = request.nextUrl.pathname
+  const isProtectedRoute = PROTECTED_PREFIXES.some((p) => path.startsWith(p))
+
+  // Public pages (home, blog, tools, health checker) don't need the session:
+  // skip the auth call there instead of paying for it on every page view.
+  if (!isProtectedRoute && !path.startsWith("/api/") && path !== "/login") {
+    return NextResponse.next({ request })
+  }
+
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
@@ -14,7 +25,7 @@ export async function updateSession(request: NextRequest) {
           return request.cookies.getAll()
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
+          cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           )
           supabaseResponse = NextResponse.next({ request })
@@ -26,9 +37,11 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  // getClaims() verifies the JWT locally when the project uses asymmetric
+  // signing keys (otherwise it falls back to a network check, like getUser())
+  // and refreshes the session cookie when needed.
+  const { data: claimsData } = await supabase.auth.getClaims()
+  const user = claimsData?.claims?.sub ? { id: claimsData.claims.sub } : null
 
   // Rate limit API routes for authenticated users
   if (user && request.nextUrl.pathname.startsWith("/api/")) {
@@ -50,15 +63,6 @@ export async function updateSession(request: NextRequest) {
     supabaseResponse.headers.set("X-RateLimit-Remaining", String(remaining))
     supabaseResponse.headers.set("X-RateLimit-Reset", String(Math.ceil(resetAt / 1000)))
   }
-
-  const isProtectedRoute =
-    request.nextUrl.pathname.startsWith("/today") ||
-    request.nextUrl.pathname.startsWith("/dashboard") ||
-    request.nextUrl.pathname.startsWith("/reports") ||
-    request.nextUrl.pathname.startsWith("/settings") ||
-    request.nextUrl.pathname.startsWith("/onboarding") ||
-    request.nextUrl.pathname.startsWith("/alerts") ||
-    request.nextUrl.pathname.startsWith("/app/")
 
   if (!user && isProtectedRoute) {
     const url = request.nextUrl.clone()

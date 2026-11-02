@@ -4,6 +4,7 @@ dotenv.config({ path: ".env.local" })
 import { createClient } from "@supabase/supabase-js"
 import { generateRecommendations } from "../lib/ai/generate-recommendations"
 import { fetchAllRows } from "../lib/supabase/fetch-all"
+import { checkAccess, sitesWithinPlan, type AccessUser } from "../lib/billing/access"
 
 const admin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -11,48 +12,60 @@ const admin = createClient(
   { auth: { autoRefreshToken: false, persistSession: false } }
 )
 
+const CONCURRENCY = 2
+
+type UserEmbed = AccessUser & { id: string }
+type SiteRow = {
+  id: string
+  site_url: string
+  user_id: string
+  sync_status: string | null
+  created_at: string | null
+  // PostgREST returns the embedded user as an object; untyped clients infer an array.
+  users: UserEmbed | UserEmbed[]
+}
+const embeddedUser = (s: SiteRow): UserEmbed => (Array.isArray(s.users) ? s.users[0] : s.users)
+
 async function main() {
   console.log("Starting recommendation generation cron...")
 
-  const { data: sites, error } = await admin
-    .from("sites")
-    .select("id, site_url, users!inner(id, trial_ends_at, subscriptions(status))")
-    .eq("sync_status", "completed")
+  // Paged (PostgREST caps responses at 1,000 rows).
+  const sites = await fetchAllRows<SiteRow>((from, to) =>
+    admin
+      .from("sites")
+      .select("id, site_url, user_id, sync_status, created_at, users!inner(id, trial_ends_at, subscriptions(status, plan, updated_at))")
+      .order("id")
+      .range(from, to)
+  )
 
-  if (error) {
-    console.error("Failed to fetch sites:", error)
-    process.exit(1)
+  // Group per user so plan limits apply: only the oldest N sites a plan covers.
+  const byUser = new Map<string, SiteRow[]>()
+  for (const s of sites) {
+    const list = byUser.get(s.user_id) ?? []
+    list.push(s)
+    byUser.set(s.user_id, list)
   }
-
-  const activeSites = (sites || []).filter((site) => {
-    const user = site.users as unknown as {
-      trial_ends_at: string | null
-      subscriptions: { status: string }[]
-    }
-    const hasPaidSub = user.subscriptions?.some((s) => s.status === "active")
-    const hasActiveTrial = user.trial_ends_at && new Date(user.trial_ends_at) > new Date()
-    return hasPaidSub || hasActiveTrial
-  })
+  const activeSites: SiteRow[] = []
+  for (const list of byUser.values()) {
+    const user = embeddedUser(list[0])
+    if (!checkAccess(user).hasAccess) continue
+    activeSites.push(...sitesWithinPlan(user, list).filter((s) => s.sync_status === "completed"))
+  }
 
   if (!activeSites.length) {
     console.log("No active sites to process")
     return
   }
 
-  // Self-healing filter: only generate for sites that don't already have fresh recs.
-  // This turns the daily cron into a safety net for users the post-sync hook missed
-  // (existing backlog, failed auto-generations, expired recs) without re-billing
-  // the AI call on sites that already have valid recommendations.
-  const siteIds = activeSites.map((s) => s.id)
-  // Paged: unpaged, sites beyond the first 1,000 rec rows looked rec-less and
-  // were regenerated (and billed) every day.
+  // Self-healing filter: only generate for sites without fresh recs. One paged
+  // read of all fresh rec site ids (an .in() list of every site id breaks the
+  // URL length limit at a few hundred sites).
   let freshRecs: { site_id: string }[]
   try {
     freshRecs = await fetchAllRows<{ site_id: string }>((from, to) =>
       admin
         .from("recommendations")
         .select("site_id")
-        .in("site_id", siteIds)
         .gt("expires_at", new Date().toISOString())
         .order("id")
         .range(from, to)
@@ -62,7 +75,7 @@ async function main() {
     process.exit(1)
   }
 
-  const sitesWithFreshRecs = new Set((freshRecs || []).map((r) => r.site_id))
+  const sitesWithFreshRecs = new Set(freshRecs.map((r) => r.site_id))
   const sitesNeedingRecs = activeSites.filter((s) => !sitesWithFreshRecs.has(s.id))
 
   if (!sitesNeedingRecs.length) {
@@ -70,35 +83,36 @@ async function main() {
     return
   }
 
-  console.log(
-    `Found ${sitesNeedingRecs.length}/${activeSites.length} active sites needing recommendations`
-  )
+  console.log(`Found ${sitesNeedingRecs.length}/${activeSites.length} active sites needing recommendations`)
 
   let succeeded = 0
   let failed = 0
+  const queue = [...sitesNeedingRecs]
 
-  for (const site of sitesNeedingRecs) {
-    try {
-      const startedAt = new Date().toISOString()
-      const recs = await generateRecommendations(site.id)
-      // Clear the expired, never-completed recs this batch replaces, so the
-      // list doesn't grow every week. Completed recs keep their impact history.
-      if (recs && recs.length > 0) {
-        await admin
-          .from("recommendations")
-          .delete()
-          .eq("site_id", site.id)
-          .eq("is_completed", false)
-          .lt("expires_at", startedAt)
+  async function worker() {
+    for (let site = queue.shift(); site; site = queue.shift()) {
+      try {
+        const startedAt = new Date().toISOString()
+        const recs = await generateRecommendations(site.id, { source: "auto" })
+        // Clear the expired, never-completed recs this batch replaces, so the
+        // list doesn't grow every week. Completed recs keep their impact history.
+        if (recs && recs.length > 0) {
+          await admin
+            .from("recommendations")
+            .delete()
+            .eq("site_id", site.id)
+            .eq("is_completed", false)
+            .lt("expires_at", startedAt)
+        }
+        console.log(`  ✓ ${site.site_url} — ${recs?.length || 0} recommendations`)
+        succeeded++
+      } catch (e) {
+        console.error(`  ✗ ${site.site_url} — ${e instanceof Error ? e.message : "Unknown error"}`)
+        failed++
       }
-      console.log(`  ✓ ${site.site_url} — ${recs?.length || 0} recommendations`)
-      succeeded++
-    } catch (e) {
-      const message = e instanceof Error ? e.message : "Unknown error"
-      console.error(`  ✗ ${site.site_url} — ${message}`)
-      failed++
     }
   }
+  await Promise.all(Array.from({ length: CONCURRENCY }, worker))
 
   console.log(`Done: ${succeeded} succeeded, ${failed} failed`)
   // Only exit 1 if *everything* failed — partial failures are normal (new sites,
@@ -106,4 +120,7 @@ async function main() {
   if (succeeded === 0 && failed > 0) process.exit(1)
 }
 
-main()
+main().catch((e) => {
+  console.error("Recommendations cron crashed:", e)
+  process.exit(1)
+})

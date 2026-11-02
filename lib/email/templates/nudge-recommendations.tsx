@@ -53,7 +53,7 @@ export function NudgeRecommendationsEmail({
 
       <Text style={paragraph}>
         Your site has <strong>{totalOpportunities} keywords</strong> sitting in
-        striking distance (positions 5 to 15). These are real keywords that real
+        striking distance (positions 5 to 20). These are real keywords that real
         people are searching for, and your site is showing up. But you have not
         generated recommendations for them yet.
       </Text>

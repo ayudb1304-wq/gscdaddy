@@ -55,8 +55,10 @@ function scorePerformance(psi: PageSpeedResult | null): CategoryScore {
   const items: CheckItem[] = []
 
   if (!psi) {
-    items.push(item("Performance score", "warning", "Could not run PageSpeed analysis"))
-    return { name: "Performance", slug: "performance", score: 50, weight: 20, items }
+    // PageSpeed (Google's service) failing isn't the site's fault: leave the
+    // category out of the overall score instead of scoring it 50 (~10 points off).
+    items.push(item("Performance score", "warning", "PageSpeed analysis was unavailable; not included in the overall score"))
+    return { name: "Performance", slug: "performance", score: 0, weight: 0, items }
   }
 
   // Overall Lighthouse score
@@ -231,7 +233,7 @@ function scoreSchema(crawl: CrawlResult): CategoryScore {
   }
 
   // Check for common useful schemas
-  const schemas = crawl.jsonLdSchemas.map((s) => s.toLowerCase())
+  const schemas = crawl.jsonLdSchemas.map((s) => String(s).toLowerCase())
   const hasOrg =
     schemas.includes("organization") || schemas.includes("localbusiness")
   const hasBreadcrumb = schemas.includes("breadcrumblist")

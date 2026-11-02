@@ -18,12 +18,21 @@ interface MetricsData {
 }
 
 function formatNumber(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`
+  // Round first, then pick the unit, so 999,950 is "1.0M" rather than "1000.0K".
+  if (Math.round(n / 100_000) >= 10) return `${(n / 1_000_000).toFixed(1)}M`
+  if (Math.round(n / 100) >= 10) return `${(n / 1_000).toFixed(1)}K`
   return n.toLocaleString()
 }
 
-function ChangeIndicator({ value, inverted = false }: { value: number | null; inverted?: boolean }) {
+function ChangeIndicator({
+  value,
+  inverted = false,
+  unit = "%",
+}: {
+  value: number | null
+  inverted?: boolean
+  unit?: "%" | "pos"
+}) {
   // No comparable prior period (new site) or no change: neutral, not a red drop.
   if (value === null || value === 0) {
     return (
@@ -39,7 +48,7 @@ function ChangeIndicator({ value, inverted = false }: { value: number | null; in
   return (
     <span className={cn("flex items-center gap-1 text-xs font-medium", color)}>
       <Icon className="h-3 w-3" />
-      {Math.abs(value)}%
+      {unit === "pos" ? `${Math.abs(value).toFixed(1)} ${Math.abs(value) === 1 ? "position" : "positions"}` : `${Math.abs(value)}%`}
     </span>
   )
 }
@@ -61,8 +70,10 @@ const cards = [
     title: "Avg Position",
     icon: ArrowUpDown,
     getValue: (d: MetricsData) => d.current.avgPosition.toFixed(1),
+    // Change in positions (current - prior); lower is better.
     getChange: (d: MetricsData) => d.changes.avgPosition,
     inverted: true,
+    unit: "pos" as const,
   },
   {
     title: "Striking Distance",
@@ -89,7 +100,7 @@ export function MetricsCards({ data }: { data: MetricsData }) {
               <div className="font-heading text-[2rem] leading-none font-semibold tracking-[-0.02em] tabular-nums">{card.getValue(data)}</div>
               {change !== null && (
                 <div className="mt-1">
-                  <ChangeIndicator value={change} inverted={card.inverted} />
+                  <ChangeIndicator value={change} inverted={card.inverted} unit={card.unit} />
                 </div>
               )}
             </CardContent>

@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
+import { notifyUsageChanged } from "@/lib/usage-events"
+import { signInWithGoogle } from "@/app/login/actions"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -65,6 +67,7 @@ export default function SitesPage() {
   const [adding, setAdding] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
   const [actionSuccess, setActionSuccess] = useState<string | null>(null)
+  const [availableError, setAvailableError] = useState<{ message: string; reauth: boolean } | null>(null)
   const router = useRouter()
 
   async function errorMessage(res: Response, fallback: string) {
@@ -105,6 +108,7 @@ export default function SitesPage() {
     if (syncingSites.length === 0) return
 
     const id = setInterval(async () => {
+      if (document.hidden) return
       for (const site of syncingSites) {
         try {
           const res = await fetch(`/api/sites/${site.id}/sync/status`)
@@ -134,7 +138,7 @@ export default function SitesPage() {
           // ignore polling errors
         }
       }
-    }, 3000)
+    }, 5000)
 
     return () => clearInterval(id)
   }, [sites])
@@ -167,6 +171,7 @@ export default function SitesPage() {
     }
     setSites((prev) => prev.filter((s) => s.id !== siteId))
     if (usage) setUsage({ ...usage, sitesUsed: usage.sitesUsed - 1 })
+    notifyUsageChanged()
     // Refresh the server-rendered layout so the header site picker drops it.
     router.refresh()
   }
@@ -174,11 +179,24 @@ export default function SitesPage() {
   async function openAddDialog() {
     setAddDialogOpen(true)
     setLoadingAvailable(true)
+    setAvailableError(null)
     try {
       const res = await fetch("/api/sites/available")
-      const data = res.ok ? await res.json().catch(() => null) : null
+      const data = await res.json().catch(() => null)
+      if (!res.ok) {
+        // Used to show "No sites found" for any failure, including revoked
+        // Google access, which sent people looking in the wrong place.
+        setAvailableSites([])
+        setAvailableError({
+          message: data?.error?.message || "Couldn't load your Search Console sites. Try again.",
+          reauth: data?.error?.code === "GOOGLE_REAUTH_REQUIRED",
+        })
+        return
+      }
       const list = data?.data ?? data
       setAvailableSites(Array.isArray(list) ? list : [])
+    } catch {
+      setAvailableError({ message: "Couldn't reach the server. Check your connection and try again.", reauth: false })
     } finally {
       setLoadingAvailable(false)
     }
@@ -216,6 +234,7 @@ export default function SitesPage() {
         )
         await fetchSites()
         router.refresh()
+        notifyUsageChanged()
       } else {
         setAddDialogOpen(false)
         setActionError(await errorMessage(res, "Couldn't add that site. Try again."))
@@ -287,6 +306,15 @@ export default function SitesPage() {
             {loadingAvailable ? (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="size-5 animate-spin text-muted-foreground" />
+              </div>
+            ) : availableError ? (
+              <div className="space-y-4 py-6 text-center">
+                <p className="text-sm text-muted-foreground">{availableError.message}</p>
+                {availableError.reauth && (
+                  <form action={signInWithGoogle}>
+                    <Button type="submit" size="sm">Reconnect Google</Button>
+                  </form>
+                )}
               </div>
             ) : availableSites.length === 0 ? (
               <p className="py-8 text-center text-sm text-muted-foreground">

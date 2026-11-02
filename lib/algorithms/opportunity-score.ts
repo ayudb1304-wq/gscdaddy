@@ -5,19 +5,24 @@ export const CTR_BY_POSITION: Record<number, number> = {
   16: 0.008, 17: 0.007, 18: 0.006, 19: 0.006, 20: 0.005,
 }
 
-// Keep this formula in sync with migration 011's SQL definition:
-//   SUM(impressions) * (21 - AVG(position)) / 16
+// Keep this formula in sync with the striking-distance view (migration 018):
+//   SUM(impressions) * (21 - weighted avg position) / 16
 export function calculateOpportunityScore(impressions: number, position: number): number {
   const positionFactor = (21 - position) / 16
   return impressions * positionFactor
 }
 
+const ctrAt = (position: number) =>
+  CTR_BY_POSITION[Math.min(20, Math.max(1, Math.round(position)))] ?? 0.005
+
+/**
+ * Extra clicks per ~28 days (the impressions window) if the keyword moved from
+ * currentPosition to targetPosition. Never negative.
+ */
 export function estimateTrafficGain(
   impressions: number,
   currentPosition: number,
   targetPosition: number = 3
 ): number {
-  const currentCtr = CTR_BY_POSITION[Math.round(currentPosition)] || 0.01
-  const targetCtr = CTR_BY_POSITION[targetPosition] || 0.10
-  return Math.round(impressions * (targetCtr - currentCtr))
+  return Math.max(0, Math.round(impressions * (ctrAt(targetPosition) - ctrAt(currentPosition))))
 }

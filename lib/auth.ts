@@ -1,7 +1,13 @@
+import { cache } from "react"
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 
-export async function getCurrentUser() {
+/**
+ * The signed-in user with subscriptions. Wrapped in React cache(): the
+ * dashboard layout and each page both call it, which made two auth calls and
+ * two user queries per navigation.
+ */
+export const getCurrentUser = cache(async function getCurrentUser() {
   const supabase = await createClient()
   const { data: { user }, error: authError } = await supabase.auth.getUser()
 
@@ -38,7 +44,7 @@ export async function getCurrentUser() {
   }
 
   return data
-}
+})
 
 export async function requireAuth() {
   const user = await getCurrentUser()
@@ -47,3 +53,14 @@ export async function requireAuth() {
 }
 
 export type AppUser = NonNullable<Awaited<ReturnType<typeof getCurrentUser>>>
+
+/** The user's sites (all columns), oldest first; cached per request like getCurrentUser. */
+export const getUserSites = cache(async function getUserSites(userId: string) {
+  const admin = createAdminClient()
+  const { data } = await admin
+    .from("sites")
+    .select("*")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: true })
+  return data ?? []
+})

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { requireAuth } from "@/lib/auth"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { createClient } from "@/lib/supabase/server"
+import { getDodoClient } from "@/lib/billing/dodo"
 
 export async function GET() {
   try {
@@ -25,6 +26,26 @@ export async function DELETE() {
   try {
     const user = await requireAuth()
     const admin = createAdminClient()
+
+    // Cancel billing first. Deleting the account used to leave the Dodo
+    // subscription running, so the person kept being charged.
+    const { data: subs } = await admin
+      .from("subscriptions")
+      .select("dodo_subscription_id")
+      .eq("user_id", user.id)
+      .in("status", ["active", "past_due"])
+    for (const sub of subs ?? []) {
+      if (!sub.dodo_subscription_id) continue
+      try {
+        await getDodoClient().subscriptions.update(sub.dodo_subscription_id, { status: "cancelled" })
+      } catch (err) {
+        console.error(`Couldn't cancel subscription ${sub.dodo_subscription_id} before account deletion:`, err)
+        return NextResponse.json(
+          { error: "We couldn't cancel your subscription, so your account wasn't deleted. Please try again or contact support." },
+          { status: 502 }
+        )
+      }
+    }
 
     // Delete user from users table (FK cascades delete sites, gsc_data, recommendations, subscriptions)
     await admin.from("users").delete().eq("id", user.id)

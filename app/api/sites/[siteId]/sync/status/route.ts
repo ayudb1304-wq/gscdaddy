@@ -2,6 +2,7 @@ import { requireAuth } from "@/lib/auth"
 import { isSyncInProgress } from "@/lib/sync/gsc-sync"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { successResponse, errors } from "@/lib/api/response"
+import { isUuid } from "@/lib/api/validate"
 
 export async function GET(
   _request: Request,
@@ -10,11 +11,12 @@ export async function GET(
   try {
     const user = await requireAuth()
     const { siteId } = await params
+    if (!isUuid(siteId)) return errors.notFound("Site")
     const admin = createAdminClient()
 
     const { data: site, error } = await admin
       .from("sites")
-      .select("*")
+      .select("id, sync_status, sync_progress, sync_started_at, last_synced_at")
       .eq("id", siteId)
       .eq("user_id", user.id)
       .single()

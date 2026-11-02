@@ -1,6 +1,8 @@
 import { requireAuth } from "@/lib/auth"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { successResponse, errors } from "@/lib/api/response"
+import { isUuid } from "@/lib/api/validate"
+import { checkAccess } from "@/lib/billing/access"
 
 export async function GET(request: Request) {
   try {
@@ -8,7 +10,8 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const siteId = searchParams.get("siteId")
 
-    if (!siteId) return errors.validation("siteId is required")
+    if (!isUuid(siteId)) return errors.validation("A valid siteId is required")
+    if (!checkAccess(user).hasAccess) return errors.trialExpired()
 
     const admin = createAdminClient()
 

@@ -35,7 +35,7 @@ export function WelcomeEmail({ name }: { name: string }) {
 
       <Text style={paragraph}>
         <strong>2. Check your Striking Distance Keywords.</strong> These are the keywords
-        where you rank positions 5-15. They are your biggest quick wins.
+        where you rank positions 5-20. They are your biggest quick wins.
       </Text>
 
       <Text style={paragraph}>

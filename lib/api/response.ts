@@ -25,4 +25,10 @@ export const errors = {
   planLimit: (message: string) => errorResponse("PLAN_LIMIT_EXCEEDED", message, 403),
   trialExpired: () => errorResponse("TRIAL_EXPIRED", "Your trial has expired. Please upgrade.", 403),
   internal: (message = "Something went wrong") => errorResponse("INTERNAL_ERROR", message, 500),
+  googleReauth: () =>
+    errorResponse(
+      "GOOGLE_REAUTH_REQUIRED",
+      "Your Google connection expired or Search Console access wasn't granted. Reconnect Google to continue.",
+      403
+    ),
 }

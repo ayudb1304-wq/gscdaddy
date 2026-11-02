@@ -43,6 +43,7 @@ export function KeywordsFilters({ filters, onFiltersChange }: KeywordsFiltersPro
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           placeholder="Search keywords or pages..."
+          aria-label="Search keywords or pages"
           value={local.search}
           onChange={(e) => apply({ ...local, search: e.target.value })}
           className="pl-9"
@@ -70,7 +71,7 @@ export function KeywordsFilters({ filters, onFiltersChange }: KeywordsFiltersPro
         <label className="mb-1 block text-xs text-muted-foreground">Max Position</label>
         <Input
           type="number"
-          placeholder="15"
+          placeholder="20"
           value={local.maxPosition}
           onChange={(e) => apply({ ...local, maxPosition: e.target.value })}
         />
