@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { Suspense, useState } from "react"
 import { Sidebar } from "./sidebar"
 import { Header } from "./header"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
@@ -30,12 +30,18 @@ export function DashboardShell({ user, sites, plan, daysRemaining, children }: D
   return (
     <div className="flex h-screen overflow-hidden bg-sidebar">
       {/* Desktop sidebar */}
-      <Sidebar className="hidden lg:flex" />
+      {/* The sidebar reads search params, which renders it client-side only. Its own Suspense
+          boundary keeps that from shifting the generated ids of everything after it. */}
+      <Suspense fallback={<div className="hidden w-60 shrink-0 bg-sidebar lg:block" />}>
+        <Sidebar className="hidden lg:flex" />
+      </Suspense>
 
       {/* Mobile sidebar */}
       <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
         <SheetContent side="left" className="w-60 border-0 p-0">
-          <Sidebar />
+          <Suspense fallback={null}>
+            <Sidebar />
+          </Suspense>
         </SheetContent>
       </Sheet>
 
