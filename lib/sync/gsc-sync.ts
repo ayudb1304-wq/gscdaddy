@@ -217,6 +217,21 @@ export async function syncSite(
     const days = eachDay(start, end)
     const isInitial = !latestRow
 
+    // Search Console's own per-day totals for the whole retention window, in
+    // one cheap request (about 480 rows), before anything that can run out of
+    // time. Storing them only for the days a sync fetched mixed sources on the
+    // dashboard (a fake step between "totals" days and "summed rows" days) and
+    // left old gaps empty.
+    await updateSyncProgress(admin, siteId, "Fetching daily totals from Search Console...")
+    await saveDailyTotals(
+      admin,
+      siteId,
+      await getValidAccessToken(site.user_id),
+      site.site_url,
+      formatDate(addDays(end, -MAX_LOOKBACK_DAYS)),
+      formatDate(end)
+    )
+
     let rowCount = 0
     let syncedThrough: string | null = null
     let complete = true
@@ -243,7 +258,6 @@ export async function syncSite(
         rowCount += results[j].length
         syncedThrough = group[j]
       }
-      await saveDailyTotals(admin, siteId, accessToken, site.site_url, group[0], group[group.length - 1])
 
       if (i + FETCH_CONCURRENCY < days.length && Date.now() - startedAt > timeBudgetMs) {
         // Saved so far is durable; the next sync resumes from the newest stored day.
