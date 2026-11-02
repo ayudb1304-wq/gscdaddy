@@ -68,10 +68,13 @@ export default function SitesPage() {
       fetch("/api/sites"),
       fetch("/api/billing/usage"),
     ])
-    const sitesData = await sitesRes.json()
-    const usageData = await usageRes.json()
-    setSites(sitesData.data || sitesData || [])
-    setUsage(usageData)
+    // Only store data from successful responses: an error body (429, 500, GSC
+    // token failure) stored as state crashed the page on .map().
+    const sitesData = sitesRes.ok ? await sitesRes.json().catch(() => null) : null
+    const usageData = usageRes.ok ? await usageRes.json().catch(() => null) : null
+    const list = sitesData?.data ?? sitesData
+    setSites(Array.isArray(list) ? list : [])
+    if (usageData) setUsage(usageData)
     setLoading(false)
   }, [])
 
@@ -148,8 +151,9 @@ export default function SitesPage() {
     setLoadingAvailable(true)
     try {
       const res = await fetch("/api/sites/available")
-      const data = await res.json()
-      setAvailableSites(data.data || data || [])
+      const data = res.ok ? await res.json().catch(() => null) : null
+      const list = data?.data ?? data
+      setAvailableSites(Array.isArray(list) ? list : [])
     } finally {
       setLoadingAvailable(false)
     }

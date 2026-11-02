@@ -31,8 +31,9 @@ export default function ProfilePage() {
 
   useEffect(() => {
     fetch("/api/users/profile")
-      .then((r) => r.json())
-      .then(setUser)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => setUser(data?.email ? data : null))
+      .catch(() => setUser(null))
       .finally(() => setLoading(false))
   }, [])
 

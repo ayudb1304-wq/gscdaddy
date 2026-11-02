@@ -3,6 +3,8 @@
  * Fetches a URL and extracts on-page SEO signals from the raw HTML.
  */
 
+import { safeFetch, readTextCapped } from "./safe-fetch"
+
 export interface CrawlResult {
   url: string
   statusCode: number
@@ -68,10 +70,9 @@ async function fetchWithTimeout(
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), timeout)
   try {
-    return await fetch(url, {
+    return await safeFetch(url, {
       signal: controller.signal,
       headers: { "User-Agent": USER_AGENT },
-      redirect: "follow",
     })
   } finally {
     clearTimeout(timer)
@@ -122,7 +123,7 @@ export async function crawlUrl(rawUrl: string): Promise<CrawlResult> {
   const start = Date.now()
   const response = await fetchWithTimeout(url)
   const responseTimeMs = Date.now() - start
-  const html = await response.text()
+  const html = await readTextCapped(response)
   const finalUrl = response.url
 
   const isHttps = finalUrl.startsWith("https://")
@@ -240,7 +241,7 @@ export async function crawlUrl(rawUrl: string): Promise<CrawlResult> {
       robotsRes.ok &&
       (robotsRes.headers.get("content-type") || "").includes("text/plain")
     ) {
-      robotsTxtContent = await robotsRes.text()
+      robotsTxtContent = await readTextCapped(robotsRes, 512 * 1024)
       hasRobotsTxt = robotsTxtContent.length > 0
     }
   } catch {

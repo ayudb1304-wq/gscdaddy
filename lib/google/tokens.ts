@@ -39,15 +39,17 @@ export async function storeTokens(
   expiresAt: Date
 ) {
   const admin = createAdminClient()
-  await admin
-    .from("users")
-    .update({
-      google_access_token: encrypt(accessToken),
-      google_refresh_token: encrypt(refreshToken),
-      google_token_expires_at: expiresAt.toISOString(),
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", userId)
+  const update: Record<string, string> = {
+    google_access_token: encrypt(accessToken),
+    google_token_expires_at: expiresAt.toISOString(),
+    updated_at: new Date().toISOString(),
+  }
+  // Google only returns a refresh token on some logins. Never overwrite a good
+  // stored refresh token with an empty one, or every later refresh fails.
+  if (refreshToken) update.google_refresh_token = encrypt(refreshToken)
+
+  const { error } = await admin.from("users").update(update).eq("id", userId)
+  if (error) console.error("Failed to store Google tokens:", error.message)
 }
 
 export async function getDecryptedTokens(userId: string) {

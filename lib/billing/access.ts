@@ -9,8 +9,10 @@ export interface AccessLevel {
 
 export function checkAccess(user: AppUser): AccessLevel {
   // Check active paid subscription
-  const sub = user.subscriptions?.[0]
-  if (sub?.status === "active") {
+  // A user can have several subscription rows (cancel then resubscribe), and
+  // the embed has no ordering, so look for any active one, not just the first.
+  const sub = user.subscriptions?.find((s: { status: string }) => s.status === "active")
+  if (sub) {
     return { hasAccess: true, plan: sub.plan }
   }
 

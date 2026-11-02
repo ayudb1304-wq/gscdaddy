@@ -95,7 +95,7 @@ export async function generateRecommendations(siteId: string) {
     schema: RecommendationSchema,
     system: SYSTEM_PROMPT,
     prompt: userPrompt,
-    maxOutputTokens: 2048,
+    maxOutputTokens: 4096,
   })
 
   // Insert into DB
@@ -108,7 +108,8 @@ export async function generateRecommendations(siteId: string) {
     page: rec.page,
     current_position: rec.current_position,
     potential_position: rec.potential_position,
-    estimated_traffic_gain: rec.estimated_traffic_gain || estimateTrafficGain(
+    // Column is INTEGER: a decimal from the model would fail the whole insert.
+    estimated_traffic_gain: Math.round(rec.estimated_traffic_gain) || estimateTrafficGain(
       keywordData.find((k: { query: string; impressions: number }) => k.query === rec.query)?.impressions || 1000,
       rec.current_position,
       Math.round(rec.potential_position)

@@ -128,8 +128,10 @@ export async function syncSite(siteId: string): Promise<{ rowCount: number }> {
     // refreshed first, the user sees empty/stale opportunities for a beat.
     // Non-fatal on failure — the nightly refresh-views cron is a safety net.
     await updateSyncProgress(admin, siteId, "Refreshing opportunities view...")
+    // rpc() returns errors instead of throwing, so check both.
     try {
-      await admin.rpc("refresh_striking_distance")
+      const { error: refreshError } = await admin.rpc("refresh_striking_distance")
+      if (refreshError) console.error(`Post-sync view refresh failed for site ${siteId}:`, refreshError.message)
     } catch (err) {
       console.error(`Post-sync view refresh failed for site ${siteId}:`, err)
     }

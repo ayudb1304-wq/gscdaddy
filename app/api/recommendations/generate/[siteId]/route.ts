@@ -42,16 +42,12 @@ export async function POST(
       return successResponse(recentRecs)
     }
 
-    // Clear stale non-completed recommendations so the user gets a fresh set.
-    // Completed recs are preserved so the user doesn't lose tracked progress.
-    await admin
-      .from("recommendations")
-      .delete()
-      .eq("site_id", siteId)
-      .eq("is_completed", false)
+    const access = checkAccess(user)
+    if (!access.hasAccess) return errors.trialExpired()
 
-    // Daily rate limit check: count today's rows for this site.
-    // Only applies when we actually need to call the AI.
+    // Daily rate limit: count every rec created today for this site BEFORE
+    // touching anything. (Previously the uncompleted recs were deleted first, so
+    // the count only saw completed ones and the limit never triggered.)
     const today = new Date().toISOString().split("T")[0]
     const { count } = await admin
       .from("recommendations")
@@ -59,7 +55,6 @@ export async function POST(
       .eq("site_id", siteId)
       .gte("created_at", `${today}T00:00:00Z`)
 
-    const access = checkAccess(user)
     const isPaid = ["blogger", "pro", "agency"].includes(access.plan)
     const limits = isPaid ? getPlanLimits(access.plan) : getPlanLimits("free")
 
@@ -69,7 +64,20 @@ export async function POST(
       )
     }
 
+    // Generate first, then clear the older uncompleted recs. If the AI call or
+    // the insert fails, the user keeps their existing recommendations.
+    const generationStartedAt = new Date().toISOString()
     const recommendations = await generateRecommendations(siteId)
+
+    if (recommendations && recommendations.length > 0) {
+      // Completed recs are preserved so the user doesn't lose tracked progress.
+      await admin
+        .from("recommendations")
+        .delete()
+        .eq("site_id", siteId)
+        .eq("is_completed", false)
+        .lt("created_at", generationStartedAt)
+    }
 
     return successResponse(recommendations)
   } catch (e) {
