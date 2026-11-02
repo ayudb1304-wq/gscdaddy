@@ -44,14 +44,16 @@ export async function captureBaseline(
   const list = rows || []
   const clicks = list.reduce((s, r) => s + (r.clicks || 0), 0)
   const impressions = list.reduce((s, r) => s + (r.impressions || 0), 0)
+  // Impression-weighted, like GSC. (The Today page recomputes both windows
+  // from raw rows; this snapshot is the fallback.)
+  const weighted = list.reduce((s, r) => s + (r.position || 0) * (r.impressions || 0), 0)
   const avgPos =
-    list.length > 0
-      ? list.reduce((s, r) => s + (r.position || 0), 0) / list.length
-      : 0
-  const avgCtr =
-    list.length > 0
-      ? list.reduce((s, r) => s + (r.ctr || 0), 0) / list.length
-      : 0
+    impressions > 0
+      ? weighted / impressions
+      : list.length > 0
+        ? list.reduce((s, r) => s + (r.position || 0), 0) / list.length
+        : 0
+  const avgCtr = impressions > 0 ? clicks / impressions : 0
 
   await admin.from("recommendation_baselines").upsert(
     {

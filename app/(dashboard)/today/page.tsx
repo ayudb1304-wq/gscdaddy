@@ -8,6 +8,9 @@ import { TodaysFocusBand, type FocusRec } from "@/components/today/todays-focus-
 import { TodayEmptyState } from "@/components/today/empty-state"
 import { isSyncInProgress } from "@/lib/sync/gsc-sync"
 
+/** Days before completion used as the "before" window for shipped-fix impact. */
+const BASELINE_DAYS = 28
+
 function fmt(d: Date): string {
   return d.toISOString().split("T")[0]
 }
@@ -112,20 +115,21 @@ export default async function TodayPage() {
   const shippedItems: ShippedRec[] = []
 
   if (baselines.length > 0) {
-    // Fetch post-completion gsc_data for all baselines in one query
-    // One narrow query per shipped rec (site + query + page + date). A single query across all
-    // sites since the oldest completion hit the 1,000-row cap, so most recs never got results.
+    // One narrow query per shipped rec (site + query + page + date), covering the 28 days
+    // before completion and everything after. Both sides are computed here from the same data
+    // with the same maths. The snapshot stored at completion missed the last 2-3 days (GSC
+    // lag) and divided by 28 calendar days, which made every fix look like a win.
     const perRec = await Promise.all(
       baselines.map((b) =>
-        fetchAllRows<{ site_id: string; query: string; page: string; date: string; clicks: number; position: number }>(
+        fetchAllRows<{ site_id: string; query: string; page: string; date: string; clicks: number; impressions: number; position: number }>(
           (from, to) =>
             admin
               .from("gsc_data")
-              .select("site_id, query, page, date, clicks, position")
+              .select("site_id, query, page, date, clicks, impressions, position")
               .eq("site_id", b.site_id)
               .eq("query", b.query)
               .eq("page", b.page)
-              .gte("date", fmt(new Date(b.completed_at)))
+              .gte("date", fmt(new Date(new Date(b.completed_at).getTime() - BASELINE_DAYS * 86_400_000)))
               .order("date", { ascending: true })
               .order("id")
               .range(from, to)
@@ -141,36 +145,45 @@ export default async function TodayPage() {
       const completedAt = new Date(b.completed_at)
       const daysSince = Math.floor((now.getTime() - completedAt.getTime()) / 86_400_000)
 
-      // Baseline window length is always 28 days by construction; defensively
-      // compute from start/end so we degrade gracefully if that ever changes.
-      const bStart = new Date(b.baseline_start)
-      const bEnd = new Date(b.baseline_end)
-      const baselineDays = Math.max(
-        1,
-        Math.round((bEnd.getTime() - bStart.getTime()) / 86_400_000) + 1
+      const completedDay = fmt(completedAt)
+      const recRows = postList.filter(
+        (r) => r.site_id === b.site_id && r.query === b.query && r.page === b.page
       )
-      const baselineClicksPerDay = Number(b.baseline_clicks) / baselineDays
+      const beforeRows = recRows.filter((r) => r.date < completedDay)
+      const postRows = recRows.filter((r) => r.date >= completedDay)
 
-      // Filter post-completion data for this (site, query, page)
-      const postRows = postList.filter(
-        (r) =>
-          r.site_id === b.site_id &&
-          r.query === b.query &&
-          r.page === b.page &&
-          new Date(r.date) >= completedAt
-      )
+      // Same definition on both sides: clicks per day that has data, and
+      // impression-weighted position (like GSC).
+      const summarize = (rows: typeof recRows) => {
+        const days = new Set(rows.map((r) => r.date)).size
+        const clicks = rows.reduce((s, r) => s + (r.clicks || 0), 0)
+        const impressions = rows.reduce((s, r) => s + (r.impressions || 0), 0)
+        const weighted = rows.reduce((s, r) => s + (r.position || 0) * (r.impressions || 0), 0)
+        const avgPosition =
+          impressions > 0 ? weighted / impressions : rows.reduce((s, r) => s + (r.position || 0), 0) / Math.max(1, rows.length)
+        return { days, clicksPerDay: days > 0 ? clicks / days : 0, avgPosition }
+      }
+
+      const before = summarize(beforeRows)
+      const baseline =
+        before.days > 0
+          ? { clicksPerDay: before.clicksPerDay, avgPosition: before.avgPosition }
+          : {
+              // No raw rows left for the window: fall back to the stored snapshot.
+              clicksPerDay:
+                Number(b.baseline_clicks) /
+                Math.max(1, Math.round((new Date(b.baseline_end).getTime() - new Date(b.baseline_start).getTime()) / 86_400_000) + 1),
+              avgPosition: Number(b.baseline_avg_position),
+            }
 
       const actual = (() => {
         if (postRows.length === 0 || daysSince < 3) return null
-        const distinctDays = new Set(postRows.map((r) => r.date)).size
-        if (distinctDays < 3) return null
-        const clicks = postRows.reduce((s, r) => s + (r.clicks || 0), 0)
-        const position =
-          postRows.reduce((s, r) => s + (r.position || 0), 0) / postRows.length
+        const after = summarize(postRows)
+        if (after.days < 3) return null
         return {
-          clicksPerDay: clicks / distinctDays,
-          avgPosition: position,
-          daysObserved: distinctDays,
+          clicksPerDay: after.clicksPerDay,
+          avgPosition: after.avgPosition,
+          daysObserved: after.days,
         }
       })()
 
@@ -180,10 +193,7 @@ export default async function TodayPage() {
         query: b.query,
         page: b.page,
         daysSinceShipped: daysSince,
-        baseline: {
-          clicksPerDay: baselineClicksPerDay,
-          avgPosition: Number(b.baseline_avg_position),
-        },
+        baseline,
         actual,
       })
     }
