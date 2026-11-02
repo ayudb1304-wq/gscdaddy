@@ -36,3 +36,14 @@ export function getEffectivePlan(user: AppUser): string {
   if (access.plan === "trial") return "pro" // trial gets pro features
   return access.plan
 }
+
+const WELCOME_WINDOW_MS = 7 * 24 * 60 * 60 * 1000
+
+/**
+ * The dashboard welcome popup is for new accounts still on the trial: not paid
+ * users, and not long-time users who happen to open a new browser.
+ */
+export function shouldShowWelcome(user: AppUser): boolean {
+  if (checkAccess(user).plan !== "trial" || !user.created_at) return false
+  return Date.now() - new Date(user.created_at).getTime() < WELCOME_WINDOW_MS
+}

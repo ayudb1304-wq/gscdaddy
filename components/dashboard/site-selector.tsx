@@ -1,6 +1,7 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useTransition } from "react"
+import { Loader2 } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
 import {
   Select,
@@ -24,6 +25,9 @@ function formatSiteUrl(url: string): string {
 export function SiteSelector({ sites }: { sites: Site[] }) {
   const router = useRouter()
   const searchParams = useSearchParams()
+  // Server-rendered pages (Dashboard, Today) keep showing the old site until
+  // the new one has loaded; the transition tells us that's happening.
+  const [switching, startSwitch] = useTransition()
   const paramSiteId = searchParams.get("siteId")
   const paramIsValid = !!paramSiteId && sites.some((s) => s.id === paramSiteId)
   const currentSiteId = paramIsValid ? paramSiteId : sites[0]?.id
@@ -41,14 +45,24 @@ export function SiteSelector({ sites }: { sites: Site[] }) {
   const handleChange = (siteId: string) => {
     const params = new URLSearchParams(searchParams.toString())
     params.set("siteId", siteId)
-    router.push(`?${params.toString()}`)
+    startSwitch(() => router.push(`?${params.toString()}`))
   }
 
   if (sites.length === 0) return null
 
   return (
-    <Select value={currentSiteId} onValueChange={handleChange}>
-      <SelectTrigger className="w-[220px]">
+    <div className="flex items-center gap-2">
+    {switching && (
+      <div
+        role="progressbar"
+        aria-label="Loading site"
+        className="fixed inset-x-0 top-0 z-50 h-0.5 overflow-hidden bg-primary/20"
+      >
+        <div className="h-full w-1/3 animate-[site-switch_1s_ease-in-out_infinite] bg-primary" />
+      </div>
+    )}
+    <Select value={currentSiteId} onValueChange={handleChange} disabled={switching}>
+      <SelectTrigger className="w-[220px]" aria-busy={switching}>
         <SelectValue placeholder="Select a site" />
       </SelectTrigger>
       <SelectContent>
@@ -59,5 +73,7 @@ export function SiteSelector({ sites }: { sites: Site[] }) {
         ))}
       </SelectContent>
     </Select>
+    {switching && <Loader2 className="size-4 animate-spin text-muted-foreground" aria-hidden="true" />}
+    </div>
   )
 }

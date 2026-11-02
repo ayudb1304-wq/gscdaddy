@@ -22,7 +22,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { Globe, Loader2, Plus, RefreshCw, Trash2 } from "lucide-react"
+import { CheckCircle2, Globe, Loader2, Plus, RefreshCw, Trash2 } from "lucide-react"
 
 interface Site {
   id: string
@@ -64,6 +64,7 @@ export default function SitesPage() {
   const [loadingAvailable, setLoadingAvailable] = useState(false)
   const [adding, setAdding] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
+  const [actionSuccess, setActionSuccess] = useState<string | null>(null)
   const router = useRouter()
 
   async function errorMessage(res: Response, fallback: string) {
@@ -141,6 +142,7 @@ export default function SitesPage() {
   async function handleSync(siteId: string) {
     setSyncing(siteId)
     setActionError(null)
+    setActionSuccess(null)
     try {
       const res = await fetch(`/api/sites/${siteId}/sync`, { method: "POST" })
       if (!res.ok) {
@@ -183,7 +185,10 @@ export default function SitesPage() {
   }
 
   async function handleAddSite(siteUrl: string, permissionLevel: string) {
+    if (adding) return
     setAdding(siteUrl)
+    setActionError(null)
+    setActionSuccess(null)
     try {
       const res = await fetch("/api/sites", {
         method: "POST",
@@ -191,14 +196,33 @@ export default function SitesPage() {
         body: JSON.stringify({ siteUrl, permissionLevel }),
       })
       if (res.ok) {
+        const json = await res.json().catch(() => null)
+        const newSiteId: string | undefined = json?.data?.id
+        // Mark it added right away so it can't be clicked twice.
+        setAvailableSites((prev) => prev.map((s) => (s.siteUrl === siteUrl ? { ...s, isAdded: true } : s)))
         setAddDialogOpen(false)
-        setActionError(null)
+
+        // Start the first sync now. Before, a new site sat in "pending" until
+        // the next daily sync, so adding one looked like nothing happened.
+        let syncStarted = false
+        if (newSiteId) {
+          const syncRes = await fetch(`/api/sites/${newSiteId}/sync`, { method: "POST" }).catch(() => null)
+          syncStarted = !!syncRes?.ok
+        }
+        setActionSuccess(
+          syncStarted
+            ? `${formatUrl(siteUrl)} added. Pulling your last 90 days of Search Console data now; this usually takes a couple of minutes.`
+            : `${formatUrl(siteUrl)} added. Click the sync button next to it to pull your Search Console data.`
+        )
         await fetchSites()
         router.refresh()
       } else {
         setAddDialogOpen(false)
         setActionError(await errorMessage(res, "Couldn't add that site. Try again."))
       }
+    } catch {
+      setAddDialogOpen(false)
+      setActionError("Couldn't reach the server. Check your connection and try again.")
     } finally {
       setAdding(null)
     }
@@ -233,6 +257,12 @@ export default function SitesPage() {
       {actionError && (
         <p role="alert" className="rounded-lg border border-critical/30 bg-critical-soft px-4 py-3 text-sm text-critical">
           {actionError}
+        </p>
+      )}
+      {actionSuccess && (
+        <p role="status" className="flex items-start gap-2 rounded-lg border border-ok/30 bg-ok-soft px-4 py-3 text-sm">
+          <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-ok" />
+          <span>{actionSuccess}</span>
         </p>
       )}
 
