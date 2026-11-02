@@ -1,6 +1,6 @@
 import { z } from "zod/v4"
 import { successResponse, errors } from "@/lib/api/response"
-import { rateLimit } from "@/lib/api/rate-limit"
+import { sharedRateLimit } from "@/lib/api/rate-limit"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { sendEmail } from "@/lib/email/resend"
 import { HealthReportEmail } from "@/lib/health-check/report-email"
@@ -16,7 +16,8 @@ export async function POST(request: Request) {
       request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
       request.headers.get("x-real-ip") ||
       "unknown"
-    const limit = rateLimit(`health-report:${ip}`)
+    // Shared across instances: each request sends an email.
+    const limit = await sharedRateLimit(`health-report:${ip}`, { windowSeconds: 3600, max: 10 })
     if (!limit.allowed) return errors.rateLimited()
 
     const body = await request.json().catch(() => null)

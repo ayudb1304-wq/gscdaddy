@@ -19,12 +19,12 @@ Checks at hand-off: `npm run typecheck` passes, `next build` passes. `npm run li
 
 1. **Ship the fixes.** The three data fixes only reach users once this branch is merged and deployed. Open a PR to `master`.
 2. **Billing page promises features that don't exist.** `app/(dashboard)/settings/billing/page.tsx` shows "Decay alerts" (all plans) and "PDF exports" (Agency) from `lib/billing/plans.ts`; nothing implements them. Recommendation: remove until built. Don't change prices.
-3. **Start Index Watch.** Plan docs are in `docs/index-watch/` (see `START-HERE.md`). Two updates already recorded in its PLAN decision log: its migration becomes **016**, and Phase 7.4 (homepage) is mostly covered by the new homepage.
+3. **Start Index Watch.** Plan docs are in `docs/index-watch/` (see `START-HERE.md`). Two updates already recorded in its PLAN decision log: its migration becomes **018** (016 and 017 were used by the audit fixes), and Phase 7.4 (homepage) is mostly covered by the new homepage.
 
 ## Not in git (set these up in the cloud environment)
 
 - **Env vars** (from `.env.local`, never commit): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI`, `ANTHROPIC_API_KEY`, `DODO_*`, `RESEND_API_KEY`, `NEXT_PUBLIC_APP_URL`, `CRON_SECRET`, `ENCRYPTION_KEY`, `INDEXNOW_SECRET`, `HIGGSFIELD_API_KEY` (only for regenerating art). The Supabase project (`woeyotulbielflkyofwy`) is **production**: every write is live.
-- **Kit agent config.** The Index Watch kit also ships `CLAUDE.md` and `.claude/` (slash commands `/iw-next`, `/iw-verify`, `/iw-review`, `/iw-seo-page`, `/iw-status`, the `iw-reviewer` agent, permissions). They weren't committed from the local session; copy them from `~/Downloads/gscdaddy-index-watch-kit/` into the repo root yourself if you want them. Update `CLAUDE.md`'s "new migrations start at 015" line to 016.
+- **Kit agent config.** The Index Watch kit also ships `CLAUDE.md` and `.claude/` (slash commands `/iw-next`, `/iw-verify`, `/iw-review`, `/iw-seo-page`, `/iw-status`, the `iw-reviewer` agent, permissions). They weren't committed from the local session; copy them from `~/Downloads/gscdaddy-index-watch-kit/` into the repo root yourself if you want them. Update `CLAUDE.md`'s "new migrations start at 015" line to 018.
 
 ## Things to know
 

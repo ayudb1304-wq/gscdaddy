@@ -5,7 +5,7 @@ import { checkAccess } from "@/lib/billing/access"
 import { getPlanLimits } from "@/lib/billing/plans"
 import { generateRecommendations } from "@/lib/ai/generate-recommendations"
 
-export const maxDuration = 60 // AI generation can take a while
+export const maxDuration = 120 // AI generation (Sonnet with thinking) can take a while
 
 export async function POST(
   _request: Request,

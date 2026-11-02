@@ -24,6 +24,8 @@ const RecommendationSchema = z.object({
   priority: z.enum(["high", "medium", "low"]),
 })
 
+export const RECOMMENDATIONS_MODEL = "claude-sonnet-5-5"
+
 export async function generateRecommendations(siteId: string) {
   const admin = createAdminClient()
 
@@ -90,12 +92,25 @@ export async function generateRecommendations(siteId: string) {
   // JSON parsing internally — replacing the manual parse/zod pipeline we had
   // with the direct Anthropic SDK.
   const { object: recommendations } = await generateObject({
-    model: anthropic("claude-haiku-4-5"),
+    model: anthropic(RECOMMENDATIONS_MODEL),
     output: "array",
     schema: RecommendationSchema,
     system: SYSTEM_PROMPT,
     prompt: userPrompt,
-    maxOutputTokens: 4096,
+    // Sonnet 5.5 thinks by default and thinking counts toward this limit, so
+    // leave room for it plus five recommendations.
+    maxOutputTokens: 16000,
+    providerOptions: {
+      anthropic: {
+        // This AI SDK version doesn't know Sonnet 5.5 and would fall back to a
+        // forced "json" tool call, which Sonnet 5.5 rejects (400). Use native
+        // structured output (output_config.format) instead.
+        structuredOutputMode: "outputFormat",
+        // Sonnet 5.5 defaults to "high"; "medium" keeps latency and cost down
+        // for a single structured response.
+        effort: "medium",
+      },
+    },
   })
 
   // Insert into DB

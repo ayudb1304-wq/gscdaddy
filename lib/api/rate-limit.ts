@@ -32,3 +32,30 @@ export function rateLimit(key: string): {
 
   return { allowed: true, remaining: MAX_REQUESTS - entry.count, resetAt: entry.resetAt }
 }
+
+/**
+ * Rate limit shared across every serverless instance, counted in Postgres
+ * (rate_limit_hit RPC, migration 017). Use it for public, unauthenticated
+ * endpoints that do expensive or abusable work. Falls back to the in-memory
+ * limiter if the database call fails, so the endpoint stays up.
+ */
+export async function sharedRateLimit(
+  key: string,
+  { windowSeconds = 60, max = 10 }: { windowSeconds?: number; max?: number } = {}
+): Promise<{ allowed: boolean; remaining: number }> {
+  try {
+    const { createAdminClient } = await import("@/lib/supabase/admin")
+    const { data, error } = await createAdminClient().rpc("rate_limit_hit", {
+      p_key: key,
+      p_window_seconds: windowSeconds,
+      p_max: max,
+    })
+    const row = Array.isArray(data) ? data[0] : data
+    if (error || !row) throw error ?? new Error("rate_limit_hit returned no row")
+    return { allowed: Boolean(row.allowed), remaining: Number(row.remaining) }
+  } catch (err) {
+    console.error("Shared rate limit unavailable, using in-memory limit:", err)
+    const { allowed, remaining } = rateLimit(key)
+    return { allowed, remaining }
+  }
+}
