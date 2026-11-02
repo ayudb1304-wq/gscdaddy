@@ -14,6 +14,19 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const { plan, interval } = schema.parse(body)
 
+    // Don't start a second subscription for someone who already pays (or whose
+    // payment is being retried): that double-bills them. Plan changes go
+    // through /api/billing/change-plan.
+    const existing = (user.subscriptions ?? []).find(
+      (s: { status: string }) => s.status === "active" || s.status === "past_due"
+    )
+    if (existing) {
+      return NextResponse.json(
+        { error: "You already have a subscription. Change plans from the billing page or update your payment method." },
+        { status: 409 }
+      )
+    }
+
     const client = getDodoClient()
     const productId = getProductId(plan, interval)
 

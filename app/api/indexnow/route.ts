@@ -1,3 +1,4 @@
+import { isAuthorizedBearer } from "@/lib/api/bearer"
 import { NextRequest, NextResponse } from "next/server"
 
 const INDEXNOW_KEY = "63f303fd44293ae3d9e48879b618d67e"
@@ -5,7 +6,7 @@ const SITE_URL = "https://gscdaddy.com"
 
 export async function POST(request: NextRequest) {
   const authHeader = request.headers.get("authorization")
-  if (authHeader !== `Bearer ${process.env.INDEXNOW_SECRET}`) {
+  if (!isAuthorizedBearer(authHeader, process.env.INDEXNOW_SECRET)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
