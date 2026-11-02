@@ -182,8 +182,9 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const currentMetrics = aggregate(current)
   const priorMetrics = aggregate(prior)
 
-  const pctChange = (curr: number, prev: number) => {
-    if (prev === 0) return curr > 0 ? 100 : 0
+  const pctChange = (curr: number, prev: number): number | null => {
+    // No prior data to compare against: show "New" rather than a fake +100%.
+    if (prev === 0) return curr > 0 ? null : 0
     return Math.round(((curr - prev) / prev) * 1000) / 10
   }
 

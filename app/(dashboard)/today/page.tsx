@@ -6,6 +6,7 @@ import { ShippedRecsBand, type ShippedRec } from "@/components/today/shipped-rec
 import { MoversBand, type Mover } from "@/components/today/movers-band"
 import { TodaysFocusBand, type FocusRec } from "@/components/today/todays-focus-band"
 import { TodayEmptyState } from "@/components/today/empty-state"
+import { isSyncInProgress } from "@/lib/sync/gsc-sync"
 
 function fmt(d: Date): string {
   return d.toISOString().split("T")[0]
@@ -29,7 +30,7 @@ export default async function TodayPage() {
 
   const { data: sitesRaw } = await admin
     .from("sites")
-    .select("id, site_url, display_name, sync_status, last_synced_at")
+    .select("*")
     .eq("user_id", user.id)
     .order("created_at", { ascending: true })
 
@@ -50,10 +51,14 @@ export default async function TodayPage() {
   // Empty state: first sync still running (no site has ever synced)
   const anySynced = sites.some((s) => s.last_synced_at)
   if (!anySynced) {
+    // A failed (or timed-out) first sync used to show "running" forever.
+    const stillRunning = sites.some(
+      (s) => s.sync_status === "pending" || isSyncInProgress(s.sync_status, s.sync_started_at)
+    )
     return (
       <div className="space-y-4">
         <Header name={user.name} />
-        <TodayEmptyState kind="first-sync" name={user.name} />
+        <TodayEmptyState kind={stillRunning ? "first-sync" : "first-sync-failed"} name={user.name} />
       </div>
     )
   }

@@ -1,3 +1,5 @@
+// Only list features that exist. Decay alerts, PDF exports, team access and
+// white label were listed here (and shown on the billing page) but never built.
 export const PLANS = {
   free: {
     sites: 1,
@@ -8,7 +10,7 @@ export const PLANS = {
     sites: 1,
     aiRecsPerDay: 5,
     price: { monthly: 19, annual: 15 },
-    features: ["striking_distance", "weekly_email", "decay_alerts"],
+    features: ["striking_distance", "weekly_email"],
   },
   pro: {
     sites: 5,
@@ -17,7 +19,6 @@ export const PLANS = {
     features: [
       "striking_distance",
       "ai_recs",
-      "decay_alerts",
       "csv_exports",
       "weekly_email",
       "priority_support",
@@ -30,10 +31,7 @@ export const PLANS = {
     features: [
       "striking_distance",
       "ai_recs",
-      "decay_alerts",
-      "pdf_exports",
-      "team_access",
-      "white_label",
+      "csv_exports",
       "weekly_email",
       "priority_support",
     ],

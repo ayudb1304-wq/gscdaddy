@@ -14,6 +14,12 @@ DECLARE
   v_clicks INT;
   v_ctr NUMERIC;
 BEGIN
+  -- Only seeds the original dev site. On a fresh database that site doesn't
+  -- exist and the inserts failed with a foreign-key error, breaking setup.
+  IF NOT EXISTS (SELECT 1 FROM sites WHERE id = v_site_id) THEN
+    RAISE NOTICE 'Skipping dummy seed: site % does not exist', v_site_id;
+    RETURN;
+  END IF;
 
   -- Define keyword/page combos with base metrics
   -- Striking distance keywords (position 5-15)
