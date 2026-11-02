@@ -117,9 +117,11 @@ export function Hero() {
       {/* Product: a real capture of the app (demo site), with the next step acted out on top */}
       <div className="relative mx-auto mt-14 max-w-6xl px-4 pb-0 md:mt-20 md:px-8">
         <motion.div
-          initial={reduce ? false : { opacity: 0, y: 60 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.1, delay: 0.6, ease: EASE }}
+          // Visible from the first paint (it holds the priority LCP image);
+          // only the slide-up animates.
+          initial={reduce ? false : { y: 60 }}
+          animate={{ y: 0 }}
+          transition={{ duration: 1.1, delay: 0.2, ease: EASE }}
           style={{ y: reduce ? 0 : frameY }}
         >
           <BrowserFrame url="gscdaddy.com/reports/striking-distance" className="translate-y-8 rounded-b-none">

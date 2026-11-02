@@ -244,6 +244,8 @@ async function main() {
           topRecommendationText: r.topRecommendationText,
         }),
       })
+      // Resend allows ~2 requests/second.
+      await new Promise((resolve) => setTimeout(resolve, 600))
 
       if (result?.id) {
         console.log(`  ✓ SENT (Resend id: ${result.id})\n`)

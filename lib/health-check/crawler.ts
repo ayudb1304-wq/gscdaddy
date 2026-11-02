@@ -208,16 +208,21 @@ export async function crawlUrl(rawUrl: string): Promise<CrawlResult> {
     html,
     /<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi
   )
+  // @type can be a string or an array (Yoast emits ["WebPage","FAQPage"]), and
+  // a block can be a top-level array of nodes. Both used to break scoring.
   const jsonLdSchemas: string[] = []
+  const addTypes = (node: unknown) => {
+    if (!node || typeof node !== "object") return
+    const t = (node as Record<string, unknown>)["@type"]
+    for (const v of Array.isArray(t) ? t : [t]) if (typeof v === "string" && v) jsonLdSchemas.push(v)
+    const graph = (node as Record<string, unknown>)["@graph"]
+    if (Array.isArray(graph)) graph.forEach(addTypes)
+  }
   for (const block of jsonLdBlocks) {
     try {
       const parsed = JSON.parse(block)
-      if (parsed["@type"]) jsonLdSchemas.push(parsed["@type"])
-      if (Array.isArray(parsed["@graph"])) {
-        for (const item of parsed["@graph"]) {
-          if (item["@type"]) jsonLdSchemas.push(item["@type"])
-        }
-      }
+      if (Array.isArray(parsed)) parsed.forEach(addTypes)
+      else addTypes(parsed)
     } catch {
       // malformed JSON-LD, skip
     }

@@ -25,29 +25,32 @@ export async function POST(req: NextRequest) {
   }
 
   const admin = createAdminClient()
+  // When the event happened at Dodo; older events than the last one applied
+  // to a subscription are skipped (Dodo doesn't guarantee delivery order).
+  const eventAt = new Date((event as { timestamp?: string }).timestamp ?? Date.now()).toISOString()
 
   try {
   switch (event.type) {
     // Subscription events
     case "subscription.active":
     case "subscription.renewed": {
-      await handleSubscriptionActive(admin, event.data as Subscriptions.Subscription)
+      await handleSubscriptionActive(admin, event.data as Subscriptions.Subscription, eventAt)
       break
     }
     case "subscription.on_hold": {
-      await handleSubscriptionStatusChange(admin, event.data as Subscriptions.Subscription, "past_due")
+      await handleSubscriptionStatusChange(admin, event.data as Subscriptions.Subscription, "past_due", eventAt)
       break
     }
     case "subscription.cancelled": {
-      await handleSubscriptionStatusChange(admin, event.data as Subscriptions.Subscription, "canceled")
+      await handleSubscriptionStatusChange(admin, event.data as Subscriptions.Subscription, "canceled", eventAt)
       break
     }
     case "subscription.failed": {
-      await handleSubscriptionStatusChange(admin, event.data as Subscriptions.Subscription, "past_due")
+      await handleSubscriptionStatusChange(admin, event.data as Subscriptions.Subscription, "past_due", eventAt)
       break
     }
     case "subscription.expired": {
-      await handleSubscriptionStatusChange(admin, event.data as Subscriptions.Subscription, "canceled")
+      await handleSubscriptionStatusChange(admin, event.data as Subscriptions.Subscription, "canceled", eventAt)
       break
     }
     case "subscription.plan_changed":
@@ -58,15 +61,15 @@ export async function POST(req: NextRequest) {
       const sub = event.data as Subscriptions.Subscription
       switch (sub.status) {
         case "active":
-          await handleSubscriptionActive(admin, sub)
+          await handleSubscriptionActive(admin, sub, eventAt)
           break
         case "on_hold":
-          await handleSubscriptionStatusChange(admin, sub, "past_due")
+          await handleSubscriptionStatusChange(admin, sub, "past_due", eventAt)
           break
         case "cancelled":
         case "expired":
         case "failed":
-          await handleSubscriptionStatusChange(admin, sub, "canceled")
+          await handleSubscriptionStatusChange(admin, sub, "canceled", eventAt)
           break
         default:
           console.log(`Ignoring ${event.type} with status ${sub.status}`)
@@ -102,18 +105,56 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ received: true })
 }
 
+type Admin = ReturnType<typeof createAdminClient>
+
+let trackingColumns: boolean | null = null
+/** Whether migration 018's subscriptions.last_event_at / billing_interval exist. */
+async function hasTrackingColumns(admin: Admin): Promise<boolean> {
+  if (trackingColumns === null) {
+    const { error } = await admin.from("subscriptions").select("last_event_at, billing_interval").limit(1)
+    trackingColumns = !error
+  }
+  return trackingColumns
+}
+
+/** True when a newer event than `eventAt` was already applied to this subscription. */
+async function isStaleEvent(admin: Admin, subscriptionId: string, eventAt: string): Promise<boolean> {
+  if (!(await hasTrackingColumns(admin))) return false
+  const { data } = await admin
+    .from("subscriptions")
+    .select("last_event_at")
+    .eq("dodo_subscription_id", subscriptionId)
+    .maybeSingle()
+  if (data?.last_event_at && new Date(data.last_event_at) > new Date(eventAt)) {
+    console.log(`Skipping out-of-order webhook for ${subscriptionId} (event ${eventAt}, applied ${data.last_event_at})`)
+    return true
+  }
+  return false
+}
+
 async function handleSubscriptionActive(
-  admin: ReturnType<typeof createAdminClient>,
-  data: Subscriptions.Subscription
+  admin: Admin,
+  data: Subscriptions.Subscription,
+  eventAt: string
 ) {
   const userId = data.metadata?.user_id
   if (!userId) {
     console.error("Webhook missing user_id in metadata", { subscriptionId: data.subscription_id })
     return
   }
+  if (await isStaleEvent(admin, data.subscription_id, eventAt)) return
+
+  // The account may have been deleted (we cancel its subscriptions, but a
+  // renewal could already be in flight): don't fail the webhook on the FK.
+  const { data: userRow } = await admin.from("users").select("id").eq("id", userId).maybeSingle()
+  if (!userRow) {
+    console.warn(`Subscription ${data.subscription_id} belongs to a deleted user; ignoring`)
+    return
+  }
 
   const planInfo = planFromProductId(data.product_id)
   const plan = planInfo?.plan ?? data.metadata?.plan ?? "blogger"
+  const tracking = await hasTrackingColumns(admin)
 
   await must(admin.from("subscriptions").upsert(
     {
@@ -126,6 +167,7 @@ async function handleSubscriptionActive(
       current_period_end: data.next_billing_date ?? null,
       cancel_at_period_end: data.cancel_at_next_billing_date ?? false,
       updated_at: new Date().toISOString(),
+      ...(tracking ? { last_event_at: eventAt, billing_interval: planInfo?.interval ?? data.metadata?.interval ?? null } : {}),
     },
     { onConflict: "dodo_subscription_id" }
   ))
@@ -142,17 +184,21 @@ async function handleSubscriptionActive(
 }
 
 async function handleSubscriptionStatusChange(
-  admin: ReturnType<typeof createAdminClient>,
+  admin: Admin,
   data: Subscriptions.Subscription,
-  status: "canceled" | "past_due" | "paused"
+  status: "canceled" | "past_due" | "paused",
+  eventAt: string
 ) {
   const userId = data.metadata?.user_id
+  if (await isStaleEvent(admin, data.subscription_id, eventAt)) return
+  const tracking = await hasTrackingColumns(admin)
 
   await must(admin
     .from("subscriptions")
     .update({
       status,
       updated_at: new Date().toISOString(),
+      ...(tracking ? { last_event_at: eventAt } : {}),
     })
     .eq("dodo_subscription_id", data.subscription_id))
 
@@ -174,14 +220,17 @@ async function handlePaymentSucceeded(
 ) {
   if (!data.subscription_id) return
 
-  // Update subscription period dates on successful renewal payment
+  // A successful payment clears a failed one (past_due -> active). It must not
+  // revive a cancelled or refunded subscription: a retried payment.succeeded
+  // arriving after a refund used to re-grant paid access.
   await must(admin
     .from("subscriptions")
     .update({
       status: "active",
       updated_at: new Date().toISOString(),
     })
-    .eq("dodo_subscription_id", data.subscription_id))
+    .eq("dodo_subscription_id", data.subscription_id)
+    .in("status", ["active", "past_due"]))
 }
 
 async function handlePaymentFailed(
@@ -190,14 +239,16 @@ async function handlePaymentFailed(
 ) {
   if (!data.subscription_id) return
 
-  // Mark subscription as past_due when a payment fails
+  // Mark an active subscription past_due when a payment fails (grace period
+  // applies in checkAccess). Never touch cancelled ones.
   await must(admin
     .from("subscriptions")
     .update({
       status: "past_due",
       updated_at: new Date().toISOString(),
     })
-    .eq("dodo_subscription_id", data.subscription_id))
+    .eq("dodo_subscription_id", data.subscription_id)
+    .eq("status", "active"))
 }
 
 async function handleRefundSucceeded(
@@ -205,6 +256,11 @@ async function handleRefundSucceeded(
   data: Refunds.Refund,
   client: ReturnType<typeof getDodoClient>
 ) {
+  // A partial (goodwill) refund doesn't end the subscription.
+  if (data.is_partial) {
+    console.log("Partial refund; subscription unchanged", { paymentId: data.payment_id })
+    return
+  }
   // Refund metadata is usually empty, so resolve the subscription through the
   // refunded payment.
   let subscriptionId = (data.metadata as Record<string, string> | undefined)?.subscription_id ?? null
@@ -228,7 +284,14 @@ async function handleRefundSucceeded(
     return
   }
 
-  // Downgrade user on refund
+  // Full refund: stop future charges at Dodo too (otherwise the next renewal
+  // bills and re-activates them), then downgrade.
+  try {
+    await client.subscriptions.update(sub.dodo_subscription_id, { status: "cancelled" })
+  } catch (err) {
+    console.error(`Couldn't cancel refunded subscription ${sub.dodo_subscription_id} at Dodo:`, err)
+  }
+
   await must(admin
     .from("subscriptions")
     .update({

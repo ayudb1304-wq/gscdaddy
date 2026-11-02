@@ -60,7 +60,7 @@ export async function POST(request: Request) {
     const score = check.results?.score?.overall ?? check.score ?? 0
     const reportUrl = `https://gscdaddy.com/seo-health-checker/${check.domain}`
 
-    await sendEmail({
+    const sent = await sendEmail({
       to: email,
       subject: `Your SEO Health Score: ${score}/100 for ${check.domain}`,
       react: HealthReportEmail({
@@ -70,6 +70,12 @@ export async function POST(request: Request) {
         categories: check.results?.score?.categories ?? [],
       }),
     })
+
+    if (!sent) {
+      // Release the one-report claim so the visitor can try again.
+      await admin.from("health_checks").update({ email: null }).eq("id", healthCheckId)
+      return errors.internal("We couldn't send the report email. Please try again.")
+    }
 
     return successResponse({ sent: true })
   } catch (e) {

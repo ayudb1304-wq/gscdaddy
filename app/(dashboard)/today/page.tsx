@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation"
-import { getCurrentUser } from "@/lib/auth"
+import { getCurrentUser, getUserSites } from "@/lib/auth"
 import { fetchAllRows } from "@/lib/supabase/fetch-all"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { ShippedRecsBand, type ShippedRec } from "@/components/today/shipped-recs-band"
@@ -31,13 +31,8 @@ export default async function TodayPage() {
 
   const admin = createAdminClient()
 
-  const { data: sitesRaw } = await admin
-    .from("sites")
-    .select("*")
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: true })
-
-  const sites = sitesRaw || []
+  // Cached per request: the layout ran the same query.
+  const sites = await getUserSites(user.id)
   const siteIds = sites.map((s) => s.id)
   const siteById = new Map(sites.map((s) => [s.id, s]))
 

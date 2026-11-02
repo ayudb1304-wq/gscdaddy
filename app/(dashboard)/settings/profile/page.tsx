@@ -28,6 +28,7 @@ export default function ProfilePage() {
   const [user, setUser] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [deleting, setDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   useEffect(() => {
     fetch("/api/users/profile")
@@ -39,11 +40,17 @@ export default function ProfilePage() {
 
   async function handleDeleteAccount() {
     setDeleting(true)
+    setDeleteError(null)
     try {
       const res = await fetch("/api/users/profile", { method: "DELETE" })
       if (res.ok) {
         window.location.href = "/"
+        return
       }
+      const body = await res.json().catch(() => null)
+      setDeleteError(body?.error || "Couldn't delete your account. Please try again.")
+    } catch {
+      setDeleteError("Couldn't reach the server. Please try again.")
     } finally {
       setDeleting(false)
     }
@@ -132,6 +139,9 @@ export default function ProfilePage() {
               <p className="text-xs text-muted-foreground">
                 Permanently delete your account and all associated data. This cannot be undone.
               </p>
+              {deleteError && (
+                <p role="alert" className="mt-2 text-xs text-critical">{deleteError}</p>
+              )}
             </div>
             <AlertDialog>
               <AlertDialogTrigger asChild>
@@ -144,8 +154,8 @@ export default function ProfilePage() {
                 <AlertDialogHeader>
                   <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This will permanently delete your account, all connected sites, synced data,
-                    recommendations, and subscription. This action cannot be undone.
+                    This cancels your subscription (no further charges) and permanently deletes your
+                    account, all connected sites, synced data and recommendations. This can&apos;t be undone.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>

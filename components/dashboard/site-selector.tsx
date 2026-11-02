@@ -33,14 +33,18 @@ export function SiteSelector({ sites }: { sites: Site[] }) {
   const currentSiteId = paramIsValid ? paramSiteId : sites[0]?.id
 
   // Ensure a valid siteId is always in the URL so client pages can read it
-  // (also replaces a stale one, e.g. after the site was removed).
+  // (also replaces a stale one, e.g. after the site was removed). Uses the
+  // History API, which Next.js syncs with useSearchParams, instead of
+  // router.replace(): that re-rendered the whole server page (e.g. Today ran
+  // all its queries twice on every arrival). Server pages already fall back to
+  // the first site when the param is missing.
   useEffect(() => {
     if (sites.length > 0 && !paramIsValid) {
       const params = new URLSearchParams(searchParams.toString())
       params.set("siteId", sites[0].id)
-      router.replace(`?${params.toString()}`)
+      window.history.replaceState(window.history.state, "", `?${params.toString()}`)
     }
-  }, [sites, searchParams, router, paramIsValid])
+  }, [sites, searchParams, paramIsValid])
 
   const handleChange = (siteId: string) => {
     const params = new URLSearchParams(searchParams.toString())

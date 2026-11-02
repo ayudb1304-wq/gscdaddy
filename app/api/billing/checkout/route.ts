@@ -11,8 +11,12 @@ const schema = z.object({
 export async function POST(req: NextRequest) {
   try {
     const user = await requireAuth()
-    const body = await req.json()
-    const { plan, interval } = schema.parse(body)
+    const body = await req.json().catch(() => null)
+    const parsed = schema.safeParse(body)
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Choose a valid plan and billing interval." }, { status: 400 })
+    }
+    const { plan, interval } = parsed.data
 
     // Don't start a second subscription for someone who already pays (or whose
     // payment is being retried): that double-bills them. Plan changes go

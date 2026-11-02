@@ -1,10 +1,10 @@
 import { redirect } from "next/navigation"
-import { getCurrentUser } from "@/lib/auth"
+import { getCurrentUser, getUserSites } from "@/lib/auth"
 import { getDailySeries, summarize } from "@/lib/metrics/daily-series"
 import { isSyncInProgress } from "@/lib/sync/gsc-sync"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { MetricsCards } from "@/components/dashboard/metrics-cards"
-import { PerformanceChart } from "@/components/dashboard/performance-chart"
+import { PerformanceChart } from "@/components/dashboard/performance-chart-lazy"
 import { TopOpportunities } from "@/components/dashboard/top-opportunities"
 import { RecentRecs } from "@/components/dashboard/recent-recs"
 import { SyncRecsBar } from "@/components/dashboard/sync-recs-bar"
@@ -20,12 +20,8 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const { siteId: siteIdParam } = await searchParams
   const admin = createAdminClient()
 
-  // Get user's sites to determine which to show
-  const { data: sites } = await admin
-    .from("sites")
-    .select("id, site_url, sync_status, sync_started_at, last_synced_at")
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: true })
+  // Get user's sites to determine which to show (cached: the layout ran the same query)
+  const sites = await getUserSites(user.id)
 
   if (!sites || sites.length === 0) {
     return (

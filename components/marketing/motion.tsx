@@ -85,8 +85,10 @@ export function BlurInWords({
         <motion.span
           key={`${word}-${i}`}
           className={cn("inline-block whitespace-pre", wordClassName?.(word, i))}
-          initial={reduce ? false : { opacity: 0, y: "0.25em", filter: "blur(12px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          // Transform only: the headline is the page's largest text, and words
+          // rendered at opacity 0 / blurred until hydration delayed LCP.
+          initial={reduce ? false : { y: "0.25em" }}
+          animate={{ y: 0 }}
           transition={{ duration: 0.9, delay: delay + i * 0.08, ease: EASE }}
         >
           {word}

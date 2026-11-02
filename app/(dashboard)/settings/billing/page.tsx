@@ -10,6 +10,10 @@ import { cn } from "@/lib/utils"
 interface Usage {
   plan: string
   daysRemaining?: number
+  pastDue?: boolean
+  hasSubscription?: boolean
+  subscriptionPlan?: string | null
+  billingInterval?: "monthly" | "annual" | null
   sitesUsed: number
   sitesLimit: number
   recsToday: number
@@ -23,7 +27,11 @@ export default function BillingPage() {
   const [loading, setLoading] = useState(true)
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null)
   const [portalLoading, setPortalLoading] = useState(false)
-  const [interval, setInterval] = useState<"monthly" | "annual">("annual")
+  // Defaults to the subscriber's current interval once usage loads (it always
+  // defaulted to annual, so a monthly customer clicking a plan got billed annually).
+  const [interval, setInterval] = useState<"monthly" | "annual">("monthly")
+  const [actionError, setActionError] = useState<string | null>(null)
+  const [processing, setProcessing] = useState(false)
 
   useEffect(() => {
     async function init() {
@@ -32,30 +40,63 @@ export default function BillingPage() {
       const subId = sessionStorage.getItem("pending_subscription_id")
       if (params.get("checkout") === "success" && subId) {
         sessionStorage.removeItem("pending_subscription_id")
-        // Poll up to 5 times for activation
-        for (let i = 0; i < 5; i++) {
+        // Poll for activation (about 30s); the webhook can lag behind the redirect.
+        let activated = false
+        for (let i = 0; i < 15 && !activated; i++) {
           const res = await fetch("/api/billing/verify", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ subscriptionId: subId }),
-          })
-          const data = await res.json()
-          if (data.activated) break
-          await new Promise((r) => setTimeout(r, 2000))
+          }).catch(() => null)
+          const data = res ? await res.json().catch(() => null) : null
+          activated = !!data?.activated
+          if (!activated) await new Promise((r) => setTimeout(r, 2000))
+        }
+        // Not confirmed yet: say so, and block a second checkout for a while
+        // instead of silently showing "Upgrade" again (people paid twice).
+        if (!activated) {
+          try {
+            sessionStorage.setItem("checkout_processing_until", String(Date.now() + 10 * 60_000))
+          } catch {}
         }
         // Clean URL
         window.history.replaceState({}, "", "/settings/billing")
       }
 
+      try {
+        setProcessing(Number(sessionStorage.getItem("checkout_processing_until") ?? 0) > Date.now())
+      } catch {}
+
       const res = await fetch("/api/billing/usage")
-      const data = await res.json()
-      setUsage(data)
+      const data = res.ok ? await res.json().catch(() => null) : null
+      if (data?.plan) {
+        setUsage(data)
+        if (data.billingInterval === "annual" || data.billingInterval === "monthly") setInterval(data.billingInterval)
+        if (data.hasSubscription) {
+          setProcessing(false)
+          try {
+            sessionStorage.removeItem("checkout_processing_until")
+          } catch {}
+        }
+      }
       setLoading(false)
     }
     init()
   }, [])
 
   async function handlePlanAction(plan: string) {
+    setActionError(null)
+    if (isPaid) {
+      const cfg = PLANS[plan as keyof typeof PLANS] as { price?: { monthly: number; annual: number } }
+      const price = cfg.price ? (interval === "annual" ? `$${cfg.price.annual}/mo billed yearly` : `$${cfg.price.monthly}/mo`) : ""
+      const upgrade = PLAN_ORDER.indexOf(plan as (typeof PLAN_ORDER)[number]) > PLAN_ORDER.indexOf((usage?.subscriptionPlan ?? "blogger") as (typeof PLAN_ORDER)[number])
+      const ok = window.confirm(
+        upgrade
+          ? `Switch to ${plan} (${price})? You'll be charged the prorated difference now.`
+          : `Switch to ${plan} (${price})? The change takes effect at your next billing date.`
+      )
+      if (!ok) return
+    }
     setCheckoutLoading(plan)
     try {
       if (isPaid) {
@@ -65,11 +106,13 @@ export default function BillingPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ plan, interval }),
         })
-        const data = await res.json()
-        if (data.success) {
+        const data = await res.json().catch(() => null)
+        if (data?.success) {
           // Refresh usage to reflect new plan
           const usageRes = await fetch("/api/billing/usage")
-          setUsage(await usageRes.json())
+          if (usageRes.ok) setUsage(await usageRes.json())
+        } else {
+          setActionError(data?.error || "Couldn't change your plan. Please try again.")
         }
       } else {
         // No subscription — create new checkout
@@ -78,12 +121,16 @@ export default function BillingPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ plan, interval }),
         })
-        const data = await res.json()
-        if (data.url) {
+        const data = await res.json().catch(() => null)
+        if (data?.url) {
           sessionStorage.setItem("pending_subscription_id", data.subscriptionId)
           window.location.href = data.url
+        } else {
+          setActionError(data?.error || "Couldn't start checkout. Please try again.")
         }
       }
+    } catch {
+      setActionError("Couldn't reach the server. Please try again.")
     } finally {
       setCheckoutLoading(null)
     }
@@ -112,7 +159,9 @@ export default function BillingPage() {
 
   if (!usage) return null
 
-  const isPaid = ["blogger", "pro", "agency"].includes(usage.plan)
+  // Subscribed (active, or payment failed and being retried): manage the
+  // subscription rather than starting a new checkout.
+  const isPaid = !!usage.hasSubscription || ["blogger", "pro", "agency"].includes(usage.plan)
   const isTrial = usage.plan === "trial"
   const isFree = usage.plan === "free"
 
@@ -126,7 +175,14 @@ export default function BillingPage() {
             <p className="text-sm text-muted-foreground">Current plan</p>
             <div className="mt-1 flex items-center gap-3">
               <p className="text-xl font-semibold capitalize">
-                {isTrial ? "Free Trial" : isFree ? "Free" : usage.plan}
+                {usage.hasSubscription && usage.subscriptionPlan
+                  ? usage.subscriptionPlan
+                  : isTrial ? "Free Trial" : isFree ? "Free" : usage.plan}
+                {usage.hasSubscription && usage.billingInterval && (
+                  <span className="ml-2 text-sm font-normal text-muted-foreground normal-case">
+                    ({usage.billingInterval})
+                  </span>
+                )}
               </p>
               {isTrial && usage.daysRemaining != null && (
                 <Badge variant="secondary" className="text-xs">
@@ -146,6 +202,24 @@ export default function BillingPage() {
             </Button>
           )}
         </div>
+
+        {usage.pastDue && (
+          <p role="alert" className="mt-4 rounded-lg border border-warning/30 bg-warning-soft px-4 py-3 text-sm">
+            Your last payment didn&apos;t go through. You still have full access for now; update your payment
+            method under <strong>Manage subscription</strong> to keep it.
+          </p>
+        )}
+        {processing && !usage.hasSubscription && (
+          <p role="status" className="mt-4 rounded-lg border px-4 py-3 text-sm text-muted-foreground">
+            We&apos;re waiting for the payment provider to confirm your payment. This usually takes under a
+            minute; refresh this page shortly. Your plan activates automatically.
+          </p>
+        )}
+        {actionError && (
+          <p role="alert" className="mt-4 rounded-lg border border-critical/30 bg-critical-soft px-4 py-3 text-sm text-critical">
+            {actionError}
+          </p>
+        )}
 
         {/* Usage bars */}
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -203,7 +277,11 @@ export default function BillingPage() {
               const config = PLANS[plan]
               const prices = config.price as { monthly: number; annual: number }
               const price = interval === "annual" ? prices.annual : prices.monthly
-              const isCurrent = usage.plan === plan
+              // Current = same plan AND same billing interval, so a monthly
+              // subscriber can still switch the same plan to annual.
+              const currentPlan = usage.hasSubscription ? usage.subscriptionPlan : usage.plan
+              const isCurrent =
+                currentPlan === plan && (!usage.hasSubscription || !usage.billingInterval || usage.billingInterval === interval)
               const isHighlighted = plan === "pro"
 
               return (
@@ -256,7 +334,7 @@ export default function BillingPage() {
                   <Button
                     className="mt-5 w-full"
                     variant={isCurrent ? "outline" : isHighlighted ? "default" : "outline"}
-                    disabled={isCurrent || checkoutLoading !== null}
+                    disabled={isCurrent || checkoutLoading !== null || (processing && !isPaid)}
                     onClick={() => handlePlanAction(plan)}
                   >
                     {checkoutLoading === plan && (
@@ -264,9 +342,11 @@ export default function BillingPage() {
                     )}
                     {isCurrent
                       ? "Current plan"
-                      : isPaid && PLAN_ORDER.indexOf(plan) < PLAN_ORDER.indexOf(usage.plan as typeof PLAN_ORDER[number])
-                        ? "Downgrade"
-                        : "Upgrade"}
+                      : isPaid && currentPlan === plan
+                        ? `Switch to ${interval}`
+                        : isPaid && PLAN_ORDER.indexOf(plan) < PLAN_ORDER.indexOf(currentPlan as typeof PLAN_ORDER[number])
+                          ? "Downgrade"
+                          : "Upgrade"}
                   </Button>
                 </div>
               )

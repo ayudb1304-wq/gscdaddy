@@ -2,6 +2,16 @@ import { requireAuth } from "@/lib/auth"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { successResponse, errors } from "@/lib/api/response"
 import { estimateTrafficGain } from "@/lib/algorithms/opportunity-score"
+import { checkAccess, getEffectivePlan } from "@/lib/billing/access"
+import { hasFeature } from "@/lib/billing/plans"
+import { isUuid, intParam } from "@/lib/api/validate"
+
+const SORTS = new Set(["opportunity_score", "total_impressions", "total_clicks", "avg_position", "avg_ctr"])
+const num = (v: string | null) => {
+  if (v === null || v === "") return null
+  const n = Number(v)
+  return Number.isFinite(n) ? n : null
+}
 
 export async function GET(
   request: Request,
@@ -10,7 +20,18 @@ export async function GET(
   try {
     const user = await requireAuth()
     const { siteId } = await params
+    if (!isUuid(siteId)) return errors.notFound("Site")
     const { searchParams } = new URL(request.url)
+
+    // Expired users could still pull every keyword through the API.
+    if (!checkAccess(user).hasAccess) return errors.trialExpired()
+
+    // CSV export pages through up to 1,000 rows at a time and is a Pro/Agency
+    // feature (it worked on every plan). Normal table views cap at 100 rows.
+    const isExport = searchParams.get("export") === "1"
+    if (isExport && !hasFeature(getEffectivePlan(user), "csv_exports")) {
+      return errors.planLimit("CSV export is included in the Pro and Agency plans.")
+    }
 
     const admin = createAdminClient()
 
@@ -24,20 +45,15 @@ export async function GET(
 
     if (siteError || !site) return errors.notFound("Site")
 
-    const sortBy = searchParams.get("sortBy") || "opportunity_score"
-    const sortOrder = searchParams.get("sortOrder") || "desc"
-    const page = parseInt(searchParams.get("page") || "1", 10)
-    const limit = Math.min(parseInt(searchParams.get("limit") || "25", 10), 10000)
-    const search = searchParams.get("search") || null
-    const minImpressions = searchParams.get("minImpressions")
-      ? parseInt(searchParams.get("minImpressions")!, 10)
-      : null
-    const minPosition = searchParams.get("minPosition")
-      ? parseFloat(searchParams.get("minPosition")!)
-      : null
-    const maxPosition = searchParams.get("maxPosition")
-      ? parseFloat(searchParams.get("maxPosition")!)
-      : null
+    // Clamped: page <= 0 or a negative limit made the SQL OFFSET/LIMIT throw (500).
+    const sortBy = SORTS.has(searchParams.get("sortBy") ?? "") ? searchParams.get("sortBy")! : "opportunity_score"
+    const sortOrder = searchParams.get("sortOrder") === "asc" ? "asc" : "desc"
+    const page = intParam(searchParams.get("page"), 1, 1, 100_000)
+    const limit = intParam(searchParams.get("limit"), 25, 1, isExport ? 1000 : 100)
+    const search = (searchParams.get("search") || "").slice(0, 200) || null
+    const minImpressions = num(searchParams.get("minImpressions"))
+    const minPosition = num(searchParams.get("minPosition"))
+    const maxPosition = num(searchParams.get("maxPosition"))
 
     const { data, error } = await admin.rpc("get_striking_distance", {
       p_site_id: siteId,
@@ -46,7 +62,7 @@ export async function GET(
       p_page: page,
       p_limit: limit,
       p_search: search,
-      p_min_impressions: minImpressions,
+      p_min_impressions: minImpressions === null ? null : Math.max(0, Math.round(minImpressions)),
       p_min_position: minPosition,
       p_max_position: maxPosition,
     })

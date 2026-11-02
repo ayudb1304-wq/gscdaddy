@@ -18,9 +18,18 @@ export async function GET() {
     const siteIds = (userSites ?? []).map((s) => s.id)
     const recsToday = await manualRecsUsedToday(admin, user.id, siteIds)
 
+    // The subscription the billing page manages: active, or payment failed.
+    const sub = (user.subscriptions ?? []).find(
+      (x: { status: string }) => x.status === "active" || x.status === "past_due"
+    ) as { status: string; plan: string; billing_interval?: string | null } | undefined
+
     return NextResponse.json({
       plan: access.plan,
       daysRemaining: access.daysRemaining,
+      pastDue: sub?.status === "past_due",
+      hasSubscription: !!sub,
+      subscriptionPlan: sub?.plan ?? null,
+      billingInterval: sub?.billing_interval ?? null,
       sitesUsed: siteIds.length,
       sitesLimit: limits.sites,
       recsToday,

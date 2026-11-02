@@ -42,7 +42,7 @@ const columns = [
   { key: "total_clicks", label: "Clicks", sortable: true },
   { key: "avg_ctr", label: "CTR", sortable: true },
   { key: "opportunity_score", label: "Opportunity", sortable: true },
-  { key: "traffic_gain", label: "Est. Traffic Gain", sortable: false },
+  { key: "traffic_gain", label: "Clicks/mo at #3", sortable: false },
 ]
 
 function formatPageUrl(url: string): string {

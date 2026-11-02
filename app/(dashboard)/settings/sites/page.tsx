@@ -108,6 +108,7 @@ export default function SitesPage() {
     if (syncingSites.length === 0) return
 
     const id = setInterval(async () => {
+      if (document.hidden) return
       for (const site of syncingSites) {
         try {
           const res = await fetch(`/api/sites/${site.id}/sync/status`)
@@ -137,7 +138,7 @@ export default function SitesPage() {
           // ignore polling errors
         }
       }
-    }, 3000)
+    }, 5000)
 
     return () => clearInterval(id)
   }, [sites])
