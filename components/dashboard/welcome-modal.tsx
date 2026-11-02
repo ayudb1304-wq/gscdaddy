@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useSyncExternalStore } from "react"
 import {
   Dialog,
   DialogContent,
@@ -10,19 +10,38 @@ import {
 import { Button } from "@/components/ui/button"
 import { Rocket, Target, Sparkles, BarChart3 } from "lucide-react"
 
-export function WelcomeModal() {
-  const [open, setOpen] = useState(false)
+const DISMISSED_KEY = "gscdaddy-welcome-dismissed"
 
-  useEffect(() => {
-    const dismissed = localStorage.getItem("gscdaddy-welcome-dismissed")
-    if (!dismissed) {
-      setOpen(true)
-    }
-  }, [])
+// Storage can throw (blocked cookies, some private modes): treat that as
+// "already dismissed" rather than crashing the dashboard or nagging forever.
+function readDismissed(): boolean {
+  try {
+    return localStorage.getItem(DISMISSED_KEY) !== null
+  } catch {
+    return true
+  }
+}
+
+const noopSubscribe = () => () => {}
+
+/**
+ * Shown once per browser to new trial users only (the layout decides who is
+ * eligible). Previously it showed to everyone, paid users included, on every
+ * new device or after clearing site data.
+ */
+export function WelcomeModal() {
+  // false on the server and during hydration, the stored value after that.
+  const dismissedOnLoad = useSyncExternalStore(noopSubscribe, readDismissed, () => true)
+  const [closed, setClosed] = useState(false)
+  const open = !dismissedOnLoad && !closed
 
   function handleClose() {
-    localStorage.setItem("gscdaddy-welcome-dismissed", "1")
-    setOpen(false)
+    try {
+      localStorage.setItem(DISMISSED_KEY, "1")
+    } catch {
+      // Storage unavailable: closing for this page view is the best we can do.
+    }
+    setClosed(true)
   }
 
   return (
@@ -80,10 +99,6 @@ export function WelcomeModal() {
         <Button onClick={handleClose} className="mt-2 w-full" size="lg">
           Let me at it
         </Button>
-
-        <p className="text-center text-[11px] text-muted-foreground">
-          Built by Ayush, a solo dev from Bangalore who got tired of staring at GSC data.
-        </p>
       </DialogContent>
     </Dialog>
   )

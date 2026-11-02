@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { redirect } from "next/navigation"
 import { getCurrentUser } from "@/lib/auth"
-import { checkAccess } from "@/lib/billing/access"
+import { checkAccess, shouldShowWelcome } from "@/lib/billing/access"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { DashboardShell } from "@/components/dashboard/dashboard-shell"
 import { AccessGate } from "@/components/dashboard/access-gate"
@@ -27,6 +27,8 @@ export default async function DashboardLayout({
 
   const access = checkAccess(user)
 
+  const showWelcome = shouldShowWelcome(user)
+
   return (
     <DashboardShell
       user={{ name: user.name, email: user.email, avatar_url: user.avatar_url }}
@@ -34,7 +36,7 @@ export default async function DashboardLayout({
       plan={access.plan}
       daysRemaining={access.daysRemaining}
     >
-      <AccessGate hasAccess={access.hasAccess}>
+      <AccessGate hasAccess={access.hasAccess} showWelcome={showWelcome}>
         {children}
       </AccessGate>
     </DashboardShell>

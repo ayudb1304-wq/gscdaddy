@@ -8,9 +8,12 @@ const UNGATED_PATHS = ["/settings/billing"]
 
 export function AccessGate({
   hasAccess,
+  showWelcome,
   children,
 }: {
   hasAccess: boolean
+  /** New trial users only; decided server-side in the dashboard layout. */
+  showWelcome: boolean
   children: React.ReactNode
 }) {
   const pathname = usePathname()
@@ -22,7 +25,7 @@ export function AccessGate({
 
   return (
     <>
-      <WelcomeModal />
+      {showWelcome && <WelcomeModal />}
       {children}
     </>
   )
