@@ -2,7 +2,7 @@ import dotenv from "dotenv"
 dotenv.config({ path: ".env.local" })
 
 import { createClient } from "@supabase/supabase-js"
-import { syncSite } from "../lib/sync/gsc-sync"
+import { syncSite, isSyncInProgress } from "../lib/sync/gsc-sync"
 
 const admin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -41,11 +41,15 @@ async function main() {
     return
   }
 
-  const { data: sites, error } = await admin
+  const { data: allSites, error } = await admin
     .from("sites")
-    .select("id, site_url")
+    .select("*")
     .in("user_id", activeUserIds)
-    .neq("sync_status", "syncing")
+
+  // Skip sites genuinely mid-sync; a stale "syncing" (killed run) is retried.
+  const sites = (allSites ?? []).filter(
+    (s: { sync_status: string | null; sync_started_at?: string | null }) => !isSyncInProgress(s.sync_status, s.sync_started_at)
+  ) as { id: string; site_url: string }[]
 
   if (error) {
     console.error("Failed to fetch sites:", error)

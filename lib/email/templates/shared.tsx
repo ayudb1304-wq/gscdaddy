@@ -11,6 +11,7 @@ import {
   Font,
 } from "@react-email/components"
 import type { ReactNode } from "react"
+import { UNSUBSCRIBE_PLACEHOLDER } from "../unsubscribe"
 
 export const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://gscdaddy.com"
 
@@ -84,7 +85,7 @@ export function EmailLayout({ children, previewText }: { children: ReactNode; pr
             </Text>
             <Text style={footerTextStyle}>
               <Link
-                href={`${APP_URL}/settings/profile`}
+                href={UNSUBSCRIBE_PLACEHOLDER}
                 style={{ color: brand.muted, textDecoration: "underline" }}
               >
                 Unsubscribe from emails

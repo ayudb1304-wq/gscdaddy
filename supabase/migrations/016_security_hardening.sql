@@ -1,4 +1,4 @@
--- Security hardening from the Nov 2026 audit.
+-- Security hardening and tracking columns from the Nov 2026 audit.
 --
 -- Every write the app makes goes through the service-role (admin) client, and every
 -- read of these tables / this RPC from app code also uses the admin client. These
@@ -41,3 +41,13 @@ DROP POLICY IF EXISTS "Anyone can read health checks" ON public.health_checks;
 -- 6. users.email_unsubscribed exists in production but no migration created it, so a
 --    fresh database breaks every email query. No-op on production.
 ALTER TABLE public.users ADD COLUMN IF NOT EXISTS email_unsubscribed BOOLEAN DEFAULT FALSE;
+
+-- 7. Send-once tracking for trial emails. They were picked by a rolling 24h
+--    window, so schedule drift or a manual re-run sent duplicates or skipped users.
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS trial_ending_email_sent_at TIMESTAMPTZ;
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS trial_expired_email_sent_at TIMESTAMPTZ;
+
+-- 8. When the current sync started. A sync killed mid-run (function timeout,
+--    Actions timeout) left sync_status = 'syncing' forever and both the cron and
+--    the manual Sync button skipped the site. Stale 'syncing' rows are now retried.
+ALTER TABLE public.sites ADD COLUMN IF NOT EXISTS sync_started_at TIMESTAMPTZ;

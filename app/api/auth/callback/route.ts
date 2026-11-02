@@ -105,6 +105,7 @@ export async function GET(request: Request) {
     after(async () => {
       await sendEmail({
         to: user.email!,
+        userId: user.id,
         subject: "Welcome to GSCdaddy — your SEO data has stories to tell",
         react: WelcomeEmail({ name: userName }),
       })

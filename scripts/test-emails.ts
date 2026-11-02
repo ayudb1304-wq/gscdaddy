@@ -5,6 +5,8 @@ import { render } from "@react-email/components"
 import { WeeklySummaryEmail } from "../lib/email/templates/weekly-summary"
 import { TrialEndingEmail } from "../lib/email/templates/trial-ending"
 import { TrialExpiredEmail } from "../lib/email/templates/trial-expired"
+import { applyUnsubscribe } from "../lib/email/unsubscribe"
+const fillUnsubscribe = (html: string) => applyUnsubscribe(html).html
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 const TO = "ayucorp1304@gmail.com"
@@ -17,7 +19,7 @@ async function main() {
   // 1. Weekly Summary
   console.log("\n1. Sending Weekly Summary...")
   try {
-    const html = await render(
+    const html = fillUnsubscribe(await render(
       WeeklySummaryEmail({
         userName: "Ayush",
         siteName: "gscdaddy.com",
@@ -40,7 +42,7 @@ async function main() {
         ],
         recsCompletedCount: 7,
       })
-    )
+    ))
     const { data, error } = await resend.emails.send({ from: FROM, to: TO, subject: "Your keywords did things this week", html })
     if (error) console.error("  Error:", error)
     else console.log("  Sent! ID:", data?.id)
@@ -51,7 +53,7 @@ async function main() {
   // 2. Trial Ending
   console.log("\n2. Sending Trial Ending...")
   try {
-    const html = await render(
+    const html = fillUnsubscribe(await render(
       TrialEndingEmail({
         userName: "Ayush",
         daysLeft: 3,
@@ -60,7 +62,7 @@ async function main() {
         recsGenerated: 15,
         sitesConnected: 2,
       })
-    )
+    ))
     const { data, error } = await resend.emails.send({ from: FROM, to: TO, subject: "3 days left to keep your SEO superpowers", html })
     if (error) console.error("  Error:", error)
     else console.log("  Sent! ID:", data?.id)
@@ -71,13 +73,13 @@ async function main() {
   // 3. Trial Expired
   console.log("\n3. Sending Trial Expired...")
   try {
-    const html = await render(
+    const html = fillUnsubscribe(await render(
       TrialExpiredEmail({
         userName: "Ayush",
         keywordsTracked: 1247,
         recsGenerated: 15,
       })
-    )
+    ))
     const { data, error } = await resend.emails.send({ from: FROM, to: TO, subject: "Your trial just left the chat", html })
     if (error) console.error("  Error:", error)
     else console.log("  Sent! ID:", data?.id)

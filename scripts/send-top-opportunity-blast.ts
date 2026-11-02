@@ -231,6 +231,7 @@ async function main() {
       const { sendEmail } = await import("../lib/email/resend")
       const result = await sendEmail({
         to: r.email,
+        userId: r.userId,
         subject,
         react: TopOpportunityAlertEmail({
           userName: r.name || "",
