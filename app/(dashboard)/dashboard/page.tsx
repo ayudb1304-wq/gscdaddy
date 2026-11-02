@@ -37,8 +37,9 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     )
   }
 
-  const siteId = siteIdParam || sites[0].id
-  const site = sites.find((s) => s.id === siteId) || sites[0]
+  // Only ever query a site the user owns: the admin client below bypasses RLS.
+  const site = sites.find((s) => s.id === siteIdParam) || sites[0]
+  const siteId = site.id
 
   // Only show the full-page "syncing" placeholder for a site's FIRST sync
   // (when there's no prior data to display). For subsequent re-syncs triggered
@@ -68,15 +69,24 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   }
 
   // Fetch dashboard data
+  // GSC data lags 2-3 days, so anchor the window to the newest day we actually
+  // have. Ending at "today" left the current window with ~3 empty days while
+  // the prior window was complete, so every site showed a fake ~10% drop.
   const dateRange = 28
-  const now = new Date()
-  const endDate = new Date(now)
+  const { data: latestRow } = await admin
+    .from("gsc_data")
+    .select("date")
+    .eq("site_id", siteId)
+    .order("date", { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  const endDate = latestRow?.date ? new Date(`${latestRow.date}T00:00:00Z`) : new Date()
   const currentStart = new Date(endDate)
-  currentStart.setDate(currentStart.getDate() - dateRange)
+  currentStart.setUTCDate(currentStart.getUTCDate() - (dateRange - 1))
   const priorEnd = new Date(currentStart)
-  priorEnd.setDate(priorEnd.getDate() - 1)
+  priorEnd.setUTCDate(priorEnd.getUTCDate() - 1)
   const priorStart = new Date(priorEnd)
-  priorStart.setDate(priorStart.getDate() - dateRange)
+  priorStart.setUTCDate(priorStart.getUTCDate() - (dateRange - 1))
   const fmt = (d: Date) => d.toISOString().split("T")[0]
 
   // Fetch all data in parallel
@@ -112,9 +122,10 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       p_page: 1,
       p_limit: 5,
     }).then((res) => {
-      if (res.error) return { data: [] }
+      if (res.error) return { data: [], total: 0 }
       // Map to the shape TopOpportunities expects
       return {
+        total: Number(res.data?.[0]?.total_count ?? 0),
         data: (res.data || []).map((r: { query: string; page: string; avg_position: number; total_impressions: number; opportunity_score: number }) => ({
           query: r.query,
           page: r.page,
@@ -159,20 +170,26 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     if (rows.length === 0) return { clicks: 0, impressions: 0, avgPosition: 0 }
     const clicks = rows.reduce((sum, r) => sum + (r.clicks || 0), 0)
     const impressions = rows.reduce((sum, r) => sum + (r.impressions || 0), 0)
-    const avgPosition = rows.reduce((sum, r) => sum + (r.position || 0), 0) / rows.length
+    // Impression-weighted, like GSC: a plain mean lets long-tail rows with a
+    // handful of impressions drag the site average down.
+    const weighted = rows.reduce((sum, r) => sum + (r.position || 0) * (r.impressions || 0), 0)
+    const avgPosition = impressions > 0
+      ? weighted / impressions
+      : rows.reduce((sum, r) => sum + (r.position || 0), 0) / rows.length
     return { clicks, impressions, avgPosition: Math.round(avgPosition * 10) / 10 }
   }
 
   const currentMetrics = aggregate(current)
   const priorMetrics = aggregate(prior)
 
-  const pctChange = (curr: number, prev: number) => {
-    if (prev === 0) return curr > 0 ? 100 : 0
+  const pctChange = (curr: number, prev: number): number | null => {
+    // No prior data to compare against: show "New" rather than a fake +100%.
+    if (prev === 0) return curr > 0 ? null : 0
     return Math.round(((curr - prev) / prev) * 1000) / 10
   }
 
-  // Use the same source as Top Opportunities so the count matches the list
-  const strikingDistanceCount = (opportunitiesResult.data || []).length
+  // Total from the RPC (the list itself is limited to the top 5)
+  const strikingDistanceCount = opportunitiesResult.total
 
   const metricsData = {
     current: currentMetrics,
@@ -213,6 +230,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           <p className="mt-1.5 max-w-2xl text-[15px] text-muted-foreground">How your site did in Google over the last 28 days.</p>
         </div>
         <SyncRecsBar
+          key={site.id}
           siteId={site.id}
           initialSyncStatus={site.sync_status}
           initialLastSyncedAt={site.last_synced_at}

@@ -1,9 +1,10 @@
 "use client"
 
 import { Suspense, useState } from "react"
+import { usePathname } from "next/navigation"
 import { Sidebar } from "./sidebar"
 import { Header } from "./header"
-import { Sheet, SheetContent } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet"
 
 interface Site {
   id: string
@@ -25,7 +26,12 @@ interface DashboardShellProps {
 }
 
 export function DashboardShell({ user, sites, plan, daysRemaining, children }: DashboardShellProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  // Remember which page the mobile menu was opened on: navigating anywhere
+  // else closes it (the shell persists across pages, so it used to stay open).
+  const pathname = usePathname()
+  const [openedOn, setOpenedOn] = useState<string | null>(null)
+  const sidebarOpen = openedOn === pathname
+  const setSidebarOpen = (open: boolean) => setOpenedOn(open ? pathname : null)
 
   return (
     <div className="flex h-screen overflow-hidden bg-sidebar">
@@ -39,6 +45,7 @@ export function DashboardShell({ user, sites, plan, daysRemaining, children }: D
       {/* Mobile sidebar */}
       <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
         <SheetContent side="left" className="w-60 border-0 p-0">
+          <SheetTitle className="sr-only">Navigation</SheetTitle>
           <Suspense fallback={null}>
             <Sidebar />
           </Suspense>

@@ -1,5 +1,6 @@
 import { z } from "zod"
 import { requireAuth } from "@/lib/auth"
+import { isSyncInProgress } from "@/lib/sync/gsc-sync"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { getEffectivePlan } from "@/lib/billing/access"
 import { getPlanLimits } from "@/lib/billing/plans"
@@ -24,7 +25,14 @@ export async function GET() {
 
     if (error) throw error
 
-    return successResponse(sites)
+    // Report a dead (timed-out) sync as failed so the UI re-enables Sync.
+    return successResponse(
+      (sites ?? []).map((s) =>
+        s.sync_status === "syncing" && !isSyncInProgress(s.sync_status, s.sync_started_at)
+          ? { ...s, sync_status: "failed", sync_progress: "Last sync didn't finish. Try again." }
+          : s
+      )
+    )
   } catch (e) {
     const message = e instanceof Error ? e.message : "Unknown error"
     if (message === "UNAUTHORIZED") return errors.unauthorized()

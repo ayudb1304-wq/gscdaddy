@@ -26,6 +26,7 @@ export async function POST(req: NextRequest) {
 
   const admin = createAdminClient()
 
+  try {
   switch (event.type) {
     // Subscription events
     case "subscription.active":
@@ -51,8 +52,25 @@ export async function POST(req: NextRequest) {
     }
     case "subscription.plan_changed":
     case "subscription.updated": {
-      // Handles downgrades taking effect at next billing date
-      await handleSubscriptionActive(admin, event.data as Subscriptions.Subscription)
+      // Route by the subscription's real status. Previously every update was
+      // treated as "active", so an update arriving after a cancellation or a
+      // failed payment silently re-activated the paid plan.
+      const sub = event.data as Subscriptions.Subscription
+      switch (sub.status) {
+        case "active":
+          await handleSubscriptionActive(admin, sub)
+          break
+        case "on_hold":
+          await handleSubscriptionStatusChange(admin, sub, "past_due")
+          break
+        case "cancelled":
+        case "expired":
+        case "failed":
+          await handleSubscriptionStatusChange(admin, sub, "canceled")
+          break
+        default:
+          console.log(`Ignoring ${event.type} with status ${sub.status}`)
+      }
       break
     }
 
@@ -68,12 +86,17 @@ export async function POST(req: NextRequest) {
 
     // Refund events
     case "refund.succeeded": {
-      await handleRefundSucceeded(admin, event.data as Refunds.Refund)
+      await handleRefundSucceeded(admin, event.data as Refunds.Refund, client)
       break
     }
 
     default:
       console.log(`Unhandled webhook event: ${event.type}`)
+  }
+  } catch (err) {
+    // Non-2xx makes Dodo retry the webhook instead of silently losing it.
+    console.error(`Webhook ${event.type} handling failed:`, err)
+    return NextResponse.json({ error: "Webhook processing failed" }, { status: 500 })
   }
 
   return NextResponse.json({ received: true })
@@ -92,7 +115,7 @@ async function handleSubscriptionActive(
   const planInfo = planFromProductId(data.product_id)
   const plan = planInfo?.plan ?? data.metadata?.plan ?? "blogger"
 
-  await admin.from("subscriptions").upsert(
+  await must(admin.from("subscriptions").upsert(
     {
       user_id: userId,
       dodo_subscription_id: data.subscription_id,
@@ -101,21 +124,21 @@ async function handleSubscriptionActive(
       status: "active",
       current_period_start: data.previous_billing_date ?? new Date().toISOString(),
       current_period_end: data.next_billing_date ?? null,
-      cancel_at_period_end: false,
+      cancel_at_period_end: data.cancel_at_next_billing_date ?? false,
       updated_at: new Date().toISOString(),
     },
     { onConflict: "dodo_subscription_id" }
-  )
+  ))
 
   const planConfig = PLANS[plan as keyof typeof PLANS]
-  await admin
+  await must(admin
     .from("users")
     .update({
       plan,
       sites_limit: planConfig?.sites ?? 1,
       updated_at: new Date().toISOString(),
     })
-    .eq("id", userId)
+    .eq("id", userId))
 }
 
 async function handleSubscriptionStatusChange(
@@ -125,23 +148,23 @@ async function handleSubscriptionStatusChange(
 ) {
   const userId = data.metadata?.user_id
 
-  await admin
+  await must(admin
     .from("subscriptions")
     .update({
       status,
       updated_at: new Date().toISOString(),
     })
-    .eq("dodo_subscription_id", data.subscription_id)
+    .eq("dodo_subscription_id", data.subscription_id))
 
   if (status === "canceled" && userId) {
-    await admin
+    await must(admin
       .from("users")
       .update({
         plan: "free",
         sites_limit: 1,
         updated_at: new Date().toISOString(),
       })
-      .eq("id", userId)
+      .eq("id", userId))
   }
 }
 
@@ -152,13 +175,13 @@ async function handlePaymentSucceeded(
   if (!data.subscription_id) return
 
   // Update subscription period dates on successful renewal payment
-  await admin
+  await must(admin
     .from("subscriptions")
     .update({
       status: "active",
       updated_at: new Date().toISOString(),
     })
-    .eq("dodo_subscription_id", data.subscription_id)
+    .eq("dodo_subscription_id", data.subscription_id))
 }
 
 async function handlePaymentFailed(
@@ -168,25 +191,37 @@ async function handlePaymentFailed(
   if (!data.subscription_id) return
 
   // Mark subscription as past_due when a payment fails
-  await admin
+  await must(admin
     .from("subscriptions")
     .update({
       status: "past_due",
       updated_at: new Date().toISOString(),
     })
-    .eq("dodo_subscription_id", data.subscription_id)
+    .eq("dodo_subscription_id", data.subscription_id))
 }
 
 async function handleRefundSucceeded(
   admin: ReturnType<typeof createAdminClient>,
-  data: Refunds.Refund
+  data: Refunds.Refund,
+  client: ReturnType<typeof getDodoClient>
 ) {
-  // Look up the subscription via the refunded payment
+  // Refund metadata is usually empty, so resolve the subscription through the
+  // refunded payment.
+  let subscriptionId = (data.metadata as Record<string, string> | undefined)?.subscription_id ?? null
+  if (!subscriptionId) {
+    const payment = await client.payments.retrieve(data.payment_id)
+    subscriptionId = payment.subscription_id ?? null
+  }
+  if (!subscriptionId) {
+    console.log("Refund for non-subscription payment", { paymentId: data.payment_id })
+    return
+  }
+
   const { data: sub } = await admin
     .from("subscriptions")
     .select("user_id, dodo_subscription_id")
-    .eq("dodo_subscription_id", data.metadata?.subscription_id ?? "")
-    .single()
+    .eq("dodo_subscription_id", subscriptionId)
+    .maybeSingle()
 
   if (!sub) {
     console.log("Refund for non-subscription payment", { paymentId: data.payment_id })
@@ -194,20 +229,27 @@ async function handleRefundSucceeded(
   }
 
   // Downgrade user on refund
-  await admin
+  await must(admin
     .from("subscriptions")
     .update({
       status: "canceled",
       updated_at: new Date().toISOString(),
     })
-    .eq("dodo_subscription_id", sub.dodo_subscription_id)
+    .eq("dodo_subscription_id", sub.dodo_subscription_id))
 
-  await admin
+  await must(admin
     .from("users")
     .update({
       plan: "free",
       sites_limit: 1,
       updated_at: new Date().toISOString(),
     })
-    .eq("id", sub.user_id)
+    .eq("id", sub.user_id))
+}
+
+/** Throw on a Supabase write error so the webhook returns 500 and Dodo retries. */
+async function must<T extends { error: { message: string } | null }>(query: PromiseLike<T>): Promise<T> {
+  const result = await query
+  if (result.error) throw new Error(result.error.message)
+  return result
 }

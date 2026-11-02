@@ -6,17 +6,40 @@ function formatDate(date: Date): string {
   return date.toISOString().split("T")[0]
 }
 
+const DAY_MS = 86_400_000
+const MAX_LOOKBACK_DAYS = 90
+
+/** A "syncing" status older than this is treated as a dead run and retried. */
+export const STALE_SYNC_MS = 30 * 60 * 1000
+
+/**
+ * True when a site is mid-sync for real. A run killed by a timeout never resets
+ * its status, so an old (or untimed) "syncing" is treated as failed.
+ */
+export function isSyncInProgress(syncStatus: string | null, syncStartedAt: string | null | undefined): boolean {
+  if (syncStatus !== "syncing") return false
+  // Column not there yet (migration 016 not applied): keep the old behaviour.
+  if (syncStartedAt === undefined) return true
+  // Stuck from before sync_started_at existed.
+  if (syncStartedAt === null) return false
+  return Date.now() - new Date(syncStartedAt).getTime() < STALE_SYNC_MS
+}
+
 function getDateRange(lastSyncedAt: string | null): { startDate: string; endDate: string } {
   const now = new Date()
   const endDate = new Date(now)
 
-  const startDate = new Date(now)
+  let startDate: Date
   if (!lastSyncedAt) {
     // Initial sync: last 90 days
-    startDate.setDate(startDate.getDate() - 90)
+    startDate = new Date(now.getTime() - MAX_LOOKBACK_DAYS * DAY_MS)
   } else {
-    // Daily sync: last 6 days (overlap to catch late-arriving data)
-    startDate.setDate(startDate.getDate() - 6)
+    // Daily sync: last 6 days (overlap to catch late-arriving data), or further
+    // back if the last good sync is older, so outages don't leave gaps.
+    const sixDaysAgo = now.getTime() - 6 * DAY_MS
+    const sinceLastSync = new Date(lastSyncedAt).getTime() - 3 * DAY_MS
+    const earliest = now.getTime() - MAX_LOOKBACK_DAYS * DAY_MS
+    startDate = new Date(Math.max(earliest, Math.min(sixDaysAgo, sinceLastSync)))
   }
 
   return {
@@ -92,11 +115,18 @@ export async function syncSite(siteId: string): Promise<{ rowCount: number }> {
     throw new Error(`Site not found: ${siteId}`)
   }
 
-  // Mark as syncing
-  await admin
+  // Mark as syncing. sync_started_at lets a run killed by a timeout be retried
+  // (column added in migration 016; fall back if it isn't applied yet).
+  const { error: markError } = await admin
     .from("sites")
-    .update({ sync_status: "syncing", sync_progress: "Starting sync..." })
+    .update({ sync_status: "syncing", sync_progress: "Starting sync...", sync_started_at: new Date().toISOString() })
     .eq("id", siteId)
+  if (markError) {
+    await admin
+      .from("sites")
+      .update({ sync_status: "syncing", sync_progress: "Starting sync..." })
+      .eq("id", siteId)
+  }
 
   try {
     // Get valid access token (refreshes if needed)
@@ -109,7 +139,7 @@ export async function syncSite(siteId: string): Promise<{ rowCount: number }> {
     await updateSyncProgress(
       admin,
       siteId,
-      `Fetching ${isInitial ? "90 days" : "6 days"} of data from GSC (${startDate} to ${endDate})...`
+      `Fetching ${isInitial ? "90 days of" : "recent"} data from GSC (${startDate} to ${endDate})...`
     )
 
     // Fetch all data from GSC (handles pagination internally)
@@ -128,8 +158,10 @@ export async function syncSite(siteId: string): Promise<{ rowCount: number }> {
     // refreshed first, the user sees empty/stale opportunities for a beat.
     // Non-fatal on failure — the nightly refresh-views cron is a safety net.
     await updateSyncProgress(admin, siteId, "Refreshing opportunities view...")
+    // rpc() returns errors instead of throwing, so check both.
     try {
-      await admin.rpc("refresh_striking_distance")
+      const { error: refreshError } = await admin.rpc("refresh_striking_distance")
+      if (refreshError) console.error(`Post-sync view refresh failed for site ${siteId}:`, refreshError.message)
     } catch (err) {
       console.error(`Post-sync view refresh failed for site ${siteId}:`, err)
     }

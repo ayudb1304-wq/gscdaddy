@@ -8,10 +8,11 @@ interface MetricsData {
     impressions: number
     avgPosition: number
   }
+  // null = no prior period to compare against (the change is hidden)
   changes: {
-    clicks: number
-    impressions: number
-    avgPosition: number
+    clicks: number | null
+    impressions: number | null
+    avgPosition: number | null
   }
   strikingDistanceCount: number
 }
@@ -22,7 +23,15 @@ function formatNumber(n: number): string {
   return n.toLocaleString()
 }
 
-function ChangeIndicator({ value, inverted = false }: { value: number; inverted?: boolean }) {
+function ChangeIndicator({ value, inverted = false }: { value: number | null; inverted?: boolean }) {
+  // No comparable prior period (new site) or no change: neutral, not a red drop.
+  if (value === null || value === 0) {
+    return (
+      <span className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+        {value === null ? "New" : "No change"}
+      </span>
+    )
+  }
   const isPositive = inverted ? value < 0 : value > 0
   const Icon = isPositive ? TrendingUp : TrendingDown
   const color = isPositive ? "text-ok" : "text-critical"

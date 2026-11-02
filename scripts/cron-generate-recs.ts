@@ -3,6 +3,7 @@ dotenv.config({ path: ".env.local" })
 
 import { createClient } from "@supabase/supabase-js"
 import { generateRecommendations } from "../lib/ai/generate-recommendations"
+import { fetchAllRows } from "../lib/supabase/fetch-all"
 
 const admin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -43,13 +44,20 @@ async function main() {
   // (existing backlog, failed auto-generations, expired recs) without re-billing
   // the AI call on sites that already have valid recommendations.
   const siteIds = activeSites.map((s) => s.id)
-  const { data: freshRecs, error: recsError } = await admin
-    .from("recommendations")
-    .select("site_id")
-    .in("site_id", siteIds)
-    .gt("expires_at", new Date().toISOString())
-
-  if (recsError) {
+  // Paged: unpaged, sites beyond the first 1,000 rec rows looked rec-less and
+  // were regenerated (and billed) every day.
+  let freshRecs: { site_id: string }[]
+  try {
+    freshRecs = await fetchAllRows<{ site_id: string }>((from, to) =>
+      admin
+        .from("recommendations")
+        .select("site_id")
+        .in("site_id", siteIds)
+        .gt("expires_at", new Date().toISOString())
+        .order("id")
+        .range(from, to)
+    )
+  } catch (recsError) {
     console.error("Failed to check existing recommendations:", recsError)
     process.exit(1)
   }
@@ -71,7 +79,18 @@ async function main() {
 
   for (const site of sitesNeedingRecs) {
     try {
+      const startedAt = new Date().toISOString()
       const recs = await generateRecommendations(site.id)
+      // Clear the expired, never-completed recs this batch replaces, so the
+      // list doesn't grow every week. Completed recs keep their impact history.
+      if (recs && recs.length > 0) {
+        await admin
+          .from("recommendations")
+          .delete()
+          .eq("site_id", site.id)
+          .eq("is_completed", false)
+          .lt("expires_at", startedAt)
+      }
       console.log(`  ✓ ${site.site_url} — ${recs?.length || 0} recommendations`)
       succeeded++
     } catch (e) {

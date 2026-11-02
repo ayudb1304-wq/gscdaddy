@@ -1,4 +1,4 @@
-import Link from "next/link"
+import { SiteLink } from "@/components/dashboard/site-link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ArrowRight } from "lucide-react"
@@ -16,12 +16,12 @@ export function RecentRecs({ data }: { data: Recommendation[] }) {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-base font-medium">Recent Recommendations</CardTitle>
-        <Link
+        <SiteLink
           href="/reports/recommendations"
           className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
         >
           View all <ArrowRight className="h-3 w-3" />
-        </Link>
+        </SiteLink>
       </CardHeader>
       <CardContent>
         {data.length === 0 ? (

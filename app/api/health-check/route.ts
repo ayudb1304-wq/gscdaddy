@@ -59,8 +59,19 @@ export async function POST(request: Request) {
       .single()
 
     if (cached?.results) {
+      // Each check row can send one report email. If this cached row's report
+      // was already claimed, hand out a copy so this visitor can get theirs.
+      let id = cached.id
+      if (cached.email) {
+        const { data: copy } = await admin
+          .from("health_checks")
+          .insert({ domain, url: cached.url, score: cached.score, results: cached.results })
+          .select("id")
+          .single()
+        id = copy?.id ?? null
+      }
       return successResponse({
-        id: cached.id,
+        id,
         domain,
         url: cached.url,
         score: cached.score,

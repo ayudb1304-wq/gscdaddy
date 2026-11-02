@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import { KeywordsTable, type KeywordRow } from "@/components/reports/keywords-table"
 import { KeywordsFilters } from "@/components/reports/keywords-filters"
@@ -33,8 +33,29 @@ export default function StrikingDistancePage() {
 
   const limit = 25
 
+  // Debounce filter typing so "foobar" doesn't fire six requests.
+  const [debouncedFilters, setDebouncedFilters] = useState(filters)
+  useEffect(() => {
+    const id = setTimeout(() => setDebouncedFilters(filters), 300)
+    return () => clearTimeout(id)
+  }, [filters])
+
+  // New site: start from page 1 with an empty table, not the old site's rows.
+  const [prevSiteId, setPrevSiteId] = useState(siteId)
+  if (siteId !== prevSiteId) {
+    setPrevSiteId(siteId)
+    setPage(1)
+    setData([])
+    setTotal(0)
+  }
+
+  // Only the latest request may update state, so a slow response for an
+  // earlier site/filter can't overwrite the current one.
+  const requestId = useRef(0)
+
   const fetchData = useCallback(async () => {
     if (!siteId) return
+    const id = ++requestId.current
     setLoading(true)
     try {
       const params = new URLSearchParams({
@@ -43,22 +64,31 @@ export default function StrikingDistancePage() {
         page: String(page),
         limit: String(limit),
       })
-      if (filters.search) params.set("search", filters.search)
-      if (filters.minImpressions) params.set("minImpressions", filters.minImpressions)
-      if (filters.minPosition) params.set("minPosition", filters.minPosition)
-      if (filters.maxPosition) params.set("maxPosition", filters.maxPosition)
+      if (debouncedFilters.search) params.set("search", debouncedFilters.search)
+      if (debouncedFilters.minImpressions) params.set("minImpressions", debouncedFilters.minImpressions)
+      if (debouncedFilters.minPosition) params.set("minPosition", debouncedFilters.minPosition)
+      if (debouncedFilters.maxPosition) params.set("maxPosition", debouncedFilters.maxPosition)
 
       const res = await fetch(`/api/reports/striking-distance/${siteId}?${params}`)
-      const json = await res.json()
+      const json = await res.json().catch(() => null)
+      if (id !== requestId.current) return
 
-      if (json.success) {
+      if (json?.success) {
         setData(json.data)
         setTotal(json.meta?.total ?? 0)
+      } else {
+        setData([])
+        setTotal(0)
+      }
+    } catch {
+      if (id === requestId.current) {
+        setData([])
+        setTotal(0)
       }
     } finally {
-      setLoading(false)
+      if (id === requestId.current) setLoading(false)
     }
-  }, [siteId, sortBy, sortOrder, page, filters])
+  }, [siteId, sortBy, sortOrder, page, debouncedFilters])
 
   useEffect(() => {
     fetchData()

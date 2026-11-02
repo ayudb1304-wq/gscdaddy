@@ -2,7 +2,8 @@ import { after } from "next/server"
 import { requireAuth } from "@/lib/auth"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { successResponse, errors } from "@/lib/api/response"
-import { syncSite } from "@/lib/sync/gsc-sync"
+import { syncSite, isSyncInProgress } from "@/lib/sync/gsc-sync"
+import { checkAccess } from "@/lib/billing/access"
 import { generateRecommendations } from "@/lib/ai/generate-recommendations"
 
 export const maxDuration = 300 // 5 minutes max for sync
@@ -16,17 +17,19 @@ export async function POST(
     const { siteId } = await params
     const admin = createAdminClient()
 
+    if (!checkAccess(user).hasAccess) return errors.trialExpired()
+
     // Verify ownership
     const { data: site, error: fetchError } = await admin
       .from("sites")
-      .select("id, sync_status")
+      .select("*")
       .eq("id", siteId)
       .eq("user_id", user.id)
       .single()
 
     if (fetchError || !site) return errors.notFound("Site")
 
-    if (site.sync_status === "syncing") {
+    if (isSyncInProgress(site.sync_status, site.sync_started_at)) {
       return errors.validation("Sync is already in progress")
     }
 

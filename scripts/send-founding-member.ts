@@ -3,6 +3,8 @@ dotenv.config({ path: ".env.local" })
 import { Resend } from "resend"
 import { render } from "@react-email/components"
 import { FoundingMemberEmail } from "../lib/email/templates/founding-member"
+import { applyUnsubscribe } from "../lib/email/unsubscribe"
+const fillUnsubscribe = (html: string) => applyUnsubscribe(html).html
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 const TO = "sorixx222@gmail.com"
@@ -18,7 +20,7 @@ async function main() {
 
   console.log("Sending founding-member email to", TO)
 
-  const html = await render(FoundingMemberEmail({ name: NAME }))
+  const html = fillUnsubscribe(await render(FoundingMemberEmail({ name: NAME })))
 
   const { data, error } = await resend.emails.send({
     from: FROM,

@@ -1,4 +1,5 @@
 import { requireAuth } from "@/lib/auth"
+import { isSyncInProgress } from "@/lib/sync/gsc-sync"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { successResponse, errors } from "@/lib/api/response"
 
@@ -13,16 +14,17 @@ export async function GET(
 
     const { data: site, error } = await admin
       .from("sites")
-      .select("id, sync_status, sync_progress, last_synced_at")
+      .select("*")
       .eq("id", siteId)
       .eq("user_id", user.id)
       .single()
 
     if (error || !site) return errors.notFound("Site")
 
+    const dead = site.sync_status === "syncing" && !isSyncInProgress(site.sync_status, site.sync_started_at)
     return successResponse({
-      syncStatus: site.sync_status,
-      syncProgress: site.sync_progress,
+      syncStatus: dead ? "failed" : site.sync_status,
+      syncProgress: dead ? "Last sync didn't finish. Try again." : site.sync_progress,
       lastSyncedAt: site.last_synced_at,
     })
   } catch (e) {

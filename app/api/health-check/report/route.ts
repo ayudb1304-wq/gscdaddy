@@ -41,11 +41,19 @@ export async function POST(request: Request) {
       return errors.notFound("Health check")
     }
 
-    // Store the email on the health check record (lead capture)
-    await admin
+    // One report email per health check, claimed atomically. Without this the
+    // endpoint could mail any list of addresses about any (attacker-chosen)
+    // domain from our sending domain.
+    const { data: claimed } = await admin
       .from("health_checks")
       .update({ email })
       .eq("id", healthCheckId)
+      .is("email", null)
+      .select("id")
+
+    if (!claimed || claimed.length === 0) {
+      return errors.validation("A report for this check has already been sent. Run a new check to get another.")
+    }
 
     // Send the report email
     const score = check.results?.score?.overall ?? check.score ?? 0

@@ -10,7 +10,12 @@ import { WelcomeEmail } from "@/lib/email/templates/welcome"
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get("code")
-  const next = searchParams.get("next") ?? "/today"
+  // Only allow same-origin relative paths ("/x", not "//evil.com" or "@evil.com").
+  const nextParam = searchParams.get("next")
+  const next =
+    nextParam && nextParam.startsWith("/") && !nextParam.startsWith("//") && !nextParam.startsWith("/\\")
+      ? nextParam
+      : "/today"
 
   if (!code) {
     return NextResponse.redirect(`${origin}/login?error=missing_code`)
@@ -100,6 +105,7 @@ export async function GET(request: Request) {
     after(async () => {
       await sendEmail({
         to: user.email!,
+        userId: user.id,
         subject: "Welcome to GSCdaddy — your SEO data has stories to tell",
         react: WelcomeEmail({ name: userName }),
       })

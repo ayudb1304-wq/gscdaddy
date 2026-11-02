@@ -8,6 +8,8 @@ import { WeeklySummaryEmail, getWeeklySummarySubject } from "../lib/email/templa
 import { TrialEndingEmail, getTrialEndingSubject } from "../lib/email/templates/trial-ending"
 import { TrialExpiredEmail, getTrialExpiredSubject } from "../lib/email/templates/trial-expired"
 import { NudgeRecommendationsEmail, getNudgeRecommendationsSubject } from "../lib/email/templates/nudge-recommendations"
+import { applyUnsubscribe } from "../lib/email/unsubscribe"
+import { fetchAllRows } from "../lib/supabase/fetch-all"
 
 const admin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -18,11 +20,42 @@ const admin = createClient(
 const resend = new Resend(process.env.RESEND_API_KEY)
 const FROM = "Sushi from GSCdaddy <sushi@gscdaddy.com>"
 
-async function send(to: string, subject: string, element: React.ReactElement) {
-  const html = await render(element)
-  const { error } = await resend.emails.send({ from: FROM, to, subject, html })
+async function send(to: string, subject: string, element: React.ReactElement, userId: string) {
+  // Signed one-click unsubscribe link in the footer + List-Unsubscribe headers.
+  const { html, headers } = applyUnsubscribe(await render(element), userId)
+  const { error } = await resend.emails.send({ from: FROM, to, subject, html, headers })
   if (error) throw new Error(error.message)
 }
+
+const siteDisplayName = (site: { display_name: string | null; site_url: string }) =>
+  site.display_name || site.site_url.replace(/^(sc-domain:|https?:\/\/)/, "").replace(/\/$/, "")
+
+/** Striking-distance keywords via the RPC (the materialized view lives in the private schema). */
+async function getStrikingDistance(siteId: string, limit: number) {
+  const { data, error } = await admin.rpc("get_striking_distance", {
+    p_site_id: siteId,
+    p_sort_by: "opportunity_score",
+    p_sort_order: "desc",
+    p_page: 1,
+    p_limit: limit,
+    p_search: null,
+    p_min_impressions: null,
+    p_min_position: null,
+    p_max_position: null,
+  })
+  if (error) throw new Error(`get_striking_distance failed: ${error.message}`)
+  const rows = (data || []) as { query: string; avg_position: number; total_impressions: number; opportunity_score: number; total_count: number }[]
+  return { rows, total: Number(rows[0]?.total_count ?? 0) }
+}
+
+/** Newest date with GSC data for a site (GSC lags 2-3 days, so "now" isn't it). */
+async function getLatestDataDate(siteId: string): Promise<Date | null> {
+  const { data } = await admin.from("gsc_data").select("date").eq("site_id", siteId).order("date", { ascending: false }).limit(1).maybeSingle()
+  return data?.date ? new Date(`${data.date}T00:00:00Z`) : null
+}
+
+const isoDay = (d: Date) => d.toISOString().split("T")[0]
+const daysBefore = (d: Date, n: number) => new Date(d.getTime() - n * 86400000)
 
 async function main() {
   const now = new Date()
@@ -96,7 +129,7 @@ async function sendWeeklySummaries(now: Date) {
           getRecsCompleted(site.id),
         ])
 
-        const siteName = site.display_name || site.site_url.replace(/^(sc-domain:|https?:\/\/)/, "").replace(/\/$/, "")
+        const siteName = siteDisplayName(site)
 
         await send(
           user.email,
@@ -110,7 +143,8 @@ async function sendWeeklySummaries(now: Date) {
             topKeywords: keywords,
             positionMovers: movers,
             recsCompletedCount: recsCount,
-          })
+          }),
+          user.id
         )
 
         console.log(`  ✓ Weekly summary sent to ${user.email} for ${siteName}`)
@@ -135,6 +169,7 @@ async function sendTrialEndingEmails(now: Date) {
     .select("id, email, name, trial_ends_at")
     .gte("trial_ends_at", twoDays)
     .lte("trial_ends_at", threeDays)
+    .is("trial_ending_email_sent_at", null)
     .or("email_unsubscribed.is.null,email_unsubscribed.eq.false")
 
   if (!users?.length) { console.log("  No trial-ending users"); return 0 }
@@ -170,9 +205,11 @@ async function sendTrialEndingEmails(now: Date) {
           keywordsTracked: keywordsCount,
           recsGenerated: recsCount,
           sitesConnected: sitesCount,
-        })
+        }),
+        user.id
       )
 
+      await admin.from("users").update({ trial_ending_email_sent_at: new Date().toISOString() }).eq("id", user.id)
       console.log(`  ✓ Trial ending email sent to ${user.email}`)
       sent++
     } catch (err) {
@@ -186,13 +223,16 @@ async function sendTrialEndingEmails(now: Date) {
 async function sendTrialExpiredEmails(now: Date) {
   let sent = 0
 
-  const oneDayAgo = new Date(now.getTime() - 86400000).toISOString()
+  // Look back 3 days so a missed run still catches people; the sent-at column
+  // makes it send exactly once.
+  const threeDaysAgo = new Date(now.getTime() - 3 * 86400000).toISOString()
 
   const { data: users } = await admin
     .from("users")
     .select("id, email, name")
-    .gte("trial_ends_at", oneDayAgo)
+    .gte("trial_ends_at", threeDaysAgo)
     .lte("trial_ends_at", now.toISOString())
+    .is("trial_expired_email_sent_at", null)
     .or("email_unsubscribed.is.null,email_unsubscribed.eq.false")
 
   if (!users?.length) { console.log("  No trial-expired users"); return 0 }
@@ -221,9 +261,11 @@ async function sendTrialExpiredEmails(now: Date) {
           userName: user.name || user.email,
           keywordsTracked: keywordsCount,
           recsGenerated: recsCount,
-        })
+        }),
+        user.id
       )
 
+      await admin.from("users").update({ trial_expired_email_sent_at: new Date().toISOString() }).eq("id", user.id)
       console.log(`  ✓ Trial expired email sent to ${user.email}`)
       sent++
     } catch (err) {
@@ -284,25 +326,14 @@ async function sendNudgeRecommendationsEmails(now: Date) {
 
         if (recsCount && recsCount > 0) continue
 
-        // Check for striking distance keywords
-        const { data: keywords } = await admin
-          .from("striking_distance_keywords")
-          .select("query, avg_position, total_impressions, opportunity_score")
-          .eq("site_id", site.id)
-          .order("opportunity_score", { ascending: false })
-          .limit(1)
-
-        if (!keywords?.length) continue
-
-        const { count: totalOpportunities } = await admin
-          .from("striking_distance_keywords")
-          .select("*", { count: "exact", head: true })
-          .eq("site_id", site.id)
-
-        if (!totalOpportunities || totalOpportunities === 0) continue
+        // Check for striking distance keywords. (This used to read the
+        // materialized view directly, which isn't exposed to the API, so the
+        // query always failed and the nudge never sent.)
+        const { rows: keywords, total: totalOpportunities } = await getStrikingDistance(site.id, 1)
+        if (!keywords.length || totalOpportunities === 0) continue
 
         const topKw = keywords[0]
-        const siteName = site.display_name || site.site_url.replace(/^(sc-domain:|https?:\/\/)/, "").replace(/\/$/, "")
+        const siteName = siteDisplayName(site)
 
         await send(
           user.email,
@@ -314,7 +345,8 @@ async function sendNudgeRecommendationsEmails(now: Date) {
             topKeywordPosition: Number(topKw.avg_position),
             topKeywordImpressions: Number(topKw.total_impressions),
             totalOpportunities,
-          })
+          }),
+          user.id
         )
 
         // Mark as nudged so we don't send again
@@ -334,40 +366,56 @@ async function sendNudgeRecommendationsEmails(now: Date) {
 // --- Data helpers ---
 
 async function getTrafficSnapshot(siteId: string) {
-  const sevenDaysAgo = new Date(Date.now() - 7 * 86400000).toISOString().split("T")[0]
-  const { data } = await admin.from("gsc_data").select("clicks, impressions, position").eq("site_id", siteId).gte("date", sevenDaysAgo)
-  if (!data?.length) return { clicks: 0, impressions: 0, avgPosition: 0 }
+  // Last 7 days of data we actually have, paged past the 1,000-row cap.
+  const latest = await getLatestDataDate(siteId)
+  if (!latest) return { clicks: 0, impressions: 0, avgPosition: 0 }
+  const data = await fetchAllRows<{ clicks: number; impressions: number; position: number }>((from, to) =>
+    admin.from("gsc_data").select("clicks, impressions, position").eq("site_id", siteId)
+      .gte("date", isoDay(daysBefore(latest, 6))).lte("date", isoDay(latest))
+      .order("id").range(from, to)
+  )
+  if (!data.length) return { clicks: 0, impressions: 0, avgPosition: 0 }
   const clicks = data.reduce((sum, r) => sum + (r.clicks || 0), 0)
   const impressions = data.reduce((sum, r) => sum + (r.impressions || 0), 0)
-  const avgPosition = data.reduce((sum, r) => sum + Number(r.position || 0), 0) / data.length
+  // Impression-weighted, like GSC.
+  const weighted = data.reduce((sum, r) => sum + Number(r.position || 0) * (r.impressions || 0), 0)
+  const avgPosition = impressions > 0 ? weighted / impressions : 0
   return { clicks, impressions, avgPosition }
 }
 
 async function getTopKeywords(siteId: string) {
-  const { data } = await admin.from("striking_distance_keywords").select("query, avg_position, total_impressions, opportunity_score").eq("site_id", siteId).order("opportunity_score", { ascending: false }).limit(5)
-  return (data || []).map((kw) => ({ query: kw.query, position: Number(kw.avg_position), opportunityScore: Number(kw.opportunity_score), impressions: Number(kw.total_impressions) }))
+  const { rows } = await getStrikingDistance(siteId, 5)
+  return rows.map((kw) => ({ query: kw.query, position: Number(kw.avg_position), opportunityScore: Number(kw.opportunity_score), impressions: Number(kw.total_impressions) }))
 }
 
 async function getPositionMovers(siteId: string) {
-  const now = Date.now()
-  const sevenDaysAgo = new Date(now - 7 * 86400000).toISOString().split("T")[0]
-  const fourteenDaysAgo = new Date(now - 14 * 86400000).toISOString().split("T")[0]
-  const { data } = await admin.from("gsc_data").select("query, date, position").eq("site_id", siteId).gte("date", fourteenDaysAgo).gte("impressions", 10)
-  if (!data?.length) return []
-  const thisWeek = new Map<string, number[]>()
-  const lastWeek = new Map<string, number[]>()
+  const latest = await getLatestDataDate(siteId)
+  if (!latest) return []
+  const thisWeekStart = isoDay(daysBefore(latest, 6))
+  const lastWeekStart = isoDay(daysBefore(latest, 13))
+  const data = await fetchAllRows<{ query: string; date: string; position: number; impressions: number }>((from, to) =>
+    admin.from("gsc_data").select("query, date, position, impressions").eq("site_id", siteId)
+      .gte("date", lastWeekStart).lte("date", isoDay(latest)).gte("impressions", 10)
+      .order("id").range(from, to)
+  )
+  if (!data.length) return []
+  // Impression-weighted position per query per week.
+  type Acc = { weighted: number; impressions: number }
+  const thisWeek = new Map<string, Acc>()
+  const lastWeek = new Map<string, Acc>()
   for (const row of data) {
-    const bucket = row.date >= sevenDaysAgo ? thisWeek : lastWeek
-    const positions = bucket.get(row.query) || []
-    positions.push(Number(row.position))
-    bucket.set(row.query, positions)
+    const bucket = row.date >= thisWeekStart ? thisWeek : lastWeek
+    const acc = bucket.get(row.query) || { weighted: 0, impressions: 0 }
+    acc.weighted += Number(row.position) * row.impressions
+    acc.impressions += row.impressions
+    bucket.set(row.query, acc)
   }
   const movers: { query: string; direction: "up" | "down"; change: number; currentPosition: number }[] = []
-  for (const [query, positions] of thisWeek) {
-    const lastPositions = lastWeek.get(query)
-    if (!lastPositions) continue
-    const avgNow = positions.reduce((a, b) => a + b, 0) / positions.length
-    const avgBefore = lastPositions.reduce((a, b) => a + b, 0) / lastPositions.length
+  for (const [query, acc] of thisWeek) {
+    const before = lastWeek.get(query)
+    if (!before) continue
+    const avgNow = acc.weighted / acc.impressions
+    const avgBefore = before.weighted / before.impressions
     const change = avgBefore - avgNow
     if (Math.abs(change) >= 1) movers.push({ query, direction: change > 0 ? "up" : "down", change: Math.abs(change), currentPosition: avgNow })
   }

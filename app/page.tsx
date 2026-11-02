@@ -23,7 +23,7 @@ import { ActionPlanMock, ShippedMock } from "@/components/marketing/app-mockups"
 import { Marquee, type MarqueeItem } from "@/components/marketing/marquee"
 import { PricingCards } from "@/components/marketing/pricing"
 import { FaqList } from "@/components/marketing/faq-list"
-import { BUILD_IN_PUBLIC_TWEETS, FAQ_ITEMS, FOUNDER, PRICING_TIERS } from "@/lib/constants"
+import { FAQ_ITEMS, PRICING_TIERS } from "@/lib/constants"
 import { TOOLS } from "@/lib/tools"
 import { TOOL_ICONS } from "@/lib/tool-icons"
 
@@ -417,58 +417,6 @@ export default function Page() {
                 </Reveal>
               ))}
             </div>
-          </Tile>
-        </TileReveal>
-
-        {/* Founder + build in public */}
-        <TileReveal>
-          <Tile tone="lime" className="px-6 py-16 md:px-12 md:py-24" aria-labelledby="founder-title">
-            <div className="grid items-center gap-10 md:grid-cols-[auto_1fr]">
-              <div className="flex flex-col items-center gap-5">
-                <Image
-                  src="/images/founder-portrait.jpg"
-                  alt="Ayush, founder of GSCdaddy"
-                  width={176}
-                  height={176}
-                  className="size-44 rounded-[2rem] object-cover shadow-[0_24px_50px_-24px_rgb(0_0_0/0.5)]"
-                />
-                <a
-                  href="https://trustmrr.com/startup/gscdaddy"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-foreground/60 underline underline-offset-4 hover:text-foreground"
-                >
-                  Revenue verified on TrustMRR
-                </a>
-              </div>
-              <div>
-                <Eyebrow>Built in public</Eyebrow>
-                <h2 id="founder-title" className="mt-4 font-heading text-2xl leading-snug font-semibold tracking-tight md:text-[2rem]">
-                  “{FOUNDER.quote}”
-                </h2>
-                <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-foreground/75">{FOUNDER.bio}</p>
-                <p className="mt-4 text-sm font-medium">
-                  {FOUNDER.name} · <span className="text-foreground/60">{FOUNDER.title}</span>
-                </p>
-              </div>
-            </div>
-            <ul className="mt-12 grid gap-3 md:grid-cols-3">
-              {BUILD_IN_PUBLIC_TWEETS.map((t, i) => (
-                <Reveal key={t.url} as="li" delay={i * 0.08}>
-                  <a
-                    href={t.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex h-full flex-col rounded-3xl p-6 ring-[1.5px] ring-foreground/60 transition-colors hover:bg-card/50"
-                  >
-                    <p className="line-clamp-6 flex-1 text-[15px] leading-relaxed whitespace-pre-line">{t.text}</p>
-                    <p className="mt-5 text-xs font-semibold tracking-[0.12em] text-foreground/60 uppercase">
-                      @ayu_theindiedev · {t.date}
-                    </p>
-                  </a>
-                </Reveal>
-              ))}
-            </ul>
           </Tile>
         </TileReveal>
 

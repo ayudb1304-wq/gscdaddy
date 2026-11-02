@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState, useCallback } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -62,16 +63,26 @@ export default function SitesPage() {
   const [availableSites, setAvailableSites] = useState<AvailableSite[]>([])
   const [loadingAvailable, setLoadingAvailable] = useState(false)
   const [adding, setAdding] = useState<string | null>(null)
+  const [actionError, setActionError] = useState<string | null>(null)
+  const router = useRouter()
+
+  async function errorMessage(res: Response, fallback: string) {
+    const body = await res.json().catch(() => null)
+    return body?.error?.message || body?.error || fallback
+  }
 
   const fetchSites = useCallback(async () => {
     const [sitesRes, usageRes] = await Promise.all([
       fetch("/api/sites"),
       fetch("/api/billing/usage"),
     ])
-    const sitesData = await sitesRes.json()
-    const usageData = await usageRes.json()
-    setSites(sitesData.data || sitesData || [])
-    setUsage(usageData)
+    // Only store data from successful responses: an error body (429, 500, GSC
+    // token failure) stored as state crashed the page on .map().
+    const sitesData = sitesRes.ok ? await sitesRes.json().catch(() => null) : null
+    const usageData = usageRes.ok ? await usageRes.json().catch(() => null) : null
+    const list = sitesData?.data ?? sitesData
+    setSites(Array.isArray(list) ? list : [])
+    if (usageData) setUsage(usageData)
     setLoading(false)
   }, [])
 
@@ -129,18 +140,33 @@ export default function SitesPage() {
 
   async function handleSync(siteId: string) {
     setSyncing(siteId)
-    await fetch(`/api/sites/${siteId}/sync`, { method: "POST" })
-    // Update the site status locally
-    setSites((prev) =>
-      prev.map((s) => (s.id === siteId ? { ...s, sync_status: "syncing" } : s))
-    )
-    setSyncing(null)
+    setActionError(null)
+    try {
+      const res = await fetch(`/api/sites/${siteId}/sync`, { method: "POST" })
+      if (!res.ok) {
+        setActionError(await errorMessage(res, "Couldn't start the sync. Try again."))
+        return
+      }
+      // Update the site status locally
+      setSites((prev) =>
+        prev.map((s) => (s.id === siteId ? { ...s, sync_status: "syncing" } : s))
+      )
+    } finally {
+      setSyncing(null)
+    }
   }
 
   async function handleRemove(siteId: string) {
-    await fetch(`/api/sites/${siteId}`, { method: "DELETE" })
+    setActionError(null)
+    const res = await fetch(`/api/sites/${siteId}`, { method: "DELETE" })
+    if (!res.ok) {
+      setActionError(await errorMessage(res, "Couldn't remove the site. Try again."))
+      return
+    }
     setSites((prev) => prev.filter((s) => s.id !== siteId))
     if (usage) setUsage({ ...usage, sitesUsed: usage.sitesUsed - 1 })
+    // Refresh the server-rendered layout so the header site picker drops it.
+    router.refresh()
   }
 
   async function openAddDialog() {
@@ -148,8 +174,9 @@ export default function SitesPage() {
     setLoadingAvailable(true)
     try {
       const res = await fetch("/api/sites/available")
-      const data = await res.json()
-      setAvailableSites(data.data || data || [])
+      const data = res.ok ? await res.json().catch(() => null) : null
+      const list = data?.data ?? data
+      setAvailableSites(Array.isArray(list) ? list : [])
     } finally {
       setLoadingAvailable(false)
     }
@@ -165,7 +192,12 @@ export default function SitesPage() {
       })
       if (res.ok) {
         setAddDialogOpen(false)
+        setActionError(null)
         await fetchSites()
+        router.refresh()
+      } else {
+        setAddDialogOpen(false)
+        setActionError(await errorMessage(res, "Couldn't add that site. Try again."))
       }
     } finally {
       setAdding(null)
@@ -198,6 +230,12 @@ export default function SitesPage() {
 
   return (
     <div className="space-y-6">
+      {actionError && (
+        <p role="alert" className="rounded-lg border border-critical/30 bg-critical-soft px-4 py-3 text-sm text-critical">
+          {actionError}
+        </p>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

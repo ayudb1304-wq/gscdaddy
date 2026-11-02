@@ -1,4 +1,4 @@
-import Link from "next/link"
+import { SiteLink } from "@/components/dashboard/site-link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowRight, TrendingUp, TrendingDown, Minus, Clock } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -53,12 +53,12 @@ export function ShippedRecsBand({ items }: { items: ShippedRec[] }) {
             How your completed recommendations are performing
           </p>
         </div>
-        <Link
+        <SiteLink
           href="/reports/recommendations"
           className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
         >
           View all <ArrowRight className="h-3 w-3" />
-        </Link>
+        </SiteLink>
       </CardHeader>
       <CardContent>
         {items.length === 0 ? (
@@ -67,12 +67,12 @@ export function ShippedRecsBand({ items }: { items: ShippedRec[] }) {
             <p className="mt-1 text-xs text-muted-foreground">
               Mark a recommendation as complete and we&apos;ll start tracking its impact here.
             </p>
-            <Link
+            <SiteLink
               href="/reports/recommendations"
               className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
             >
               Go to recommendations <ArrowRight className="h-3 w-3" />
-            </Link>
+            </SiteLink>
           </div>
         ) : (
           <div className="space-y-4">

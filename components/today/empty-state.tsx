@@ -1,9 +1,9 @@
-import Link from "next/link"
+import { SiteLink } from "@/components/dashboard/site-link"
 import { ArrowRight, Globe, Sparkles, Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface EmptyStateProps {
-  kind: "no-sites" | "first-sync" | "no-data-yet"
+  kind: "no-sites" | "first-sync" | "first-sync-failed" | "no-data-yet"
   name?: string | null
 }
 
@@ -21,11 +21,28 @@ export function TodayEmptyState({ kind, name }: EmptyStateProps) {
           GSCdaddy pulls your Google Search Console data, surfaces striking-distance
           keywords, and drafts AI recommendations — all on autopilot. It starts here.
         </p>
-        <Link href="/settings/sites" className="mt-5">
+        <SiteLink href="/settings/sites" className="mt-5">
           <Button className="gap-1.5">
             Connect a site <ArrowRight className="size-3.5" />
           </Button>
-        </Link>
+        </SiteLink>
+      </div>
+    )
+  }
+
+  if (kind === "first-sync-failed") {
+    return (
+      <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border/60 bg-card py-16 text-center">
+        <h2 className="text-xl font-semibold">Your first sync didn&apos;t finish</h2>
+        <p className="mt-2 max-w-md text-sm text-muted-foreground">
+          We couldn&apos;t pull your Search Console data. Start the sync again from your
+          sites settings. If it keeps failing, log out and back in to refresh Google access.
+        </p>
+        <SiteLink href="/settings/sites" className="mt-5">
+          <Button variant="outline" className="gap-1.5">
+            Go to sites <ArrowRight className="size-3.5" />
+          </Button>
+        </SiteLink>
       </div>
     )
   }
@@ -41,11 +58,11 @@ export function TodayEmptyState({ kind, name }: EmptyStateProps) {
           We&apos;re pulling the last 90 days of Search Console data. This usually takes
           a couple of minutes. You can watch the progress on your dashboard.
         </p>
-        <Link href="/dashboard" className="mt-5">
+        <SiteLink href="/dashboard" className="mt-5">
           <Button variant="outline" className="gap-1.5">
             Go to dashboard <ArrowRight className="size-3.5" />
           </Button>
-        </Link>
+        </SiteLink>
       </div>
     )
   }
@@ -63,14 +80,14 @@ export function TodayEmptyState({ kind, name }: EmptyStateProps) {
         keywords and recommendations come to life.
       </p>
       <div className="mt-5 flex flex-wrap justify-center gap-2">
-        <Link href="/reports/recommendations">
+        <SiteLink href="/reports/recommendations">
           <Button className="gap-1.5">
             Try generating recommendations <ArrowRight className="size-3.5" />
           </Button>
-        </Link>
-        <Link href="/dashboard">
+        </SiteLink>
+        <SiteLink href="/dashboard">
           <Button variant="outline">See dashboard</Button>
-        </Link>
+        </SiteLink>
       </div>
     </div>
   )

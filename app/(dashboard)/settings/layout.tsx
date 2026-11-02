@@ -1,6 +1,6 @@
 "use client"
 
-import Link from "next/link"
+import { SiteLink } from "@/components/dashboard/site-link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 
@@ -18,7 +18,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
       <h1 className="font-heading text-3xl leading-tight font-semibold tracking-[-0.02em] md:text-[2.25rem]">Settings</h1>
       <nav className="mt-6 inline-flex gap-1 rounded-xl bg-muted p-1">
         {tabs.map((tab) => (
-          <Link
+          <SiteLink
             key={tab.href}
             href={tab.href}
             className={cn(
@@ -29,7 +29,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
             )}
           >
             {tab.label}
-          </Link>
+          </SiteLink>
         ))}
       </nav>
       <div className="mt-8">{children}</div>

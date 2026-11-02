@@ -2,7 +2,7 @@ import dotenv from "dotenv"
 dotenv.config({ path: ".env.local" })
 
 import { createClient } from "@supabase/supabase-js"
-import { syncSite } from "../lib/sync/gsc-sync"
+import { syncSite, isSyncInProgress } from "../lib/sync/gsc-sync"
 
 const admin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -13,10 +13,43 @@ const admin = createClient(
 async function main() {
   console.log("Starting GSC sync cron...")
 
-  const { data: sites, error } = await admin
+  // Only sync users who still have access: an unexpired trial or an active
+  // subscription. Expired trials and churned users were being synced forever,
+  // spending GSC quota and failing daily on revoked tokens.
+  const { data: users, error: usersError } = await admin
+    .from("users")
+    .select("id, trial_ends_at, subscriptions(status)")
+    .range(0, 9999)
+
+  if (usersError) {
+    console.error("Failed to fetch users:", usersError)
+    process.exit(1)
+  }
+
+  const now = Date.now()
+  const activeUserIds = (users ?? [])
+    .filter((u) => {
+      const trialActive = u.trial_ends_at && new Date(u.trial_ends_at).getTime() > now
+      const paid = ((u.subscriptions as { status: string }[] | null) ?? []).some((s) => s.status === "active")
+      return trialActive || paid
+    })
+    .map((u) => u.id)
+
+  console.log(`${activeUserIds.length} of ${users?.length ?? 0} users have active access`)
+  if (activeUserIds.length === 0) {
+    console.log("No active users to sync")
+    return
+  }
+
+  const { data: allSites, error } = await admin
     .from("sites")
-    .select("id, site_url")
-    .neq("sync_status", "syncing")
+    .select("*")
+    .in("user_id", activeUserIds)
+
+  // Skip sites genuinely mid-sync; a stale "syncing" (killed run) is retried.
+  const sites = (allSites ?? []).filter(
+    (s: { sync_status: string | null; sync_started_at?: string | null }) => !isSyncInProgress(s.sync_status, s.sync_started_at)
+  ) as { id: string; site_url: string }[]
 
   if (error) {
     console.error("Failed to fetch sites:", error)
