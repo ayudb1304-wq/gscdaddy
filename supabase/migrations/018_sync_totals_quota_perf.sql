@@ -98,9 +98,9 @@ AS $$
       AND NOT EXISTS (SELECT 1 FROM totals WHERE totals.date = g.date)
     GROUP BY g.date
   )
-  SELECT totals.date, totals.clicks, totals.impressions, totals.position, true FROM totals
+  SELECT totals.date, totals.clicks, totals.impressions, totals.position::numeric, true FROM totals
   UNION ALL
-  SELECT summed.date, summed.clicks, summed.impressions, summed.position, false FROM summed
+  SELECT summed.date, summed.clicks, summed.impressions, summed.position::numeric, false FROM summed
   ORDER BY 1;
 $$;
 
@@ -193,8 +193,12 @@ agg AS (
   HAVING SUM(g.impressions) >= 5
 )
 SELECT
-  site_id, query, page, avg_position, total_impressions, total_clicks, avg_ctr,
-  total_impressions * (21 - avg_position) / 16 AS opportunity_score,
+  site_id, query, page,
+  avg_position::numeric AS avg_position,
+  total_impressions::bigint AS total_impressions,
+  total_clicks::bigint AS total_clicks,
+  avg_ctr::numeric AS avg_ctr,
+  (total_impressions * (21 - avg_position) / 16)::numeric AS opportunity_score,
   last_seen
 FROM agg
 WHERE avg_position >= 5 AND avg_position <= 20
