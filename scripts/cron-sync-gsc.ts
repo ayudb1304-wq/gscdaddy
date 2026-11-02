@@ -68,8 +68,14 @@ async function main() {
 
   for (const site of sites) {
     try {
-      const { rowCount } = await syncSite(site.id)
-      console.log(`  ✓ ${site.site_url} — ${rowCount} rows`)
+      // The view is refreshed once below for all sites, not after each one.
+      const { rowCount, complete, syncedThrough } = await syncSite(site.id, {
+        refreshView: false,
+        timeBudgetMs: 8 * 60_000,
+      })
+      console.log(
+        `  ✓ ${site.site_url} — ${rowCount} rows${complete ? "" : ` (partial, through ${syncedThrough}; continues tomorrow)`}`
+      )
       succeeded++
     } catch (e) {
       const message = e instanceof Error ? e.message : "Unknown error"

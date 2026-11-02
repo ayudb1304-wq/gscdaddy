@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
+import { notifyUsageChanged } from "@/lib/usage-events"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -167,6 +168,7 @@ export default function SitesPage() {
     }
     setSites((prev) => prev.filter((s) => s.id !== siteId))
     if (usage) setUsage({ ...usage, sitesUsed: usage.sitesUsed - 1 })
+    notifyUsageChanged()
     // Refresh the server-rendered layout so the header site picker drops it.
     router.refresh()
   }
@@ -216,6 +218,7 @@ export default function SitesPage() {
         )
         await fetchSites()
         router.refresh()
+        notifyUsageChanged()
       } else {
         setAddDialogOpen(false)
         setActionError(await errorMessage(res, "Couldn't add that site. Try again."))

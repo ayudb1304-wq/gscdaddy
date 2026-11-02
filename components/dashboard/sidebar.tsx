@@ -21,6 +21,7 @@ import { Logo } from "@/components/logo"
 import { cn } from "@/lib/utils"
 import { TOOLS } from "@/lib/tools"
 import { TOOL_ICONS } from "@/lib/tool-icons"
+import { USAGE_CHANGED_EVENT } from "@/lib/usage-events"
 
 type NavIcon = React.ComponentType<{ className?: string }>
 type NavLink = { label: string; href: string; icon: NavIcon }
@@ -78,11 +79,31 @@ export function Sidebar({ className }: { className?: string }) {
   const [settingsOpen, setSettingsOpen] = useState(pathname.startsWith("/settings"))
   const [usage, setUsage] = useState<Usage | null>(null)
 
+  // Refetch whenever sites or recommendations change (and on returning to the
+  // tab): this shell persists across pages, so a one-time fetch went stale.
   useEffect(() => {
-    fetch("/api/billing/usage")
-      .then((r) => r.json())
-      .then(setUsage)
-      .catch(() => {})
+    let cancelled = false
+    const load = () => {
+      fetch("/api/billing/usage")
+        .then((r) => (r.ok ? r.json() : null))
+        .then((data) => {
+          if (!cancelled && data && typeof data.sitesUsed === "number") setUsage(data)
+        })
+        .catch(() => {})
+    }
+    const onVisible = () => {
+      if (document.visibilityState === "visible") load()
+    }
+    load()
+    window.addEventListener(USAGE_CHANGED_EVENT, load)
+    window.addEventListener("gsc:sync-completed", load)
+    document.addEventListener("visibilitychange", onVisible)
+    return () => {
+      cancelled = true
+      window.removeEventListener(USAGE_CHANGED_EVENT, load)
+      window.removeEventListener("gsc:sync-completed", load)
+      document.removeEventListener("visibilitychange", onVisible)
+    }
   }, [])
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`)

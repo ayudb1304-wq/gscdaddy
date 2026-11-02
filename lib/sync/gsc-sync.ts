@@ -7,7 +7,16 @@ function formatDate(date: Date): string {
 }
 
 const DAY_MS = 86_400_000
-const MAX_LOOKBACK_DAYS = 90
+/** First sync for a site: this many days back. */
+const INITIAL_DAYS = 90
+/** Re-fetch this many days before the newest stored day (GSC finalizes late). */
+const OVERLAP_DAYS = 4
+/** Always cover at least the last N days. */
+const MIN_RECENT_DAYS = 6
+/** Search Console keeps about 16 months of data. */
+const MAX_LOOKBACK_DAYS = 480
+/** Fetch and save in chunks so long backfills make durable progress. */
+const CHUNK_DAYS = 30
 
 /** A "syncing" status older than this is treated as a dead run and retried. */
 export const STALE_SYNC_MS = 30 * 60 * 1000
@@ -25,27 +34,45 @@ export function isSyncInProgress(syncStatus: string | null, syncStartedAt: strin
   return Date.now() - new Date(syncStartedAt).getTime() < STALE_SYNC_MS
 }
 
-function getDateRange(lastSyncedAt: string | null): { startDate: string; endDate: string } {
-  const now = new Date()
-  const endDate = new Date(now)
+const utcDay = (d: Date) => new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()))
+const addDays = (d: Date, n: number) => new Date(d.getTime() + n * DAY_MS)
 
-  let startDate: Date
-  if (!lastSyncedAt) {
-    // Initial sync: last 90 days
-    startDate = new Date(now.getTime() - MAX_LOOKBACK_DAYS * DAY_MS)
+/**
+ * Where to start fetching. Based on the newest day actually stored for the site,
+ * not on when the last sync ran: a sync that "completed" with no data, or a site
+ * that was stuck for months, used to leave a gap that never filled.
+ */
+export function getSyncRange(latestStoredDate: string | null, now = new Date()): { start: Date; end: Date } {
+  const end = utcDay(now)
+  const earliest = addDays(end, -MAX_LOOKBACK_DAYS)
+  let start: Date
+  if (!latestStoredDate) {
+    start = addDays(end, -INITIAL_DAYS)
   } else {
-    // Daily sync: last 6 days (overlap to catch late-arriving data), or further
-    // back if the last good sync is older, so outages don't leave gaps.
-    const sixDaysAgo = now.getTime() - 6 * DAY_MS
-    const sinceLastSync = new Date(lastSyncedAt).getTime() - 3 * DAY_MS
-    const earliest = now.getTime() - MAX_LOOKBACK_DAYS * DAY_MS
-    startDate = new Date(Math.max(earliest, Math.min(sixDaysAgo, sinceLastSync)))
+    const fromLatest = addDays(new Date(`${latestStoredDate}T00:00:00Z`), -OVERLAP_DAYS)
+    start = new Date(Math.min(fromLatest.getTime(), addDays(end, -MIN_RECENT_DAYS).getTime()))
   }
+  if (start < earliest) start = earliest
+  return { start, end }
+}
 
-  return {
-    startDate: formatDate(startDate),
-    endDate: formatDate(endDate),
+/** Split [start, end] into consecutive chunks of at most CHUNK_DAYS days, oldest first. */
+export function chunkRange(start: Date, end: Date, days = CHUNK_DAYS): { start: string; end: string }[] {
+  const chunks: { start: string; end: string }[] = []
+  for (let cs = start; cs <= end; cs = addDays(cs, days)) {
+    const ce = addDays(cs, days - 1)
+    chunks.push({ start: formatDate(cs), end: formatDate(ce > end ? end : ce) })
   }
+  // Fold a short tail (under a week) into the previous chunk: one fewer API call.
+  if (chunks.length > 1) {
+    const tail = chunks[chunks.length - 1]
+    const tailDays = (new Date(`${tail.end}T00:00:00Z`).getTime() - new Date(`${tail.start}T00:00:00Z`).getTime()) / DAY_MS + 1
+    if (tailDays < 7) {
+      chunks.pop()
+      chunks[chunks.length - 1].end = tail.end
+    }
+  }
+  return chunks
 }
 
 const BATCH_SIZE = 1000
@@ -101,8 +128,19 @@ async function batchUpsert(
   }
 }
 
-export async function syncSite(siteId: string): Promise<{ rowCount: number }> {
+export interface SyncOptions {
+  /** Refresh the striking-distance view at the end (the cron does it once for all sites). */
+  refreshView?: boolean
+  /** Stop after the current chunk once this much time has passed; the next sync continues. */
+  timeBudgetMs?: number
+}
+
+export async function syncSite(
+  siteId: string,
+  { refreshView = true, timeBudgetMs = Infinity }: SyncOptions = {}
+): Promise<{ rowCount: number; complete: boolean; syncedThrough: string | null }> {
   const admin = createAdminClient()
+  const startedAt = Date.now()
 
   // Fetch site record
   const { data: site, error: siteError } = await admin
@@ -129,27 +167,47 @@ export async function syncSite(siteId: string): Promise<{ rowCount: number }> {
   }
 
   try {
-    // Get valid access token (refreshes if needed)
     await updateSyncProgress(admin, siteId, "Authenticating with Google...")
-    const accessToken = await getValidAccessToken(site.user_id)
+    // Fail fast on revoked access before planning anything.
+    await getValidAccessToken(site.user_id)
 
-    // Determine date range
-    const { startDate, endDate } = getDateRange(site.last_synced_at)
-    const isInitial = !site.last_synced_at
-    await updateSyncProgress(
-      admin,
-      siteId,
-      `Fetching ${isInitial ? "90 days of" : "recent"} data from GSC (${startDate} to ${endDate})...`
-    )
+    const { data: latestRow } = await admin
+      .from("gsc_data")
+      .select("date")
+      .eq("site_id", siteId)
+      .order("date", { ascending: false })
+      .limit(1)
+      .maybeSingle()
 
-    // Fetch all data from GSC (handles pagination internally)
-    const rows = await fetchAllSearchAnalytics(accessToken, site.site_url, startDate, endDate)
+    const { start, end } = getSyncRange(latestRow?.date ?? null)
+    const chunks = chunkRange(start, end)
+    const isInitial = !latestRow
 
-    await updateSyncProgress(admin, siteId, `Fetched ${rows.length} rows. Saving to database...`)
+    let rowCount = 0
+    let syncedThrough: string | null = null
+    let complete = true
 
-    // Batch upsert into gsc_data
-    if (rows.length > 0) {
-      await batchUpsert(admin, siteId, rows)
+    for (let i = 0; i < chunks.length; i++) {
+      const chunk = chunks[i]
+      await updateSyncProgress(
+        admin,
+        siteId,
+        `${isInitial ? "First sync" : "Syncing"}: ${chunk.start} to ${chunk.end} (${i + 1}/${chunks.length})...`
+      )
+      // Per chunk, so a long backfill never runs on an expired token.
+      const accessToken = await getValidAccessToken(site.user_id)
+      const rows = await fetchAllSearchAnalytics(accessToken, site.site_url, chunk.start, chunk.end)
+      if (rows.length > 0) {
+        await batchUpsert(admin, siteId, rows)
+      }
+      rowCount += rows.length
+      syncedThrough = chunk.end
+
+      if (i < chunks.length - 1 && Date.now() - startedAt > timeBudgetMs) {
+        // Saved so far is durable; the next sync resumes from the newest stored day.
+        complete = false
+        break
+      }
     }
 
     // Refresh the striking-distance materialized view before flipping status
@@ -157,27 +215,30 @@ export async function syncSite(siteId: string): Promise<{ rowCount: number }> {
     // refetch as soon as they see status != "syncing"; if the view isn't
     // refreshed first, the user sees empty/stale opportunities for a beat.
     // Non-fatal on failure — the nightly refresh-views cron is a safety net.
-    await updateSyncProgress(admin, siteId, "Refreshing opportunities view...")
-    // rpc() returns errors instead of throwing, so check both.
-    try {
-      const { error: refreshError } = await admin.rpc("refresh_striking_distance")
-      if (refreshError) console.error(`Post-sync view refresh failed for site ${siteId}:`, refreshError.message)
-    } catch (err) {
-      console.error(`Post-sync view refresh failed for site ${siteId}:`, err)
+    if (refreshView) {
+      await updateSyncProgress(admin, siteId, "Refreshing opportunities view...")
+      // rpc() returns errors instead of throwing, so check both.
+      try {
+        const { error: refreshError } = await admin.rpc("refresh_striking_distance")
+        if (refreshError) console.error(`Post-sync view refresh failed for site ${siteId}:`, refreshError.message)
+      } catch (err) {
+        console.error(`Post-sync view refresh failed for site ${siteId}:`, err)
+      }
     }
 
-    // Mark as completed
     await admin
       .from("sites")
       .update({
         sync_status: "completed",
-        sync_progress: `Completed: ${rows.length} rows synced`,
+        sync_progress: complete
+          ? `Completed: ${rowCount} rows synced`
+          : `Synced through ${syncedThrough} (${rowCount} rows). The rest continues on the next sync.`,
         last_synced_at: new Date().toISOString(),
       })
       .eq("id", siteId)
 
-    console.log(`Sync completed for site ${siteId}: ${rows.length} rows`)
-    return { rowCount: rows.length }
+    console.log(`Sync ${complete ? "completed" : "partially completed"} for site ${siteId}: ${rowCount} rows through ${syncedThrough}`)
+    return { rowCount, complete, syncedThrough }
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error"
     // Mark as failed

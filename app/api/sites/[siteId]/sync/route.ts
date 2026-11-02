@@ -36,7 +36,9 @@ export async function POST(
     // Use next/server after() to keep the function alive after responding
     after(async () => {
       try {
-        await syncSite(siteId)
+        // Stay well inside the 300s function limit; a long backfill resumes
+        // on the next sync from the newest stored day.
+        await syncSite(siteId, { timeBudgetMs: 200_000 })
       } catch (err) {
         console.error(`Background sync failed for site ${siteId}:`, err)
         return

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import { useSearchParams } from "next/navigation"
+import { notifyUsageChanged } from "@/lib/usage-events"
 import { RecommendationCard } from "@/components/reports/recommendation-card"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -85,6 +86,7 @@ export default function RecommendationsPage() {
       const json = await res.json().catch(() => null)
       if (json?.success) {
         await fetchRecs()
+        notifyUsageChanged()
       } else {
         setActionError(json?.error?.message || "Generating recommendations took too long or failed. Try again in a minute.")
       }
@@ -120,6 +122,7 @@ export default function RecommendationsPage() {
       setActionError("Couldn't dismiss that recommendation. Try again.")
       return
     }
+    notifyUsageChanged()
     {
       setRecommendations((prev) => prev.filter((r) => r.id !== id))
     }
