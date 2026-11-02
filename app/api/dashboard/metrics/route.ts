@@ -1,6 +1,7 @@
 import { requireAuth } from "@/lib/auth"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { successResponse, errors } from "@/lib/api/response"
+import { fetchAllRows } from "@/lib/supabase/fetch-all"
 
 export async function GET(request: Request) {
   try {
@@ -36,22 +37,35 @@ export async function GET(request: Request) {
     const fmt = (d: Date) => d.toISOString().split("T")[0]
 
     // Current period metrics
-    const { data: current, error: currentError } = await admin
-      .from("gsc_data")
-      .select("clicks, impressions, position")
-      .eq("site_id", siteId)
-      .gte("date", fmt(currentStart))
-      .lte("date", fmt(currentEnd))
-
-    if (currentError) return errors.internal("Failed to fetch metrics")
+    // Paged: one request is capped at 1,000 rows, which undercounted busy sites.
+    type Row = { clicks: number; impressions: number; position: number }
+    let current: Row[]
+    try {
+      current = await fetchAllRows<Row>((from, to) =>
+        admin
+          .from("gsc_data")
+          .select("clicks, impressions, position")
+          .eq("site_id", siteId)
+          .gte("date", fmt(currentStart))
+          .lte("date", fmt(currentEnd))
+          .order("id")
+          .range(from, to)
+      )
+    } catch {
+      return errors.internal("Failed to fetch metrics")
+    }
 
     // Prior period metrics
-    const { data: prior } = await admin
-      .from("gsc_data")
-      .select("clicks, impressions, position")
-      .eq("site_id", siteId)
-      .gte("date", fmt(priorStart))
-      .lte("date", fmt(priorEnd))
+    const prior = await fetchAllRows<Row>((from, to) =>
+      admin
+        .from("gsc_data")
+        .select("clicks, impressions, position")
+        .eq("site_id", siteId)
+        .gte("date", fmt(priorStart))
+        .lte("date", fmt(priorEnd))
+        .order("id")
+        .range(from, to)
+    ).catch(() => [] as Row[])
 
     // Striking distance count from materialized view
     const { count: strikingCount } = await admin

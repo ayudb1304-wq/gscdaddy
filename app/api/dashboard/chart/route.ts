@@ -1,6 +1,7 @@
 import { requireAuth } from "@/lib/auth"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { successResponse, errors } from "@/lib/api/response"
+import { fetchAllRows } from "@/lib/supabase/fetch-all"
 
 export async function GET(request: Request) {
   try {
@@ -32,15 +33,23 @@ export async function GET(request: Request) {
     const fmt = (d: Date) => d.toISOString().split("T")[0]
 
     // Fetch raw data grouped by date
-    const { data, error } = await admin
-      .from("gsc_data")
-      .select("date, clicks, impressions, position")
-      .eq("site_id", siteId)
-      .gte("date", fmt(startDate))
-      .lte("date", fmt(endDate))
-      .order("date", { ascending: true })
-
-    if (error) return errors.internal("Failed to fetch chart data")
+    // Paged: one request is capped at 1,000 rows, which cut the chart off for busy sites.
+    let data: { date: string; clicks: number; impressions: number; position: number }[]
+    try {
+      data = await fetchAllRows((from, to) =>
+        admin
+          .from("gsc_data")
+          .select("date, clicks, impressions, position")
+          .eq("site_id", siteId)
+          .gte("date", fmt(startDate))
+          .lte("date", fmt(endDate))
+          .order("date", { ascending: true })
+          .order("id")
+          .range(from, to)
+      )
+    } catch {
+      return errors.internal("Failed to fetch chart data")
+    }
 
     // Aggregate by date
     const byDate = new Map<string, { clicks: number; impressions: number; positions: number[]; }>()
