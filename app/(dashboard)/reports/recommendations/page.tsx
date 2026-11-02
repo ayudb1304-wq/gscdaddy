@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import { RecommendationCard } from "@/components/reports/recommendation-card"
 import { Button } from "@/components/ui/button"
@@ -32,18 +32,33 @@ export default function RecommendationsPage() {
   const [loading, setLoading] = useState(true)
   const [generating, setGenerating] = useState(false)
   const [activeTab, setActiveTab] = useState<FilterTab>("all")
+  const [actionError, setActionError] = useState<string | null>(null)
+
+  // Don't show the previous site's recs while the new site loads.
+  const [prevSiteId, setPrevSiteId] = useState(siteId)
+  if (siteId !== prevSiteId) {
+    setPrevSiteId(siteId)
+    setRecommendations([])
+    setActionError(null)
+  }
+
+  // Only the latest request may update state (slow responses for a previous
+  // site would otherwise overwrite the current one).
+  const requestId = useRef(0)
 
   const fetchRecs = useCallback(async () => {
     if (!siteId) return
+    const id = ++requestId.current
     setLoading(true)
     try {
       const res = await fetch(`/api/recommendations?siteId=${siteId}`)
-      const json = await res.json()
-      if (json.success) {
-        setRecommendations(json.data)
-      }
+      const json = await res.json().catch(() => null)
+      if (id !== requestId.current) return
+      setRecommendations(json?.success ? json.data : [])
+    } catch {
+      if (id === requestId.current) setRecommendations([])
     } finally {
-      setLoading(false)
+      if (id === requestId.current) setLoading(false)
     }
   }, [siteId])
 
@@ -63,23 +78,32 @@ export default function RecommendationsPage() {
   const handleGenerate = async () => {
     if (!siteId) return
     setGenerating(true)
+    setActionError(null)
     try {
       const res = await fetch(`/api/recommendations/generate/${siteId}`, { method: "POST" })
-      const json = await res.json()
-      if (json.success) {
+      // A timeout comes back as an HTML error page, not JSON.
+      const json = await res.json().catch(() => null)
+      if (json?.success) {
         await fetchRecs()
       } else {
-        alert(json.error?.message || "Failed to generate recommendations")
+        setActionError(json?.error?.message || "Generating recommendations took too long or failed. Try again in a minute.")
       }
+    } catch {
+      setActionError("Couldn't reach the server. Check your connection and try again.")
     } finally {
       setGenerating(false)
     }
   }
 
   const handleComplete = async (id: string) => {
-    const res = await fetch(`/api/recommendations/${id}`, { method: "PATCH" })
-    const json = await res.json()
-    if (json.success) {
+    setActionError(null)
+    const res = await fetch(`/api/recommendations/${id}`, { method: "PATCH" }).catch(() => null)
+    const json = res ? await res.json().catch(() => null) : null
+    if (!json?.success) {
+      setActionError("Couldn't update that recommendation. Try again.")
+      return
+    }
+    {
       setRecommendations((prev) =>
         prev.map((r) =>
           r.id === id ? { ...r, is_completed: json.data.is_completed } : r
@@ -89,9 +113,14 @@ export default function RecommendationsPage() {
   }
 
   const handleDismiss = async (id: string) => {
-    const res = await fetch(`/api/recommendations/${id}`, { method: "DELETE" })
-    const json = await res.json()
-    if (json.success) {
+    setActionError(null)
+    const res = await fetch(`/api/recommendations/${id}`, { method: "DELETE" }).catch(() => null)
+    const json = res ? await res.json().catch(() => null) : null
+    if (!json?.success) {
+      setActionError("Couldn't dismiss that recommendation. Try again.")
+      return
+    }
+    {
       setRecommendations((prev) => prev.filter((r) => r.id !== id))
     }
   }
@@ -138,6 +167,12 @@ export default function RecommendationsPage() {
         </Button>
       </div>
 
+      {actionError && (
+        <p role="alert" className="rounded-lg border border-critical/30 bg-critical-soft px-4 py-3 text-sm text-critical">
+          {actionError}
+        </p>
+      )}
+
       {/* Filter tabs */}
       <div className="flex gap-1 border-b">
         {tabs.map((tab) => (
@@ -164,10 +199,18 @@ export default function RecommendationsPage() {
       ) : filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <Sparkles className="h-10 w-10 text-muted-foreground/50 mb-4" />
-          <p className="text-lg font-medium">No recommendations yet</p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Click &quot;Generate New&quot; to get AI-powered SEO recommendations.
-          </p>
+          {recommendations.length > 0 ? (
+            <p className="text-lg font-medium">
+              {activeTab === "completed" ? "Nothing completed yet" : "No active recommendations"}
+            </p>
+          ) : (
+            <>
+              <p className="text-lg font-medium">No recommendations yet</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Click &quot;Generate New&quot; to get AI-powered SEO recommendations.
+              </p>
+            </>
+          )}
         </div>
       ) : (
         <div className="space-y-4">

@@ -63,6 +63,7 @@ export function Header({ user, sites, plan, daysRemaining, onToggleSidebar }: He
           size="icon"
           className="lg:hidden"
           onClick={onToggleSidebar}
+          aria-label="Open menu"
         >
           <Menu className="h-5 w-5" />
         </Button>
@@ -103,7 +104,10 @@ export function Header({ user, sites, plan, daysRemaining, onToggleSidebar }: He
             </div>
             <DropdownMenuItem
               className="cursor-pointer"
-              onSelect={() => { window.location.href = "/settings/profile" }}
+              onSelect={() => {
+                const siteId = new URLSearchParams(window.location.search).get("siteId")
+                window.location.href = siteId ? `/settings/profile?siteId=${encodeURIComponent(siteId)}` : "/settings/profile"
+              }}
             >
               Settings
             </DropdownMenuItem>

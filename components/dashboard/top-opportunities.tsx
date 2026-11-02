@@ -1,4 +1,4 @@
-import Link from "next/link"
+import { SiteLink } from "@/components/dashboard/site-link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowRight } from "lucide-react"
 
@@ -15,12 +15,12 @@ export function TopOpportunities({ data }: { data: Opportunity[] }) {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-base font-medium">Top Opportunities</CardTitle>
-        <Link
+        <SiteLink
           href="/reports/striking-distance"
           className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
         >
           View all <ArrowRight className="h-3 w-3" />
-        </Link>
+        </SiteLink>
       </CardHeader>
       <CardContent>
         {data.length === 0 ? (

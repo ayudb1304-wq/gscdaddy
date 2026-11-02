@@ -1,4 +1,4 @@
-import Link from "next/link"
+import { SiteLink } from "@/components/dashboard/site-link"
 import { Badge } from "@/components/ui/badge"
 import { Target, ArrowRight } from "lucide-react"
 import { MarkCompleteButton } from "./mark-complete-button"
@@ -38,12 +38,12 @@ export function TodaysFocusBand({ rec }: { rec: FocusRec | null }) {
           <Target className="size-4 text-brand-strong" /> Today&apos;s focus
         </p>
         {rec && (
-          <Link
+          <SiteLink
             href="/reports/recommendations"
             className="flex items-center gap-1 text-sm text-foreground/70 transition-colors hover:text-foreground"
           >
             All plans <ArrowRight className="size-4" />
-          </Link>
+          </SiteLink>
         )}
       </div>
 
@@ -55,12 +55,12 @@ export function TodaysFocusBand({ rec }: { rec: FocusRec | null }) {
           <p className="mt-1 text-[15px] text-foreground/75">
             Nothing pending. Generate fresh recommendations or check back after tomorrow&apos;s sync.
           </p>
-          <Link
+          <SiteLink
             href="/reports/recommendations"
             className="mt-4 inline-flex h-10 items-center gap-1.5 rounded-xl bg-ink px-4 text-sm font-medium text-ink-foreground"
           >
             Generate recommendations <ArrowRight className="size-4" />
-          </Link>
+          </SiteLink>
         </div>
       ) : (
         <div className="mt-4 grid gap-6 lg:grid-cols-[1fr_1.1fr]">

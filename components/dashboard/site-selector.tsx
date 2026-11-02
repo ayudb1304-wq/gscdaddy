@@ -24,16 +24,19 @@ function formatSiteUrl(url: string): string {
 export function SiteSelector({ sites }: { sites: Site[] }) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const currentSiteId = searchParams.get("siteId") || sites[0]?.id
+  const paramSiteId = searchParams.get("siteId")
+  const paramIsValid = !!paramSiteId && sites.some((s) => s.id === paramSiteId)
+  const currentSiteId = paramIsValid ? paramSiteId : sites[0]?.id
 
-  // Ensure siteId is always in the URL so client pages can read it
+  // Ensure a valid siteId is always in the URL so client pages can read it
+  // (also replaces a stale one, e.g. after the site was removed).
   useEffect(() => {
-    if (sites.length > 0 && !searchParams.get("siteId")) {
+    if (sites.length > 0 && !paramIsValid) {
       const params = new URLSearchParams(searchParams.toString())
       params.set("siteId", sites[0].id)
       router.replace(`?${params.toString()}`)
     }
-  }, [sites, searchParams, router])
+  }, [sites, searchParams, router, paramIsValid])
 
   const handleChange = (siteId: string) => {
     const params = new URLSearchParams(searchParams.toString())
