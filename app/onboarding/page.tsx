@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { Logo } from "@/components/logo"
 import {
@@ -141,21 +142,44 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="dark">
-      <div className="flex min-h-screen flex-col bg-background text-foreground">
-        {/* Header */}
-        <div className="flex items-center justify-center gap-2 py-6 font-heading text-xl font-bold">
-          <Logo size={24} />
-          GSCdaddy
+    <div className="grid min-h-screen gap-3 bg-background p-3 text-foreground lg:grid-cols-[0.9fr_1.1fr]">
+      {/* Left: the same sky as the homepage and login, with what happens next */}
+      <aside className="relative hidden overflow-hidden rounded-tile lg:block">
+        <Image
+          src="/marketing/hero-sky.jpg"
+          alt=""
+          fill
+          priority
+          sizes="45vw"
+          className="object-cover object-bottom dark:brightness-[0.45] dark:saturate-[0.8]"
+        />
+        <div className="relative flex h-full flex-col justify-between p-10">
+          <div className="flex w-fit items-center gap-2 rounded-xl bg-white/80 px-3 py-2 backdrop-blur">
+            <Image src="/images/GSCDaddyLogo.png" alt="" width={24} height={24} priority />
+            <span className="font-heading text-base font-bold text-[oklch(0.2_0.008_230)]">GSCdaddy</span>
+          </div>
+          <div className="max-w-sm pb-[22%]">
+            <h2 className="font-heading text-4xl leading-[1.05] font-semibold tracking-[-0.03em] text-[oklch(0.27_0.09_245)] dark:text-white">
+              Two minutes to your first keyword opportunities.
+            </h2>
+            <p className="mt-4 text-[15px] text-[oklch(0.28_0.05_245)] dark:text-white/85">
+              Tell us who you are, pick a site from Search Console, and we&apos;ll pull your data while you
+              grab a coffee.
+            </p>
+          </div>
         </div>
+      </aside>
 
-        {/* Wizard */}
-        <div className="flex flex-1 flex-col items-center justify-center px-4 pb-16">
+      {/* Right: the wizard */}
+      <main className="flex flex-col">
+        <div className="flex items-center justify-center gap-2 py-6 lg:hidden">
+          <Logo size={26} />
+          <span className="font-heading text-xl font-bold">GSCdaddy</span>
+        </div>
+        <div className="flex flex-1 flex-col items-center justify-center px-4 py-10 lg:py-16">
           <ProgressBar currentStep={step} />
 
-          {step === 2 && (
-            <PersonaStep onSelect={handlePersonaSelect} loading={loading} />
-          )}
+          {step === 2 && <PersonaStep onSelect={handlePersonaSelect} loading={loading} />}
 
           {step === 3 && !showSitePicker && (
             <PrimingStep onConnect={handleConnect} onSkip={handleSkip} loading={loading} />
@@ -178,7 +202,7 @@ export default function OnboardingPage() {
             />
           )}
         </div>
-      </div>
+      </main>
     </div>
   )
 }
