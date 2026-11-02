@@ -22,17 +22,17 @@ interface Recommendation {
 }
 
 const TYPE_CONFIG: Record<string, { label: string; className: string }> = {
-  title_optimization: { label: "Title Optimization", className: "bg-blue-500/10 text-blue-600 border-blue-200" },
-  content_expansion: { label: "Content Expansion", className: "bg-emerald-500/10 text-emerald-600 border-emerald-200" },
-  internal_linking: { label: "Internal Linking", className: "bg-purple-500/10 text-purple-600 border-purple-200" },
-  content_refresh: { label: "Content Refresh", className: "bg-amber-500/10 text-amber-600 border-amber-200" },
-  cannibalization_fix: { label: "Cannibalization Fix", className: "bg-red-500/10 text-red-600 border-red-200" },
-  quick_win: { label: "Quick Win", className: "bg-orange-500/10 text-orange-600 border-orange-200" },
+  title_optimization: { label: "Title Optimization", className: "bg-tile-sky text-foreground" },
+  content_expansion: { label: "Content Expansion", className: "bg-tile-lime text-foreground" },
+  internal_linking: { label: "Internal Linking", className: "bg-tile-lilac text-foreground" },
+  content_refresh: { label: "Content Refresh", className: "bg-tile-cream text-foreground" },
+  cannibalization_fix: { label: "Cannibalization Fix", className: "bg-tile-rose text-foreground" },
+  quick_win: { label: "Quick Win", className: "bg-tile-peach text-foreground" },
 }
 
 const PRIORITY_CONFIG: Record<string, string> = {
-  high: "text-red-500",
-  medium: "text-amber-500",
+  high: "text-critical",
+  medium: "text-warning",
   low: "text-muted-foreground",
 }
 
@@ -86,7 +86,7 @@ export function RecommendationCard({ recommendation: rec, onComplete, onDismiss 
 
         <div className="flex items-center gap-2 shrink-0">
           <div className="text-right text-xs">
-            <div className="flex items-center gap-1 text-emerald-500">
+            <div className="flex items-center gap-1 text-ok">
               <ArrowUp className="h-3 w-3" />
               <span className="font-mono">{rec.current_position.toFixed(1)} → {rec.potential_position.toFixed(1)}</span>
             </div>
@@ -107,7 +107,7 @@ export function RecommendationCard({ recommendation: rec, onComplete, onDismiss 
                   <span className={cn(
                     "mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border text-[10px]",
                     rec.is_completed
-                      ? "border-emerald-500 bg-emerald-500/10 text-emerald-500"
+                      ? "border-ok bg-ok-soft text-ok"
                       : "border-muted-foreground/30"
                   )}>
                     {rec.is_completed && <Check className="h-2.5 w-2.5" />}

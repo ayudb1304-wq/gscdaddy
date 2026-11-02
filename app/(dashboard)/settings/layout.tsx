@@ -14,17 +14,17 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
   const pathname = usePathname()
 
   return (
-    <div className="mx-auto max-w-4xl p-6 md:p-8">
-      <h1 className="font-heading text-2xl font-semibold">Settings</h1>
-      <nav className="mt-4 flex gap-1 border-b">
+    <div className="max-w-4xl">
+      <h1 className="font-heading text-3xl leading-tight font-semibold tracking-[-0.02em] md:text-[2.25rem]">Settings</h1>
+      <nav className="mt-6 inline-flex gap-1 rounded-xl bg-muted p-1">
         {tabs.map((tab) => (
           <Link
             key={tab.href}
             href={tab.href}
             className={cn(
-              "px-4 py-2 text-sm font-medium transition-colors -mb-px",
+              "rounded-lg px-4 py-1.5 text-sm font-medium transition-colors",
               pathname.startsWith(tab.href)
-                ? "border-b-2 border-primary text-foreground"
+                ? "bg-background text-foreground shadow-[0_1px_2px_rgb(0_0_0/0.08)]"
                 : "text-muted-foreground hover:text-foreground"
             )}
           >
@@ -32,7 +32,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
           </Link>
         ))}
       </nav>
-      <div className="mt-6">{children}</div>
+      <div className="mt-8">{children}</div>
     </div>
   )
 }

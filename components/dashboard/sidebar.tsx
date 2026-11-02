@@ -3,23 +3,29 @@
 import Link from "next/link"
 import { usePathname, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
-import { LayoutDashboard, Target, Lightbulb, Settings, Crosshair, ChevronDown, CreditCard, Globe, Sparkles, User, Sunrise, Wrench, HeartPulse } from "lucide-react"
+import {
+  ChevronDown,
+  CreditCard,
+  Crosshair,
+  Globe,
+  HeartPulse,
+  LayoutDashboard,
+  Lightbulb,
+  Settings,
+  Sparkles,
+  Sunrise,
+  User,
+  Wrench,
+} from "lucide-react"
 import { Logo } from "@/components/logo"
 import { cn } from "@/lib/utils"
 import { TOOLS } from "@/lib/tools"
 import { TOOL_ICONS } from "@/lib/tool-icons"
 
 type NavIcon = React.ComponentType<{ className?: string }>
-type NavChild = { label: string; href: string; icon: NavIcon; external?: boolean }
-type NavItem = {
-  label: string
-  href?: string
-  icon: NavIcon
-  children?: NavChild[]
-}
+type NavLink = { label: string; href: string; icon: NavIcon }
 
-// Shorter labels so the sidebar row doesn't wrap. Public /tools cards keep
-// the longer marketing names from lib/tools.ts.
+// Shorter labels so sidebar rows don't wrap. Public /tools cards keep the longer names.
 const TOOL_SIDEBAR_LABELS: Record<string, string> = {
   "keyword-calculator": "Keyword Calculator",
   "serp-preview": "SERP Preview",
@@ -31,7 +37,17 @@ const TOOL_SIDEBAR_LABELS: Record<string, string> = {
   "readability-checker": "Readability",
 }
 
-const toolsChildren: NavChild[] = [
+const MAIN: NavLink[] = [
+  { label: "Today", href: "/today", icon: Sunrise },
+  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+]
+
+const KEYWORDS: NavLink[] = [
+  { label: "Striking distance", href: "/reports/striking-distance", icon: Crosshair },
+  { label: "Recommendations", href: "/reports/recommendations", icon: Lightbulb },
+]
+
+const TOOL_LINKS: NavLink[] = [
   { label: "SEO Health Checker", href: "/app/tools/seo-health-checker", icon: HeartPulse },
   ...TOOLS.map((t) => ({
     label: TOOL_SIDEBAR_LABELS[t.slug] ?? t.name,
@@ -40,39 +56,10 @@ const toolsChildren: NavChild[] = [
   })),
 ]
 
-const navItems: NavItem[] = [
-  {
-    label: "Today",
-    href: "/today",
-    icon: Sunrise,
-  },
-  {
-    label: "Dashboard",
-    href: "/dashboard",
-    icon: LayoutDashboard,
-  },
-  {
-    label: "Reports",
-    icon: Target,
-    children: [
-      { label: "Striking Distance", href: "/reports/striking-distance", icon: Crosshair },
-      { label: "Recommendations", href: "/reports/recommendations", icon: Lightbulb },
-    ],
-  },
-  {
-    label: "Tools",
-    icon: Wrench,
-    children: toolsChildren,
-  },
-  {
-    label: "Settings",
-    icon: Settings,
-    children: [
-      { label: "Profile", href: "/settings/profile", icon: User },
-      { label: "Sites", href: "/settings/sites", icon: Globe },
-      { label: "Billing", href: "/settings/billing", icon: CreditCard },
-    ],
-  },
+const SETTINGS: NavLink[] = [
+  { label: "Profile", href: "/settings/profile", icon: User },
+  { label: "Sites", href: "/settings/sites", icon: Globe },
+  { label: "Billing", href: "/settings/billing", icon: CreditCard },
 ]
 
 interface Usage {
@@ -87,7 +74,8 @@ export function Sidebar({ className }: { className?: string }) {
   const searchParams = useSearchParams()
   const siteId = searchParams.get("siteId")
   const withSiteId = (href: string) => (siteId ? `${href}?siteId=${siteId}` : href)
-  const [expandedSections, setExpandedSections] = useState<string[]>(["Reports"])
+  const [toolsOpen, setToolsOpen] = useState(pathname.startsWith("/app/tools"))
+  const [settingsOpen, setSettingsOpen] = useState(pathname.startsWith("/settings"))
   const [usage, setUsage] = useState<Usage | null>(null)
 
   useEffect(() => {
@@ -97,113 +85,61 @@ export function Sidebar({ className }: { className?: string }) {
       .catch(() => {})
   }, [])
 
-  const toggleSection = (label: string) => {
-    setExpandedSections((prev) =>
-      prev.includes(label) ? prev.filter((s) => s !== label) : [...prev, label]
-    )
-  }
+  const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`)
+
+  const item = (link: NavLink, nested = false) => (
+    <li key={link.href}>
+      <Link
+        href={withSiteId(link.href)}
+        aria-current={isActive(link.href) ? "page" : undefined}
+        className={cn(
+          "flex items-center gap-2.5 rounded-lg px-2.5 text-sm transition-colors",
+          nested ? "h-8 text-[13px]" : "h-9",
+          isActive(link.href)
+            ? "bg-sidebar-accent font-medium text-sidebar-foreground shadow-[0_1px_2px_rgb(0_0_0/0.06)] ring-1 ring-black/[0.05] dark:shadow-none dark:ring-white/[0.06]"
+            : "text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground"
+        )}
+      >
+        <link.icon className={cn("shrink-0", nested ? "size-3.5" : "size-4", isActive(link.href) && "text-brand-strong")} />
+        <span className="truncate">{link.label}</span>
+      </Link>
+    </li>
+  )
 
   return (
-    <aside
-      className={cn(
-        "flex h-full w-64 flex-col border-r bg-sidebar text-sidebar-foreground",
-        className
-      )}
-    >
-      {/* Logo */}
-      <div className="flex h-14 items-center gap-2 border-b border-sidebar-border px-4">
-        <Logo size={28} />
-        <span className="font-heading text-lg font-bold">GSCdaddy</span>
-      </div>
+    <aside className={cn("flex h-full w-60 flex-col bg-sidebar text-sidebar-foreground", className)}>
+      <Link href={withSiteId("/today")} className="flex h-16 items-center gap-2 px-5">
+        <Logo size={26} />
+        <span className="font-heading text-lg font-bold tracking-tight">GSCdaddy</span>
+      </Link>
 
-      {/* Navigation */}
-      <nav className="flex-1 space-y-1 px-2 py-3">
-        {navItems.map((item) => {
-          if (item.children) {
-            const isExpanded = expandedSections.includes(item.label)
-            const isChildActive = item.children.some((child) => pathname.startsWith(child.href))
+      <nav aria-label="App" className="flex-1 space-y-6 overflow-y-auto px-3 pt-2 pb-4">
+        <ul className="space-y-0.5">{MAIN.map((l) => item(l))}</ul>
 
-            return (
-              <div key={item.label}>
-                <button
-                  onClick={() => toggleSection(item.label)}
-                  className={cn(
-                    "flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                    "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                    isChildActive && "text-sidebar-primary"
-                  )}
-                >
-                  <item.icon className="h-4 w-4" />
-                  <span className="flex-1 text-left">{item.label}</span>
-                  <ChevronDown
-                    className={cn("h-4 w-4 transition-transform", isExpanded && "rotate-180")}
-                  />
-                </button>
-                {isExpanded && (
-                  <div className="ml-4 mt-1 space-y-1">
-                    {item.children.map((child) => (
-                      <Link
-                        key={child.href}
-                        href={child.external ? child.href : withSiteId(child.href)}
-                        {...(child.external
-                          ? { target: "_blank", rel: "noopener noreferrer" }
-                          : {})}
-                        className={cn(
-                          "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
-                          "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                          !child.external && pathname.startsWith(child.href)
-                            ? "bg-sidebar-accent text-sidebar-primary font-medium"
-                            : "text-sidebar-foreground/70"
-                        )}
-                      >
-                        <child.icon className="h-4 w-4" />
-                        {child.label}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )
-          }
+        <div>
+          <p className="px-2.5 pb-1.5 text-[11px] font-semibold tracking-[0.12em] text-sidebar-foreground/45 uppercase">
+            Keywords
+          </p>
+          <ul className="space-y-0.5">{KEYWORDS.map((l) => item(l))}</ul>
+        </div>
 
-          return (
-            <Link
-              key={item.href}
-              href={withSiteId(item.href!)}
-              className={cn(
-                "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                pathname === item.href
-                  ? "bg-sidebar-accent text-sidebar-primary"
-                  : "text-sidebar-foreground/70"
-              )}
-            >
-              <item.icon className="h-4 w-4" />
-              {item.label}
-            </Link>
-          )
-        })}
+        <Collapsible label="Free tools" icon={Wrench} open={toolsOpen} onToggle={() => setToolsOpen((v) => !v)}>
+          {TOOL_LINKS.map((l) => item(l, true))}
+        </Collapsible>
+
+        <Collapsible label="Settings" icon={Settings} open={settingsOpen} onToggle={() => setSettingsOpen((v) => !v)}>
+          {SETTINGS.map((l) => item(l, true))}
+        </Collapsible>
       </nav>
 
-      {/* Usage counters — only show when user has some usage */}
       {usage && (usage.sitesUsed > 0 || usage.recsToday > 0) && (
-        <div className="border-t border-sidebar-border px-4 py-3 space-y-2.5">
-          <UsageCounter
-            icon={Globe}
-            label="Sites"
-            used={usage.sitesUsed}
-            limit={usage.sitesLimit}
-          />
-          <UsageCounter
-            icon={Sparkles}
-            label="AI recs today"
-            used={usage.recsToday}
-            limit={usage.recsLimit}
-          />
+        <div className="m-3 space-y-3 rounded-xl bg-sidebar-accent p-3 ring-1 ring-black/[0.05] dark:ring-white/[0.06]">
+          <UsageCounter icon={Globe} label="Sites" used={usage.sitesUsed} limit={usage.sitesLimit} />
+          <UsageCounter icon={Sparkles} label="AI plans today" used={usage.recsToday} limit={usage.recsLimit} />
           {(usage.sitesUsed >= usage.sitesLimit || usage.recsToday >= usage.recsLimit) && (
             <Link
               href={withSiteId("/settings/billing")}
-              className="block text-center text-[11px] text-sidebar-foreground/50 hover:text-sidebar-foreground/70 transition-colors"
+              className="block rounded-lg bg-ink py-1.5 text-center text-xs font-medium text-ink-foreground"
             >
               Upgrade for more
             </Link>
@@ -214,45 +150,65 @@ export function Sidebar({ className }: { className?: string }) {
   )
 }
 
+function Collapsible({
+  label,
+  icon: Icon,
+  open,
+  onToggle,
+  children,
+}: {
+  label: string
+  icon: NavIcon
+  open: boolean
+  onToggle: () => void
+  children: React.ReactNode
+}) {
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={open}
+        className="flex h-9 w-full items-center gap-2.5 rounded-lg px-2.5 text-sm text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground"
+      >
+        <Icon className="size-4" />
+        <span className="flex-1 text-left">{label}</span>
+        <ChevronDown className={cn("size-4 transition-transform", open && "rotate-180")} />
+      </button>
+      {open && <ul className="mt-0.5 ml-3 space-y-0.5 border-l border-sidebar-border pl-2">{children}</ul>}
+    </div>
+  )
+}
+
 function UsageCounter({
   icon: Icon,
   label,
   used,
   limit,
 }: {
-  icon: React.ComponentType<{ className?: string }>
+  icon: NavIcon
   label: string
   used: number
   limit: number
 }) {
-  const isUnlimited = limit >= 999
-  const remaining = isUnlimited ? null : limit - used
-  const pct = isUnlimited ? 0 : Math.min((used / limit) * 100, 100)
-
+  const unlimited = limit >= 999
+  const pct = unlimited ? 0 : Math.min((used / limit) * 100, 100)
   return (
-    <div className="space-y-1">
-      <div className="flex items-center justify-between text-[11px]">
+    <div className="space-y-1.5">
+      <div className="flex items-center justify-between text-xs">
         <span className="flex items-center gap-1.5 text-sidebar-foreground/60">
-          <Icon className="h-3 w-3" />
+          <Icon className="size-3.5" />
           {label}
         </span>
-        <span className="font-medium text-sidebar-foreground/80">
-          {isUnlimited ? `${used}` : `${remaining} left`}
-        </span>
+        <span className="font-medium tabular-nums">{unlimited ? used : `${used} / ${limit}`}</span>
       </div>
-      <div className="h-1 overflow-hidden rounded-full bg-sidebar-accent">
+      <div className="h-1.5 overflow-hidden rounded-full bg-muted">
         <div
           className={cn(
             "h-full rounded-full transition-all",
-            isUnlimited
-              ? "bg-sidebar-primary/40"
-              : pct >= 90
-                ? "bg-destructive"
-                : pct >= 70
-                  ? "bg-yellow-500"
-                  : "bg-sidebar-primary"
+            unlimited ? "bg-brand/40" : pct >= 90 ? "bg-critical" : pct >= 70 ? "bg-warning" : "bg-brand"
           )}
-          style={{ width: isUnlimited ? "5%" : `${pct}%` }}
+          style={{ width: unlimited ? "5%" : `${pct}%` }}
         />
       </div>
     </div>

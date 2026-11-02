@@ -28,19 +28,20 @@ export function DashboardShell({ user, sites, plan, daysRemaining, children }: D
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen overflow-hidden bg-sidebar">
       {/* Desktop sidebar */}
       <Sidebar className="hidden lg:flex" />
 
       {/* Mobile sidebar */}
       <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-        <SheetContent side="left" className="w-64 p-0">
+        <SheetContent side="left" className="w-60 border-0 p-0">
           <Sidebar />
         </SheetContent>
       </Sheet>
 
       {/* Main area */}
-      <div className="flex flex-1 flex-col overflow-hidden">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden lg:py-2 lg:pr-2">
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-background lg:rounded-2xl lg:shadow-[0_1px_3px_rgb(0_0_0/0.05)] lg:ring-1 lg:ring-black/[0.06] dark:lg:ring-white/[0.07]">
         <Header
           user={user}
           sites={sites}
@@ -48,9 +49,10 @@ export function DashboardShell({ user, sites, plan, daysRemaining, children }: D
           daysRemaining={daysRemaining}
           onToggleSidebar={() => setSidebarOpen(true)}
         />
-        <main className="flex-1 overflow-y-auto p-4 md:p-6">
-          {children}
+        <main className="flex-1 overflow-y-auto">
+          <div className="mx-auto w-full max-w-[1200px] px-4 py-6 md:px-8 md:py-8">{children}</div>
         </main>
+        </div>
       </div>
     </div>
   )

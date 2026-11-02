@@ -123,9 +123,9 @@ export default function RecommendationsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">AI Recommendations</h1>
-          <p className="text-sm text-muted-foreground">
-            AI-powered SEO recommendations for your striking distance keywords
+          <h1 className="font-heading text-3xl leading-tight font-semibold tracking-[-0.02em] md:text-[2.25rem]">Recommendations</h1>
+          <p className="mt-1.5 max-w-2xl text-[15px] text-muted-foreground">
+            Step-by-step plans for your striking-distance keywords, written from your own data.
           </p>
         </div>
         <Button onClick={handleGenerate} disabled={generating}>

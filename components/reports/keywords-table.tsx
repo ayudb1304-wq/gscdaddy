@@ -60,6 +60,7 @@ export function KeywordsTable({
   onPageChange,
 }: KeywordsTableProps) {
   const totalPages = Math.ceil(total / limit)
+  const maxScore = Math.max(1, ...data.map((r) => r.opportunityScore))
 
   if (data.length === 0) {
     return (
@@ -74,7 +75,7 @@ export function KeywordsTable({
 
   return (
     <div>
-      <div className="rounded-md border">
+      <div className="overflow-hidden rounded-2xl bg-card shadow-[0_1px_2px_rgb(0_0_0/0.04),0_8px_24px_-16px_rgb(0_0_0/0.12)] ring-1 ring-black/[0.06] dark:ring-white/[0.08]">
         <Table>
           <TableHeader>
             <TableRow>
@@ -101,23 +102,44 @@ export function KeywordsTable({
           <TableBody>
             {data.map((row) => (
               <TableRow key={`${row.query}-${row.page}`}>
-                <TableCell>
+                <TableCell className="py-3">
                   <div>
                     <p className="font-medium">{row.query}</p>
-                    <p className="text-xs text-muted-foreground truncate max-w-[300px]">
+                    <p className="max-w-[300px] truncate text-xs text-muted-foreground">
                       {formatPageUrl(row.page)}
                     </p>
                   </div>
                 </TableCell>
-                <TableCell className="font-mono">{row.avgPosition.toFixed(1)}</TableCell>
-                <TableCell className="font-mono">{row.impressions.toLocaleString()}</TableCell>
-                <TableCell className="font-mono">{row.clicks.toLocaleString()}</TableCell>
-                <TableCell className="font-mono">{(row.ctr * 100).toFixed(2)}%</TableCell>
-                <TableCell className="font-mono font-medium">{row.opportunityScore.toLocaleString()}</TableCell>
+                <TableCell>
+                  <span
+                    className={cn(
+                      "inline-flex min-w-12 justify-center rounded-md px-2 py-0.5 font-mono text-[13px] tabular-nums",
+                      row.avgPosition <= 10 ? "bg-ok-soft text-ok" : "bg-muted"
+                    )}
+                  >
+                    {row.avgPosition.toFixed(1)}
+                  </span>
+                </TableCell>
+                <TableCell className="font-mono text-[13px] tabular-nums">{row.impressions.toLocaleString()}</TableCell>
+                <TableCell className="font-mono text-[13px] tabular-nums">{row.clicks.toLocaleString()}</TableCell>
+                <TableCell className="font-mono text-[13px] tabular-nums">{(row.ctr * 100).toFixed(2)}%</TableCell>
+                <TableCell>
+                  <div className="flex min-w-36 items-center gap-2.5">
+                    <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
+                      <span
+                        className="block h-full rounded-full bg-brand"
+                        style={{ width: `${Math.round((row.opportunityScore / maxScore) * 100)}%` }}
+                      />
+                    </span>
+                    <span className="w-12 text-right font-mono text-[13px] tabular-nums">
+                      {row.opportunityScore.toLocaleString()}
+                    </span>
+                  </div>
+                </TableCell>
                 <TableCell>
                   <span className={cn(
                     "font-mono text-sm",
-                    row.estimatedTrafficGain > 0 ? "text-emerald-500" : "text-muted-foreground"
+                    row.estimatedTrafficGain > 0 ? "text-ok" : "text-muted-foreground"
                   )}>
                     +{row.estimatedTrafficGain.toLocaleString()}
                   </span>
