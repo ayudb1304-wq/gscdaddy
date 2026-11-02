@@ -35,6 +35,7 @@ export default async function DashboardLayout({
       sites={sites || []}
       plan={access.plan}
       daysRemaining={access.daysRemaining}
+      needsGoogleReconnect={user.google_auth_status === "reauth_required"}
     >
       <AccessGate hasAccess={access.hasAccess} showWelcome={showWelcome}>
         {children}

@@ -18,7 +18,8 @@ interface ChartDataPoint {
   date: string
   clicks: number
   impressions: number
-  position: number
+  /** null on days without impressions (drawn as a gap) */
+  position: number | null
 }
 
 type Metric = "clicks" | "impressions" | "position"

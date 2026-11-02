@@ -3,7 +3,7 @@ import { after } from "next/server"
 import { createServerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
 import { createAdminClient } from "@/lib/supabase/admin"
-import { storeTokens } from "@/lib/google/tokens"
+import { storeTokens, setGoogleAuthStatus } from "@/lib/google/tokens"
 import { sendEmail } from "@/lib/email/resend"
 import { WelcomeEmail } from "@/lib/email/templates/welcome"
 
@@ -97,6 +97,8 @@ export async function GET(request: Request) {
       providerRefreshToken || "",
       expiresAt
     )
+    // Fresh consent: clear any "reconnect Google" state.
+    await setGoogleAuthStatus(user.id, true)
   }
 
   // Send welcome email to new users (in background)

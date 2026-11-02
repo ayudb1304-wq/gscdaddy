@@ -4,6 +4,7 @@ import React from "react"
 import { Check, Pen, Users, Building2, Shield, Lock, RefreshCw, Globe, Loader2, Target, Sparkles, Mail, BarChart3, FileDown, TrendingUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { signInWithGoogle } from "@/app/login/actions"
 
 // ─── Progress Bar ────────────────────────────────────────────────
 
@@ -221,6 +222,7 @@ export function SitePickerStep({
   loading,
   selectingUrl = null,
   error = null,
+  reauth = false,
 }: {
   sites: AvailableSite[]
   onSelect: (siteUrl: string, permissionLevel: string) => void
@@ -229,7 +231,31 @@ export function SitePickerStep({
   /** The site currently being added (shows "Adding…" on it). */
   selectingUrl?: string | null
   error?: string | null
+  /** The error is a Google auth problem: offer to reconnect. */
+  reauth?: boolean
 }) {
+  if (sites.length === 0 && error) {
+    return (
+      <div className="mx-auto max-w-md text-center">
+        <h1 className="font-heading text-3xl font-semibold tracking-[-0.02em]">We couldn&apos;t load your sites</h1>
+        <p className="mt-2 text-[15px] text-muted-foreground">{error}</p>
+        {reauth && (
+          <form action={signInWithGoogle} className="mt-6">
+            <Button type="submit">Reconnect Google</Button>
+          </form>
+        )}
+        <div className="mt-4">
+          <button
+            onClick={onSkip}
+            className="text-xs text-muted-foreground underline underline-offset-2 transition-colors hover:text-foreground"
+          >
+            Skip and add later from Settings
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   if (sites.length === 0) {
     return (
       <div className="mx-auto max-w-md text-center">
@@ -325,7 +351,7 @@ export function CelebrationStep({
   syncStage,
   onGoToDashboard,
 }: {
-  syncStatus: "syncing" | "completed" | "timeout"
+  syncStatus: "syncing" | "completed" | "timeout" | "failed"
   syncStage: number
   onGoToDashboard: () => void
 }) {
@@ -355,6 +381,21 @@ export function CelebrationStep({
 
         <Button variant="outline" className="mt-8" onClick={onGoToDashboard}>
           Go to dashboard anyway
+        </Button>
+      </div>
+    )
+  }
+
+  if (syncStatus === "failed") {
+    return (
+      <div className="mx-auto max-w-md text-center">
+        <h1 className="font-heading text-3xl font-semibold tracking-[-0.02em]">Your first sync didn&apos;t finish</h1>
+        <p className="mt-2 text-[15px] text-muted-foreground">
+          Your site is added, but we couldn&apos;t pull its Search Console data yet. You can retry from your sites
+          settings; the daily sync will also try again.
+        </p>
+        <Button size="lg" className="mt-8 h-12 px-8 text-sm font-semibold" onClick={onGoToDashboard}>
+          Continue to GSCdaddy
         </Button>
       </div>
     )

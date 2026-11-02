@@ -15,7 +15,8 @@ export interface ShippedRec {
   }
   actual: {
     clicksPerDay: number
-    avgPosition: number
+    /** null when the keyword had no impressions after shipping */
+    avgPosition: number | null
     daysObserved: number
   } | null
 }
@@ -102,11 +103,17 @@ export function ShippedRecsBand({ items }: { items: ShippedRec[] }) {
                       <div>
                         <p className="text-muted-foreground">Position</p>
                         <div className="flex items-center justify-end gap-1.5">
-                          <span className="font-medium">{item.actual.avgPosition.toFixed(1)}</span>
-                          <DeltaChip
-                            delta={item.actual.avgPosition - item.baseline.avgPosition}
-                            inverse
-                          />
+                          {item.actual.avgPosition === null ? (
+                            <span className="font-medium text-muted-foreground">Not ranking</span>
+                          ) : (
+                            <>
+                              <span className="font-medium">{item.actual.avgPosition.toFixed(1)}</span>
+                              <DeltaChip
+                                delta={item.actual.avgPosition - item.baseline.avgPosition}
+                                inverse
+                              />
+                            </>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -114,8 +121,9 @@ export function ShippedRecsBand({ items }: { items: ShippedRec[] }) {
                     <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                       <Clock className="h-3 w-3" />
                       <span>
-                        Shipped {item.daysSinceShipped}d ago · checking in{" "}
-                        {Math.max(1, 3 - item.daysSinceShipped)}d
+                        {item.daysSinceShipped < 3
+                          ? `Shipped ${item.daysSinceShipped}d ago · checking in ${Math.max(1, 3 - item.daysSinceShipped)}d`
+                          : `Shipped ${item.daysSinceShipped}d ago · waiting for Search Console data (it runs 2-3 days behind)`}
                       </span>
                     </div>
                   )}

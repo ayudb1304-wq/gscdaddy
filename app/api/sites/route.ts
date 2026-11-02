@@ -2,14 +2,15 @@ import { z } from "zod"
 import { requireAuth } from "@/lib/auth"
 import { isSyncInProgress } from "@/lib/sync/gsc-sync"
 import { createAdminClient } from "@/lib/supabase/admin"
-import { getEffectivePlan } from "@/lib/billing/access"
-import { getPlanLimits } from "@/lib/billing/plans"
+import { getEffectivePlan, getUserLimits } from "@/lib/billing/access"
+import { getValidAccessToken } from "@/lib/google/tokens"
+import { listAvailableSites, GoogleAuthError } from "@/lib/google/search-console"
 import { successResponse, errors } from "@/lib/api/response"
 
 const addSiteSchema = z.object({
-  siteUrl: z.string().min(1),
-  displayName: z.string().optional(),
-  permissionLevel: z.string().optional(),
+  siteUrl: z.string().min(1).max(2048),
+  displayName: z.string().max(200).optional(),
+  permissionLevel: z.string().max(64).optional(),
 })
 
 export async function GET() {
@@ -43,19 +44,19 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const user = await requireAuth()
-    const body = await request.json()
+    const body = await request.json().catch(() => null)
     const parsed = addSiteSchema.safeParse(body)
 
     if (!parsed.success) {
       return errors.validation(parsed.error.issues[0].message)
     }
 
-    const { siteUrl, displayName, permissionLevel } = parsed.data
+    const { siteUrl, displayName } = parsed.data
     const admin = createAdminClient()
 
-    // Check plan limit
+    // Check plan limit (same limits the usage meter shows; trial = Pro)
     const plan = getEffectivePlan(user)
-    const limits = getPlanLimits(plan)
+    const limits = getUserLimits(user)
     const { count } = await admin
       .from("sites")
       .select("*", { count: "exact", head: true })
@@ -66,6 +67,16 @@ export async function POST(request: Request) {
         `Your ${plan} plan allows up to ${limits.sites} site(s). Please upgrade to add more.`
       )
     }
+
+    // Only properties this Google account can actually query. Anything else
+    // (unverified, typo, someone else's site) would fail every sync while
+    // taking a plan slot. Permission level comes from Google, not the client.
+    const gscSites = await listAvailableSites(await getValidAccessToken(user.id))
+    const property = gscSites.find((p) => p.siteUrl === siteUrl)
+    if (!property || property.permissionLevel === "siteUnverifiedUser") {
+      return errors.validation("That property isn't verified in your Google Search Console account.")
+    }
+    const permissionLevel = property.permissionLevel
 
     // Insert site
     const { data: site, error } = await admin
@@ -91,6 +102,7 @@ export async function POST(request: Request) {
   } catch (e) {
     const message = e instanceof Error ? e.message : "Unknown error"
     if (message === "UNAUTHORIZED") return errors.unauthorized()
+    if (e instanceof GoogleAuthError) return errors.googleReauth()
     console.error("Failed to add site:", message)
     return errors.internal("Failed to add site")
   }

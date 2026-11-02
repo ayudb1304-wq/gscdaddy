@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation"
 import { Sidebar } from "./sidebar"
 import { Header } from "./header"
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet"
+import { ReconnectBanner } from "./reconnect-banner"
 
 interface Site {
   id: string
@@ -22,10 +23,12 @@ interface DashboardShellProps {
   sites: Site[]
   plan: string
   daysRemaining?: number
+  /** Google rejected the stored credentials; show the reconnect banner. */
+  needsGoogleReconnect?: boolean
   children: React.ReactNode
 }
 
-export function DashboardShell({ user, sites, plan, daysRemaining, children }: DashboardShellProps) {
+export function DashboardShell({ user, sites, plan, daysRemaining, needsGoogleReconnect, children }: DashboardShellProps) {
   // Remember which page the mobile menu was opened on: navigating anywhere
   // else closes it (the shell persists across pages, so it used to stay open).
   const pathname = usePathname()
@@ -62,6 +65,7 @@ export function DashboardShell({ user, sites, plan, daysRemaining, children }: D
           daysRemaining={daysRemaining}
           onToggleSidebar={() => setSidebarOpen(true)}
         />
+        {needsGoogleReconnect && <ReconnectBanner />}
         <main className="flex-1 overflow-y-auto">
           <div className="mx-auto w-full max-w-[1200px] px-4 py-6 md:px-8 md:py-8">{children}</div>
         </main>

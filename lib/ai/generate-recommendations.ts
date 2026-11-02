@@ -4,6 +4,7 @@ import { z } from "zod/v4"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { SYSTEM_PROMPT, buildUserPrompt } from "./prompts"
 import { estimateTrafficGain } from "@/lib/algorithms/opportunity-score"
+import { logGeneration } from "@/lib/recommendations/quota"
 
 const RecommendationSchema = z.object({
   type: z.enum([
@@ -26,7 +27,15 @@ const RecommendationSchema = z.object({
 
 export const RECOMMENDATIONS_MODEL = "claude-sonnet-5-5"
 
-export async function generateRecommendations(siteId: string) {
+/** Most recommendations kept from one generation. */
+const MAX_RECS = 5
+/** Abort the model call before the 120s route limit. */
+const MODEL_TIMEOUT_MS = 100_000
+
+export async function generateRecommendations(
+  siteId: string,
+  { source = "auto" }: { source?: "manual" | "auto" } = {}
+) {
   const admin = createAdminClient()
 
   // Fetch site
@@ -100,6 +109,7 @@ export async function generateRecommendations(siteId: string) {
     // Sonnet 5.5 thinks by default and thinking counts toward this limit, so
     // leave room for it plus five recommendations.
     maxOutputTokens: 16000,
+    abortSignal: AbortSignal.timeout(MODEL_TIMEOUT_MS),
     providerOptions: {
       anthropic: {
         // This AI SDK version doesn't know Sonnet 5.5 and would fall back to a
@@ -113,27 +123,41 @@ export async function generateRecommendations(siteId: string) {
     },
   })
 
-  // Insert into DB
+  // Check the model's output against the data we sent. Its own numbers are not
+  // trusted: positions come from the input row, the target is clamped between
+  // #1 and the current position, the gain is recomputed, and recs for keywords
+  // that weren't in the input (or a re-normalised URL) are dropped, since they
+  // would break the shipped-fix baseline join.
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+  const byKey = new Map(keywordData.map((k: { query: string; page: string }) => [`${k.query}\u0000${k.page}`, k]))
 
-  const records = recommendations.map((rec) => ({
-    site_id: siteId,
-    type: rec.type,
-    query: rec.query,
-    page: rec.page,
-    current_position: rec.current_position,
-    potential_position: rec.potential_position,
-    // Column is INTEGER: a decimal from the model would fail the whole insert.
-    estimated_traffic_gain: Math.round(rec.estimated_traffic_gain) || estimateTrafficGain(
-      keywordData.find((k: { query: string; impressions: number }) => k.query === rec.query)?.impressions || 1000,
-      rec.current_position,
-      Math.round(rec.potential_position)
-    ),
-    recommendation_text: rec.recommendation_text,
-    action_items: rec.action_items,
-    priority: rec.priority,
-    expires_at: expiresAt,
-  }))
+  const records = recommendations
+    .map((rec) => {
+      const input = byKey.get(`${rec.query}\u0000${rec.page}`) as (typeof keywordData)[number] | undefined
+      if (!input) return null
+      const current = Math.round(input.avgPosition * 10) / 10
+      const target = Math.min(current, Math.max(1, Math.round(rec.potential_position)))
+      return {
+        site_id: siteId,
+        type: rec.type,
+        query: input.query,
+        page: input.page,
+        current_position: current,
+        potential_position: target,
+        estimated_traffic_gain: estimateTrafficGain(input.impressions, current, target),
+        recommendation_text: rec.recommendation_text,
+        action_items: rec.action_items,
+        priority: rec.priority,
+        expires_at: expiresAt,
+      }
+    })
+    .filter((r): r is NonNullable<typeof r> => r !== null)
+    .slice(0, MAX_RECS)
+
+  if (records.length === 0) {
+    console.warn(`Model returned no usable recommendations for site ${siteId} (${recommendations.length} raw)`)
+    return []
+  }
 
   const { data: inserted, error: insertError } = await admin
     .from("recommendations")
@@ -144,6 +168,7 @@ export async function generateRecommendations(siteId: string) {
     throw new Error(`Failed to save recommendations: ${insertError.message}`)
   }
 
+  await logGeneration(admin, { userId: site.user_id, siteId, source, recCount: inserted?.length ?? 0 })
   console.log(`Generated ${inserted?.length || 0} recommendations for site ${siteId}`)
   return inserted
 }

@@ -26,7 +26,8 @@ export default function OnboardingPage() {
   const [showSitePicker, setShowSitePicker] = useState(false)
   const [selectingUrl, setSelectingUrl] = useState<string | null>(null)
   const [siteError, setSiteError] = useState<string | null>(null)
-  const [syncStatus, setSyncStatus] = useState<"syncing" | "completed" | "timeout">("syncing")
+  const [syncStatus, setSyncStatus] = useState<"syncing" | "completed" | "timeout" | "failed">("syncing")
+  const [connectReauth, setConnectReauth] = useState(false)
   const [syncStage, setSyncStage] = useState(0)
 
   // ─── Step 2: Persona ────────────────────────────────
@@ -51,13 +52,22 @@ export default function OnboardingPage() {
     setLoading(true)
     try {
       const res = await fetch("/api/sites/available")
-      const json = await res.json()
-      if (json.success) {
+      const json = await res.json().catch(() => null)
+      if (json?.success) {
         setAvailableSites(json.data)
-        setShowSitePicker(true)
+        setSiteError(null)
+      } else {
+        // Used to do nothing visible (e.g. the Search Console box was unticked
+        // on Google's consent screen, or access was revoked).
+        setAvailableSites([])
+        setSiteError(json?.error?.message || "Couldn't load your Search Console sites. Try again.")
+        setConnectReauth(json?.error?.code === "GOOGLE_REAUTH_REQUIRED")
       }
+      setShowSitePicker(true)
     } catch (e) {
       console.error("Failed to fetch sites:", e)
+      setSiteError("Couldn't reach the server. Check your connection and try again.")
+      setShowSitePicker(true)
     } finally {
       setLoading(false)
     }
@@ -77,9 +87,10 @@ export default function OnboardingPage() {
       const json = await res.json().catch(() => null)
       if (json?.success) {
         // Trigger sync
-        await fetch(`/api/sites/${json.data.id}/sync`, { method: "POST" })
+        const syncRes = await fetch(`/api/sites/${json.data.id}/sync`, { method: "POST" }).catch(() => null)
         setStep(4)
-        startSyncProgress()
+        if (syncRes?.ok) startSyncProgress()
+        else setSyncStatus("failed")
       } else {
         // Used to fail silently: the button just re-enabled.
         setSiteError(json?.error?.message || "Couldn't add that site. Try again.")
@@ -98,21 +109,18 @@ export default function OnboardingPage() {
     setSyncStatus("syncing")
     setSyncStage(0)
 
-    // Advance stages over time
+    // Animate the early stages; only the real sync status completes it (it used
+    // to declare "ready" after 13 seconds no matter what happened).
     const stages = [
       setTimeout(() => setSyncStage(1), 2000),
       setTimeout(() => setSyncStage(2), 5000),
       setTimeout(() => setSyncStage(3), 9000),
-      setTimeout(() => {
-        setSyncStage(4)
-        setSyncStatus("completed")
-      }, 13000),
     ]
 
-    // Timeout fallback after 30s
+    // After 3 minutes, stop waiting on this screen; the sync carries on.
     const timeout = setTimeout(() => {
       setSyncStatus((prev) => (prev === "syncing" ? "timeout" : prev))
-    }, 30000)
+    }, 180_000)
 
     return () => {
       stages.forEach(clearTimeout)
@@ -133,6 +141,8 @@ export default function OnboardingPage() {
           if (site.sync_status === "completed") {
             setSyncStage(4)
             setSyncStatus("completed")
+          } else if (site.sync_status === "failed") {
+            setSyncStatus("failed")
           }
         }
       } catch {
@@ -203,6 +213,7 @@ export default function OnboardingPage() {
               loading={loading}
               selectingUrl={selectingUrl}
               error={siteError}
+              reauth={connectReauth}
             />
           )}
 
